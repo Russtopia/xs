@@ -298,7 +298,7 @@ func doCopyMode(conn *hkexnet.Conn, remoteDest bool, files string, rec *hkexsh.S
 					if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
 						exitStatus = uint32(status.ExitStatus())
 						fmt.Print(stdErrBuffer)
-						fmt.Printf("Exit Status: %d\n", exitStatus) //#
+						//fmt.Printf("Exit Status: %d\n", exitStatus) //#
 					}
 				}
 			}
@@ -367,7 +367,7 @@ func doCopyMode(conn *hkexnet.Conn, remoteDest bool, files string, rec *hkexsh.S
 					// an ExitStatus() method with the same signature.
 					if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
 						exitStatus = uint32(status.ExitStatus())
-						log.Printf("Exit Status: %d", exitStatus)
+						//log.Printf("Exit Status: %d", exitStatus)
 					}
 				}
 			}

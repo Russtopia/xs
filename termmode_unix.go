@@ -3,6 +3,7 @@
 package hkexsh
 
 import (
+	"errors"
 	"io"
 
 	unix "golang.org/x/sys/unix"
@@ -67,7 +68,11 @@ func GetState(fd int) (*State, error) {
 // Restore restores the terminal connected to the given file descriptor to a
 // previous state.
 func Restore(fd int, state *State) error {
-	return unix.IoctlSetTermios(fd, ioctlWriteTermios, &state.termios)
+	if state != nil {
+		return unix.IoctlSetTermios(fd, ioctlWriteTermios, &state.termios)
+	} else {
+		return errors.New("nil State")
+	}
 }
 
 // ReadPassword reads a line of input from a terminal without local echo.  This
