@@ -115,8 +115,6 @@ func copyBuffer(dst io.Writer, src io.Reader, buf []byte) (written int64, err er
 	// or tunnel traffic indicator - note we cannot just spawn a goroutine
 	// here, as copyBuffer() returns after each burst of data. Scope must
 	// outlive individual copyBuffer calls).
-	// (Note that since this custom copyBuffer func is used only by
-	// the hkexsh client, it should eventually be moved to client.)
 	escs := escSeqs{
 		'i': func(io.Writer) { os.Stdout.Write([]byte("\x1b[s\x1b[2;1H\x1b[1;31m[HKEXSH]\x1b[39;49m\x1b[u")) },
 		't': func(io.Writer) { os.Stdout.Write([]byte("\x1b[1;32m[HKEXSH]\x1b[39;49m")) },
