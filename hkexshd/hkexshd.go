@@ -387,7 +387,7 @@ func main() {
 
 	flag.BoolVar(&vopt, "v", false, "show version")
 	flag.StringVar(&laddr, "l", ":2000", "interface[:port] to listen")
-	flag.BoolVar(&chaffEnabled, "e", true, "enabled chaff pkts")
+	flag.BoolVar(&chaffEnabled, "e", true, "enable chaff pkts")
 	flag.UintVar(&chaffFreqMin, "f", 100, "chaff pkt freq min (msecs)")
 	flag.UintVar(&chaffFreqMax, "F", 5000, "chaff pkt freq max (msecs)")
 	flag.UintVar(&chaffBytesMax, "B", 64, "chaff pkt size max (bytes)")

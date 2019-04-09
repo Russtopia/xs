@@ -49,6 +49,7 @@ import (
 	"blitter.com/go/herradurakex"
 	"blitter.com/go/hkexsh/logger"
 	kyber "git.schwanenlied.me/yawning/kyber.git"
+	newhope "git.schwanenlied.me/yawning/newhope.git"
 )
 
 /*---------------------------------------------------------------------*/
@@ -197,6 +198,12 @@ func getkexalgnum(extensions ...string) (k KEXAlg) {
 		case "KEX_KYBER1024":
 			k = KEX_KYBER1024
 			break //out of for
+		case "KEX_NEWHOPE":
+			k = KEX_NEWHOPE
+			break //out of for
+		case "KEX_NEWHOPE_SIMPLE":
+			k = KEX_NEWHOPE_SIMPLE
+			break //out of for
 		}
 	}
 	return
@@ -227,12 +234,16 @@ func _new(kexAlg KEXAlg, conn *net.Conn) (hc *Conn, e error) {
 	case KEX_HERRADURA1024:
 		fallthrough
 	case KEX_HERRADURA2048:
-		log.Printf("[KEx alg %d accepted]\n", kexAlg)
+		fallthrough
 	case KEX_KYBER512:
 		fallthrough
 	case KEX_KYBER768:
 		fallthrough
 	case KEX_KYBER1024:
+		fallthrough
+	case KEX_NEWHOPE:
+		fallthrough
+	case KEX_NEWHOPE_SIMPLE:
 		log.Printf("[KEx alg %d accepted]\n", kexAlg)
 	default:
 		// UNREACHABLE: _getkexalgnum() guarantees a valid KEX value
@@ -276,7 +287,7 @@ func (hc *Conn) applyConnExtensions(extensions ...string) {
 }
 
 // randReader wraps rand.Read() in a struct that implements io.Reader
-// for use by the Kyber KEM methods.
+// for use by the Kyber and NEWHOPE/NEWHOPE_SIMPLE KEM methods.
 type randReader struct {
 }
 
@@ -285,11 +296,101 @@ func (r randReader) Read(b []byte) (n int, e error) {
 	return
 }
 
+func NewHopeDialSetup(c io.ReadWriter, hc *Conn) (err error) {
+	// Send hkexnet.Conn parameters to remote side
+
+	// Alice, step 1: Generate a key pair.
+	r := new(randReader)
+	rand.Seed(time.Now().UnixNano())
+	
+	privKeyAlice, pubKeyAlice, err := newhope.GenerateKeyPairAlice(r)
+	if err != nil {
+		panic(err)
+	}
+
+	// Alice, step 2: Send the public key to Bob
+	fmt.Fprintf(c, "0x%x\n0x%x:0x%x\n", pubKeyAlice.Send,
+		hc.cipheropts, hc.opts)
+
+	// [Bob does step 1-3], from which we read Bob's pubkey
+	publicKeyBob := big.NewInt(0)
+	fmt.Fscanf(c, "0x%x\n", publicKeyBob)
+	var pubKeyBob newhope.PublicKeyBob
+	for i := range(pubKeyBob.Send) {
+			pubKeyBob.Send[i] = publicKeyBob.Bytes()[i]
+	}
+	log.Printf("[Got server pubKey[]:%v]\n", pubKeyBob)
+
+	// Read cipheropts, session opts
+	_, err = fmt.Fscanf(c, "0x%x:0x%x\n",
+		&hc.cipheropts, &hc.opts)
+	if err != nil {
+		return err
+	}
+
+	// Alice, step 3: Derive shared secret
+	// (NOTE: actual over-wire exchange was already done above. This is
+	//  the math voodoo 'exchange' done after receiving data from Bob.)
+	aliceSharedSecret, err := newhope.KeyExchangeAlice(&pubKeyBob, privKeyAlice)
+	if err != nil {
+		panic(err)
+	}
+	log.Printf("[Derived sharedSecret:0x%x]\n", aliceSharedSecret)
+	hc.r, hc.rm, err = hc.getStream(aliceSharedSecret)
+	hc.w, hc.wm, err = hc.getStream(aliceSharedSecret)
+	return
+}
+
+func NewHopeSimpleDialSetup(c io.ReadWriter, hc *Conn) (err error) {
+	// Send hkexnet.Conn parameters to remote side
+
+	// Alice, step 1: Generate a key pair.
+	r := new(randReader)
+	rand.Seed(time.Now().UnixNano())
+	privKeyAlice, pubKeyAlice, err := newhope.GenerateKeyPairSimpleAlice(r)
+	if err != nil {
+		panic(err)
+	}
+
+	// Alice, step 2: Send the public key to Bob
+	fmt.Fprintf(c, "0x%x\n0x%x:0x%x\n", pubKeyAlice.Send,
+		hc.cipheropts, hc.opts)
+
+	// [Bob does step 1-3], from which we read Bob's pubkey
+	publicKeyBob := big.NewInt(0)
+	fmt.Fscanf(c, "0x%x\n", publicKeyBob)
+	var pubKeyBob newhope.PublicKeySimpleBob
+	for i := range(pubKeyBob.Send) {
+			pubKeyBob.Send[i] = publicKeyBob.Bytes()[i]
+	}
+	log.Printf("[Got server pubKey[]:%v]\n", pubKeyBob)
+
+	// Read cipheropts, session opts
+	_, err = fmt.Fscanf(c, "0x%x:0x%x\n",
+		&hc.cipheropts, &hc.opts)
+	if err != nil {
+		return err
+	}
+
+	// Alice, step 3: Derive shared secret
+	// (NOTE: actual over-wire exchange was already done above. This is
+	//  the math voodoo 'exchange' done after receiving data from Bob.)
+	aliceSharedSecret, err := newhope.KeyExchangeSimpleAlice(&pubKeyBob, privKeyAlice)
+	if err != nil {
+		panic(err)
+	}
+	log.Printf("[Derived sharedSecret:0x%x]\n", aliceSharedSecret)
+	hc.r, hc.rm, err = hc.getStream(aliceSharedSecret)
+	hc.w, hc.wm, err = hc.getStream(aliceSharedSecret)
+	return
+}
+
 func KyberDialSetup(c io.ReadWriter /*net.Conn*/, hc *Conn) (err error) {
 	// Send hkexnet.Conn parameters to remote side
 
 	// Alice, step 1: Generate a key pair.
 	r := new(randReader)
+	rand.Seed(time.Now().UnixNano())
 	var alicePublicKey *kyber.PublicKey
 	var alicePrivateKey *kyber.PrivateKey
 	switch hc.kex {
@@ -312,12 +413,12 @@ func KyberDialSetup(c io.ReadWriter /*net.Conn*/, hc *Conn) (err error) {
 		hc.cipheropts, hc.opts)
 
 	// [Bob, step 1-3], from which we read cipher text
-	cipherB := make([]byte, 4096)
-	fmt.Fscanf(c, "0x%x\n", &cipherB)
+	pubKeyB := make([]byte, 4096)
+	fmt.Fscanf(c, "0x%x\n", &pubKeyB)
 	//if err != nil {
 	//	return err
 	//}
-	log.Printf("[Got server ciphertext[]:%v]\n", cipherB)
+	log.Printf("[Got server pubKeyB[]:%v]\n", pubKeyB)
 
 	// Read cipheropts, session opts
 	_, err = fmt.Fscanf(c, "0x%x:0x%x\n",
@@ -327,7 +428,7 @@ func KyberDialSetup(c io.ReadWriter /*net.Conn*/, hc *Conn) (err error) {
 	}
 
 	// Alice, step 3: Decrypt the KEM cipher text.
-	aliceSharedSecret := alicePrivateKey.KEMDecrypt(cipherB)
+	aliceSharedSecret := alicePrivateKey.KEMDecrypt(pubKeyB)
 
 	log.Printf("[Derived sharedSecret:0x%x]\n", aliceSharedSecret)
 	hc.r, hc.rm, err = hc.getStream(aliceSharedSecret)
@@ -378,6 +479,84 @@ func HKExDialSetup(c io.ReadWriter /*net.Conn*/, hc *Conn) (err error) {
 	return
 }
 
+func NewHopeAcceptSetup(c *net.Conn, hc *Conn) (err error) {
+	r := new(randReader)
+	rand.Seed(time.Now().UnixNano())
+	// Bob, step 1: Deserialize Alice's public key from the binary encoding.
+	alicePublicKey := big.NewInt(0)
+	_, err = fmt.Fscanln(*c, alicePublicKey)
+	log.Printf("[Got client pubKey:0x%x\n]", alicePublicKey)
+	if err != nil {
+		return err
+	}
+
+	var pubKeyAlice newhope.PublicKeyAlice
+	for i := range(pubKeyAlice.Send) {
+			pubKeyAlice.Send[i] = alicePublicKey.Bytes()[i]
+	}
+	
+	_, err = fmt.Fscanf(*c, "0x%x:0x%x\n",
+		&hc.cipheropts, &hc.opts)
+	log.Printf("[Got cipheropts, opts:%v, %v]", hc.cipheropts, hc.opts)
+	if err != nil {
+		return err
+	}
+
+	// Bob, step 2: Generate the KEM cipher text and shared secret.
+	pubKeyBob, bobSharedSecret, err := newhope.KeyExchangeBob(r, &pubKeyAlice)
+	if err != nil {
+		panic(err)
+	}
+
+	// Bob, step 3: Send the cipher text to Alice.
+	fmt.Fprintf(*c, "0x%x\n0x%x:0x%x\n", pubKeyBob.Send,
+		hc.cipheropts, hc.opts)
+
+	log.Printf("[Derived sharedSecret:0x%x]\n", bobSharedSecret)
+	hc.r, hc.rm, err = hc.getStream(bobSharedSecret)
+	hc.w, hc.wm, err = hc.getStream(bobSharedSecret)
+	return
+}
+
+func NewHopeSimpleAcceptSetup(c *net.Conn, hc *Conn) (err error) {
+	r := new(randReader)
+	rand.Seed(time.Now().UnixNano())
+	// Bob, step 1: Deserialize Alice's public key from the binary encoding.
+	alicePublicKey := big.NewInt(0)
+	_, err = fmt.Fscanln(*c, alicePublicKey)
+	log.Printf("[Got client pubKey:0x%x\n]", alicePublicKey)
+	if err != nil {
+		return err
+	}
+
+	var pubKeyAlice newhope.PublicKeySimpleAlice
+	for i := range(pubKeyAlice.Send) {
+			pubKeyAlice.Send[i] = alicePublicKey.Bytes()[i]
+	}
+	
+	_, err = fmt.Fscanf(*c, "0x%x:0x%x\n",
+		&hc.cipheropts, &hc.opts)
+	log.Printf("[Got cipheropts, opts:%v, %v]", hc.cipheropts, hc.opts)
+	if err != nil {
+		return err
+	}
+
+	// Bob, step 2: Generate the KEM cipher text and shared secret.
+	pubKeyBob, bobSharedSecret, err := newhope.KeyExchangeSimpleBob(r, &pubKeyAlice)
+	if err != nil {
+		panic(err)
+	}
+
+	// Bob, step 3: Send the cipher text to Alice.
+	fmt.Fprintf(*c, "0x%x\n0x%x:0x%x\n", pubKeyBob.Send,
+		hc.cipheropts, hc.opts)
+
+	log.Printf("[Derived sharedSecret:0x%x]\n", bobSharedSecret)
+	hc.r, hc.rm, err = hc.getStream(bobSharedSecret)
+	hc.w, hc.wm, err = hc.getStream(bobSharedSecret)
+	return
+}
+
 func KyberAcceptSetup(c *net.Conn, hc *Conn) (err error) {
 	// Bob, step 1: Deserialize Alice's public key from the binary encoding.
 	alicePublicKey := big.NewInt(0)
@@ -411,13 +590,13 @@ func KyberAcceptSetup(c *net.Conn, hc *Conn) (err error) {
 
 	// Bob, step 2: Generate the KEM cipher text and shared secret.
 	r := new(randReader)
+	rand.Seed(time.Now().UnixNano())
 	cipherText, bobSharedSecret, err := peerPublicKey.KEMEncrypt(r)
 	if err != nil {
 		panic(err)
 	}
 
 	// Bob, step 3: Send the cipher text to Alice.
-	//fmt.Println("cipherText:",cipherText)
 	fmt.Fprintf(*c, "0x%x\n0x%x:0x%x\n", cipherText,
 		hc.cipheropts, hc.opts)
 
@@ -523,6 +702,16 @@ func Dial(protocol string, ipport string, extensions ...string) (hc Conn, err er
 	case KEX_KYBER1024:
 		log.Printf("[Setting up for KEX_KYBER %d]\n", hc.kex)
 		if KyberDialSetup(c, &hc) != nil {
+			return Conn{}, nil
+		}
+	case KEX_NEWHOPE:
+		log.Printf("[Setting up for KEX_NEWHOPE %d]\n", hc.kex)
+		if NewHopeDialSetup(c, &hc) != nil {
+			return Conn{}, nil
+		}
+	case KEX_NEWHOPE_SIMPLE:
+		log.Printf("[Setting up for KEX_NEWHOPE_SIMPLE %d]\n", hc.kex)
+		if NewHopeSimpleDialSetup(c, &hc) != nil {
 			return Conn{}, nil
 		}
 	default:
@@ -684,6 +873,16 @@ func (hl *HKExListener) Accept() (hc Conn, err error) {
 	case KEX_KYBER1024:
 		log.Printf("[Setting up for KEX_KYBER %d]\n", hc.kex)
 		if KyberAcceptSetup(&c, &hc) != nil {
+			return Conn{}, err
+		}
+	case KEX_NEWHOPE:
+		log.Printf("[Setting up for KEX_NEWHOPE %d]\n", hc.kex)
+		if NewHopeAcceptSetup(&c, &hc) != nil {
+			return Conn{}, err
+		}
+	case KEX_NEWHOPE_SIMPLE:
+		log.Printf("[Setting up for KEX_NEWHOPE_SIMPLE %d]\n", hc.kex)
+		if NewHopeSimpleAcceptSetup(&c, &hc) != nil {
 			return Conn{}, err
 		}
 	default:

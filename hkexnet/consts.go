@@ -20,8 +20,8 @@ const (
 	KEX_KYBER768
 	KEX_KYBER1024
 	KEX_resvd11
-	KEX_resvd12
-	KEX_resvd13
+	KEX_NEWHOPE
+	KEX_NEWHOPE_SIMPLE  // 'NewHopeLP-Simple' - https://eprint.iacr.org/2016/1157
 	KEX_resvd14
 	KEX_resvd15
 )
