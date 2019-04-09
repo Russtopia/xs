@@ -9,8 +9,8 @@ remote shell client and server, similar in role to ssh, offering
 encrypted interactive and non-interactive sessions, file copying and tunnels with traffic obfuscation ('chaffing').
 
 ***
-
-**NOTE: Due to the experimental nature of the HerraduraKEx and Kyber IND-CCA-2 algorithms, and the novelty of the overall codebase, this package SHOULD BE CONSIDERED EXTREMELY EXPERIMENTAL and USED WITH CAUTION. It DEFINITELY SHOULD NOT be used for any sensitive applications. USE AT YOUR OWN RISK. NEITHER WARRANTY NOR CLAIM OF FITNESS FOR PURPOSE IS EXPRESSED OR IMPLIED.**
+newhopecrypto.org](https://www.newhopecrypto.org/) :: [Yawning/go-newhope golang implementation](
+**NOTE: Due to the experimental nature of the KEX/KEM algorithms used, and the novelty of the overall codebase, this package SHOULD BE CONSIDERED EXTREMELY EXPERIMENTAL and USED WITH CAUTION. It DEFINITELY SHOULD NOT be used for any sensitive applications. USE AT YOUR OWN RISK. NEITHER WARRANTY NOR CLAIM OF FITNESS FOR PURPOSE IS EXPRESSED OR IMPLIED.**
 
 ***
 
@@ -25,6 +25,8 @@ Currently supported exchanges are:
 * The HerraduraKEx key exchange algorithm first released at
 [Omar Elejandro Herrera Reyna's HerraduraKEx project](http://github.com/Caume/HerraduraKEx);
 * The KYBER IND-CCA-2 secure key encapsulation mechanism, [pq-crystals Kyber](https://pq-crystals.org/kyber/)  :: [Yawning/kyber golang implementation](https://git.schwanenlied.me/yawning/kyber)
+* The NEWHOPE algorithm [newhopecrypto.org](https://www.newhopecrypto.org/) :: [Yawning/go-newhope golang implementation](https://git.schwanenlied.me/yawning/newhope)
+
 
 Currently supported session algorithms:
 
@@ -72,6 +74,7 @@ Dependencies:
 * [github.com/jameskeane/bcrypt](http://github.com/jameskeane/bcrypt) //password storage/auth
 * [blitter.com/go/goutmp](https://gogs.blitter.com/RLabs/goutmp) // wtmp/lastlog C bindings
 * [https://git.schwanenlied.me/yawning/kyber](https://git.schwanenlied.me/yawning/kyber) // golang Kyber KEM
+* [https://git.schwanenlied.me/yawning/newhope](https://git.schwanenlied.me/yawning/newhope) // golang NEWHOPE,NEWHOPE-SIMPLE KEX
 * [blitter.com/go/mtwist](https://gogs.blitter.com/RLabs/mtwist) // 64-bit Mersenne Twister PRNG
 * [blitter.com/go/cryptmt](https://gogs.blitter.com/RLabs/cryptmt) // CryptMTv1 stream cipher
 
