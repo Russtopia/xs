@@ -9,7 +9,6 @@ remote shell client and server, similar in role to ssh, offering
 encrypted interactive and non-interactive sessions, file copying and tunnels with traffic obfuscation ('chaffing').
 
 ***
-newhopecrypto.org](https://www.newhopecrypto.org/) :: [Yawning/go-newhope golang implementation](
 **NOTE: Due to the experimental nature of the KEX/KEM algorithms used, and the novelty of the overall codebase, this package SHOULD BE CONSIDERED EXTREMELY EXPERIMENTAL and USED WITH CAUTION. It DEFINITELY SHOULD NOT be used for any sensitive applications. USE AT YOUR OWN RISK. NEITHER WARRANTY NOR CLAIM OF FITNESS FOR PURPOSE IS EXPRESSED OR IMPLIED.**
 
 ***
