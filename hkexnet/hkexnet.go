@@ -9,13 +9,12 @@
 
 package hkexnet
 
-// TODO:
-// If key exchange algs other than the experimental HerraduraKEx are to
-// be supported, the Dial() and Accept() methods should take a kex param,
-// specifying which to use; and the client/server negotiation must then
-// prefix the channel setup with this param over the wire in order to decide
-// which is in use.
-//
+// Implementation of HKEx-wrapped versions of the golang standard
+// net package interfaces, allowing clients and servers to simply replace
+// 'net.Dial' and 'net.Listen' with 'hkex.Dial' and 'hkex.Listen'
+// (though some extra methods are implemented and must be used
+//  for things outside of the scope of plain sockets).
+
 // DESIGN PRINCIPLE: There shall be no protocol features which enable
 // downgrade attacks. The server shall have final authority to accept or
 // reject any and all proposed KEx and connection parameters proposed by
@@ -23,11 +22,6 @@ package hkexnet
 // with possibly a status code sent so client can determine why connection
 // was denied (compare to how failed auth is communicated to client).
 
-// Implementation of HKEx-wrapped versions of the golang standard
-// net package interfaces, allowing clients and servers to simply replace
-// 'net.Dial' and 'net.Listen' with 'hkex.Dial' and 'hkex.Listen'
-// (though some extra methods are implemented and must be used
-//  for things outside of the scope of plain sockets).
 import (
 	"bytes"
 	"crypto/cipher"
@@ -173,42 +167,6 @@ func (hc *Conn) SetOpts(opts uint32) {
 	hc.opts = opts
 }
 
-func getkexalgnum(extensions ...string) (k KEXAlg) {
-	k = KEX_HERRADURA256 // default
-	for _, s := range extensions {
-		switch s {
-		case "KEX_HERRADURA256":
-			k = KEX_HERRADURA256
-			break //out of for
-		case "KEX_HERRADURA512":
-			k = KEX_HERRADURA512
-			break //out of for
-		case "KEX_HERRADURA1024":
-			k = KEX_HERRADURA1024
-			break //out of for
-		case "KEX_HERRADURA2048":
-			k = KEX_HERRADURA2048
-			break //out of for
-		case "KEX_KYBER512":
-			k = KEX_KYBER512
-			break //out of for
-		case "KEX_KYBER768":
-			k = KEX_KYBER768
-			break //out of for
-		case "KEX_KYBER1024":
-			k = KEX_KYBER1024
-			break //out of for
-		case "KEX_NEWHOPE":
-			k = KEX_NEWHOPE
-			break //out of for
-		case "KEX_NEWHOPE_SIMPLE":
-			k = KEX_NEWHOPE_SIMPLE
-			break //out of for
-		}
-	}
-	return
-}
-
 // Return a new hkexnet.Conn
 //
 // Note this is internal: use Dial() or Accept()
@@ -253,6 +211,26 @@ func _new(kexAlg KEXAlg, conn *net.Conn) (hc *Conn, e error) {
 	return
 }
 
+// applyConnExtensions processes optional Dial() negotiation
+// parameters. See also getkexalgnum().
+//
+// Currently defined extension values
+//
+// KEx algs
+//
+// KEX_HERRADURA256 KEX_HERRADURA512 KEX_HERRADURA1024 KEX_HERRADURA2048
+//
+// KEX_KYBER512 KEX_KYBER768 KEX_KYBER1024
+//
+// KEX_NEWHOPE KEX_NEWHOPE_SIMPLE
+//
+// Session (symmetric) crypto
+//
+// C_AES_256 C_TWOFISH_128 C_BLOWFISH_128 C_CRYPTMT1
+//
+// Session HMACs
+//
+// H_SHA256 H_SHA512
 func (hc *Conn) applyConnExtensions(extensions ...string) {
 	for _, s := range extensions {
 		switch s {
@@ -286,6 +264,42 @@ func (hc *Conn) applyConnExtensions(extensions ...string) {
 	}
 }
 
+func getkexalgnum(extensions ...string) (k KEXAlg) {
+	k = KEX_HERRADURA256 // default
+	for _, s := range extensions {
+		switch s {
+		case "KEX_HERRADURA256":
+			k = KEX_HERRADURA256
+			break //out of for
+		case "KEX_HERRADURA512":
+			k = KEX_HERRADURA512
+			break //out of for
+		case "KEX_HERRADURA1024":
+			k = KEX_HERRADURA1024
+			break //out of for
+		case "KEX_HERRADURA2048":
+			k = KEX_HERRADURA2048
+			break //out of for
+		case "KEX_KYBER512":
+			k = KEX_KYBER512
+			break //out of for
+		case "KEX_KYBER768":
+			k = KEX_KYBER768
+			break //out of for
+		case "KEX_KYBER1024":
+			k = KEX_KYBER1024
+			break //out of for
+		case "KEX_NEWHOPE":
+			k = KEX_NEWHOPE
+			break //out of for
+		case "KEX_NEWHOPE_SIMPLE":
+			k = KEX_NEWHOPE_SIMPLE
+			break //out of for
+		}
+	}
+	return
+}
+
 // randReader wraps rand.Read() in a struct that implements io.Reader
 // for use by the Kyber and NEWHOPE/NEWHOPE_SIMPLE KEM methods.
 type randReader struct {
@@ -302,7 +316,7 @@ func NewHopeDialSetup(c io.ReadWriter, hc *Conn) (err error) {
 	// Alice, step 1: Generate a key pair.
 	r := new(randReader)
 	rand.Seed(time.Now().UnixNano())
-	
+
 	privKeyAlice, pubKeyAlice, err := newhope.GenerateKeyPairAlice(r)
 	if err != nil {
 		panic(err)
@@ -316,8 +330,8 @@ func NewHopeDialSetup(c io.ReadWriter, hc *Conn) (err error) {
 	publicKeyBob := big.NewInt(0)
 	fmt.Fscanf(c, "0x%x\n", publicKeyBob)
 	var pubKeyBob newhope.PublicKeyBob
-	for i := range(pubKeyBob.Send) {
-			pubKeyBob.Send[i] = publicKeyBob.Bytes()[i]
+	for i := range pubKeyBob.Send {
+		pubKeyBob.Send[i] = publicKeyBob.Bytes()[i]
 	}
 	log.Printf("[Got server pubKey[]:%v]\n", pubKeyBob)
 
@@ -360,8 +374,8 @@ func NewHopeSimpleDialSetup(c io.ReadWriter, hc *Conn) (err error) {
 	publicKeyBob := big.NewInt(0)
 	fmt.Fscanf(c, "0x%x\n", publicKeyBob)
 	var pubKeyBob newhope.PublicKeySimpleBob
-	for i := range(pubKeyBob.Send) {
-			pubKeyBob.Send[i] = publicKeyBob.Bytes()[i]
+	for i := range pubKeyBob.Send {
+		pubKeyBob.Send[i] = publicKeyBob.Bytes()[i]
 	}
 	log.Printf("[Got server pubKey[]:%v]\n", pubKeyBob)
 
@@ -491,10 +505,10 @@ func NewHopeAcceptSetup(c *net.Conn, hc *Conn) (err error) {
 	}
 
 	var pubKeyAlice newhope.PublicKeyAlice
-	for i := range(pubKeyAlice.Send) {
-			pubKeyAlice.Send[i] = alicePublicKey.Bytes()[i]
+	for i := range pubKeyAlice.Send {
+		pubKeyAlice.Send[i] = alicePublicKey.Bytes()[i]
 	}
-	
+
 	_, err = fmt.Fscanf(*c, "0x%x:0x%x\n",
 		&hc.cipheropts, &hc.opts)
 	log.Printf("[Got cipheropts, opts:%v, %v]", hc.cipheropts, hc.opts)
@@ -530,10 +544,10 @@ func NewHopeSimpleAcceptSetup(c *net.Conn, hc *Conn) (err error) {
 	}
 
 	var pubKeyAlice newhope.PublicKeySimpleAlice
-	for i := range(pubKeyAlice.Send) {
-			pubKeyAlice.Send[i] = alicePublicKey.Bytes()[i]
+	for i := range pubKeyAlice.Send {
+		pubKeyAlice.Send[i] = alicePublicKey.Bytes()[i]
 	}
-	
+
 	_, err = fmt.Fscanf(*c, "0x%x:0x%x\n",
 		&hc.cipheropts, &hc.opts)
 	log.Printf("[Got cipheropts, opts:%v, %v]", hc.cipheropts, hc.opts)
@@ -654,11 +668,13 @@ func HKExAcceptSetup(c *net.Conn, hc *Conn) (err error) {
 // channel on connect
 //
 //   Can be called like net.Dial(), defaulting to C_AES_256/H_SHA256,
-//   or additional option arguments can be passed amongst the following:
+//   or additional extensions can be passed amongst the following:
 //
-//   "C_AES_256" | "C_TWOFISH_128"
+//   "C_AES_256" | "C_TWOFISH_128" | ...
 //
-//   "H_SHA256"
+//   "H_SHA256" | "H_SHA512" | ...
+//
+// See go doc -u hkexnet.applyConnExtensions
 func Dial(protocol string, ipport string, extensions ...string) (hc Conn, err error) {
 	if Log == nil {
 		Init(false, "client", logger.LOG_DAEMON|logger.LOG_DEBUG)

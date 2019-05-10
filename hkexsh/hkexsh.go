@@ -1,6 +1,6 @@
 // hkexsh client
 //
-// Copyright (c) 2017-2018 Russell Magee
+// Copyright (c) 2017-2019 Russell Magee
 // Licensed under the terms of the MIT license (see LICENSE.mit in this
 // distribution)
 //
@@ -36,6 +36,7 @@ import (
 )
 
 var (
+	// wg controls when the goroutines handling client I/O complete
 	wg sync.WaitGroup
 	// Log defaults to regular syslog output (no -d)
 	Log *logger.Writer
@@ -43,6 +44,7 @@ var (
 
 ////////////////////////////////////////////////////
 
+// Praise Bob. Do not remove, lest ye lose Slack.
 const bob = string("\r\n\r\n" +
 	"@@@@@@@^^~~~~~~~~~~~~~~~~~~~~^@@@@@@@@@\r\n" +
 	"@@@@@@^     ~^  @  @@ @ @ @ I  ~^@@@@@@\r\n" +
@@ -70,8 +72,10 @@ const bob = string("\r\n\r\n" +
 	"\r\n")
 
 type (
+	// Handler for special functions invoked by escSeqs
 	escHandler func(io.Writer)
-	escSeqs    map[byte]escHandler
+	// escSeqs is a map of special keystroke sequences to trigger escHandlers
+	escSeqs map[byte]escHandler
 )
 
 // Copy copies from src to dst until either EOF is reached
@@ -91,6 +95,8 @@ type (
 // calls a client-custom version of copyBuffer(), which allows
 // some client escape sequences to trigger special actions during
 // interactive sessions.
+//
+// (See go doc hkexsh/hkexsh.{escSeqs,escHandler})
 func Copy(dst io.Writer, src io.Reader) (written int64, err error) {
 	written, err = copyBuffer(dst, src, nil)
 	return
@@ -102,9 +108,13 @@ func Copy(dst io.Writer, src io.Reader) (written int64, err error) {
 // This private version of copyBuffer is derived from the
 // go stdlib pkg/io, with escape sequence interpretation to trigger
 // some special client-side actions.
+//
+// (See go doc hkexsh/hkexsh.{escSeqs,escHandler})
 func copyBuffer(dst io.Writer, src io.Reader, buf []byte) (written int64, err error) {
 	// NOTE: using dst.Write() in these esc funcs will cause the output
-	// to function as a 'macro', outputting as if user typed the sequence.
+	// to function as a 'macro', outputting as if user typed the sequence
+	// (that is, the client 'sees' the user type it, and the server 'sees'
+	// it as well).
 	//
 	// Using os.Stdout outputs to the client's term w/o it or the server
 	// 'seeing' the output.
@@ -156,7 +166,7 @@ func copyBuffer(dst io.Writer, src io.Reader, buf []byte) (written int64, err er
 				if buf[0] == 0x1d {
 					seqPos++
 				}
-			} else /* seqPos > 0 */ {
+			} else {
 				if v, ok := escs[buf[0]]; ok {
 					v(dst)
 					nr--
@@ -185,13 +195,14 @@ func copyBuffer(dst io.Writer, src io.Reader, buf []byte) (written int64, err er
 			break
 		}
 	}
-	//_,_ = dst.Write([]byte{0x2f})
 	return written, err
 }
 
 ////////////////////////////////////////////////////
 
 // GetSize gets the terminal size using 'stty' command
+//
+// TODO: do in code someday instead of using external 'stty'
 func GetSize() (cols, rows int, err error) {
 	cmd := exec.Command("stty", "size") // #nosec
 	cmd.Stdin = os.Stdin
@@ -216,6 +227,7 @@ func GetSize() (cols, rows int, err error) {
 }
 
 // doCopyMode begins a secure hkexsh local<->remote file copy operation.
+//
 // TODO: reduce gocyclo
 func doCopyMode(conn *hkexnet.Conn, remoteDest bool, files string, rec *hkexsh.Session) (exitStatus uint32, err error) {
 	if remoteDest {
@@ -256,7 +268,6 @@ func doCopyMode(conn *hkexnet.Conn, remoteDest bool, files string, rec *hkexsh.S
 		// NOTE the lack of quotes around --xform option's sed expression.
 		// When args are passed in exec() format, no quoting is required
 		// (as this isn't input from a shell) (right? -rlm 20180823)
-		//cmdArgs := []string{"-xvz", "-C", files, `--xform=s#.*/\(.*\)#\1#`}
 		c = exec.Command(cmdName, cmdArgs...) // #nosec
 		c.Dir, _ = os.Getwd()                 // #nosec
 		log.Println("[wd:", c.Dir, "]")
@@ -296,7 +307,6 @@ func doCopyMode(conn *hkexnet.Conn, remoteDest bool, files string, rec *hkexsh.S
 					if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
 						exitStatus = uint32(status.ExitStatus())
 						fmt.Print(stdErrBuffer)
-						//fmt.Printf("Exit Status: %d\n", exitStatus) //#
 					}
 				}
 			}
@@ -331,10 +341,6 @@ func doCopyMode(conn *hkexnet.Conn, remoteDest bool, files string, rec *hkexsh.S
 		log.Println("remote filepath:", string(rec.Cmd()), "local files:", files)
 		var c *exec.Cmd
 
-		//os.Clearenv()
-		//os.Setenv("HOME", u.HomeDir)
-		//os.Setenv("TERM", "vt102") // TODO: server or client option?
-
 		cmdName := "/bin/tar"
 		destPath := files
 
@@ -353,7 +359,6 @@ func doCopyMode(conn *hkexnet.Conn, remoteDest bool, files string, rec *hkexsh.S
 		err = c.Start() // returns immediately
 		if err != nil {
 			fmt.Println(err)
-			//log.Fatal(err)
 		} else {
 			if err = c.Wait(); err != nil {
 				if exiterr, ok := err.(*exec.ExitError); ok {
@@ -365,7 +370,6 @@ func doCopyMode(conn *hkexnet.Conn, remoteDest bool, files string, rec *hkexsh.S
 					// an ExitStatus() method with the same signature.
 					if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
 						exitStatus = uint32(status.ExitStatus())
-						//log.Printf("Exit Status: %d", exitStatus)
 					}
 				}
 			}
@@ -380,7 +384,8 @@ func doCopyMode(conn *hkexnet.Conn, remoteDest bool, files string, rec *hkexsh.S
 	return
 }
 
-// doShellMode begins an hkexsh shell session (one-shot command or interactive).
+// doShellMode begins an hkexsh shell session (one-shot command or
+// interactive).
 func doShellMode(isInteractive bool, conn *hkexnet.Conn, oldState *hkexsh.State, rec *hkexsh.Session) {
 	//client reader (from server) goroutine
 	//Read remote end's stdout
@@ -434,7 +439,6 @@ func doShellMode(isInteractive bool, conn *hkexnet.Conn, oldState *hkexsh.State,
 		// TODO:.gv:doShellMode:2:shellStdinToRemote
 		shellStdinToRemote := func() {
 			defer wg.Done()
-			//!defer wg.Done()
 			_, outerr := func(conn *hkexnet.Conn, r io.Reader) (w int64, e error) {
 				// Copy() expects EOF so this will
 				// exit with outerr == nil
@@ -471,6 +475,10 @@ func usageCp() {
 	flag.PrintDefaults()
 }
 
+// rejectUserMsg snarkily rebukes users giving incorrect
+// credentials.
+//
+// TODO: do this from the server side and have client just emit that
 func rejectUserMsg() string {
 	return "Begone, " + spinsult.GetSentence() + "\r\n"
 }
@@ -519,15 +527,9 @@ func parseNonSwitchArgs(a []string) (user, host, path string, isDest bool, other
 			}
 			fancyHost = fancyHostPath[0]
 
-			//if fancyPath == "" {
-			//	fancyPath = "."
-			//}
-
 			if i == len(a)-1 {
 				isDest = true
-				//fmt.Println("remote path isDest")
 			}
-			//fmt.Println("fancyArgs: user:", fancyUser, "host:", fancyHost, "path:", fancyPath)
 		} else {
 			otherArgs = append(otherArgs, a[i])
 		}
@@ -580,17 +582,6 @@ func sendSessionParams(conn io.Writer /* *hkexnet.Conn*/, rec *hkexsh.Session) (
 	return e
 }
 
-// hkexsh - a client for secure shell and file copy operations.
-//
-// While conforming to the basic net.Conn interface HKex.Conn has extra
-// capabilities designed to allow apps to define connection options,
-// encryption/hmac settings and operations across the encrypted channel.
-//
-// Initial setup is the same as using plain net.Dial(), but one may
-// specify extra extension tags (strings) to set the cipher and hmac
-// setting desired; as well as the intended operation mode for the
-// connection (app-specific, passed through to the server to use or
-// ignore at its discretion).
 // TODO: reduce gocyclo
 func main() {
 	version := hkexsh.Version

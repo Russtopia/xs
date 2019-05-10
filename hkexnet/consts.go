@@ -7,6 +7,10 @@
 // golang implementation by Russ Magee (rmagee_at_gmail.com)
 package hkexnet
 
+// KEX algorithm values
+//
+// Specified (in string form) as the extensions parameter
+// to hkexnet.Dial()
 const (
 	KEX_HERRADURA256 = iota // this MUST be first for default if omitted in ctor
 	KEX_HERRADURA512
@@ -21,13 +25,13 @@ const (
 	KEX_KYBER1024
 	KEX_resvd11
 	KEX_NEWHOPE
-	KEX_NEWHOPE_SIMPLE  // 'NewHopeLP-Simple' - https://eprint.iacr.org/2016/1157
+	KEX_NEWHOPE_SIMPLE // 'NewHopeLP-Simple' - https://eprint.iacr.org/2016/1157
 	KEX_resvd14
 	KEX_resvd15
 )
 
 // Sent from client to server in order to specify which
-// algo shall be used (eg., HerraduraKEx, [TODO: others...])
+// algo shall be used (see hkexnet.KEX_HERRADURA256, ...)
 type KEXAlg uint8
 
 // Extended exit status codes - indicate comm/pty issues
@@ -63,8 +67,8 @@ const (
 	CSOTunHangup    // client -> server: tunnel lport hung up
 )
 
-// TunEndpoint.tunCtl control values - used to control workers for client or server tunnels
-// depending on the code
+// TunEndpoint.tunCtl control values - used to control workers for client
+// or server tunnels depending on the code
 const (
 	TunCtl_Client_Listen = 'a'
 	// [CSOTunAccept]
@@ -77,12 +81,13 @@ const (
 	// action:server side should dial() rport on client's behalf
 )
 
-// Channel status Op byte type
+// Channel status Op byte type (see CSONone, ... and CSENone, ...)
 type CSOType uint32
 
 //TODO: this should be small (max unfragmented packet size?)
 const MAX_PAYLOAD_LEN = 4*1024*1024*1024 - 1
 
+// Session symmetric crypto algs
 const (
 	CAlgAES256     = iota
 	CAlgTwofish128 // golang.org/x/crypto/twofish
@@ -94,11 +99,12 @@ const (
 // Available ciphers for hkex.Conn
 type CSCipherAlg uint32
 
+// Session packet auth HMAC algs
 const (
 	HmacSHA256 = iota
 	HmacSHA512
 	HmacNoneDisallowed
 )
 
-// Available HMACs for hkex.Conn (TODO: not currently used)
+// Available HMACs for hkex.Conn
 type CSHmacAlg uint32
