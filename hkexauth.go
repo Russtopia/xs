@@ -37,8 +37,7 @@ func AuthUserByPasswd(username string, auth string, fname string) (valid bool, a
 	b, e := ioutil.ReadFile(fname) // nolint: gosec
 	if e != nil {
 		valid = false
-		log.Println("ERROR: Cannot read hkexsh.passwd file!")
-		log.Fatal(e)
+		log.Printf("ERROR: Cannot read %s!\n", fname)
 	}
 	r := csv.NewReader(bytes.NewReader(b))
 

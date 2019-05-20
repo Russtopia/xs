@@ -781,7 +781,7 @@ func main() {
 	conn, err := hkexnet.Dial("tcp", server, cipherAlg, hmacAlg, kexAlg)
 	if err != nil {
 		fmt.Println(err)
-		panic(err)
+		os.Exit(3)
 	}
 	defer conn.Close() // nolint: errcheck
 	// From this point on, conn is a secure encrypted channel
