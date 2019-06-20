@@ -23,10 +23,14 @@ import (
 	"path"
 	"path/filepath"
 	"runtime"
+	"runtime/pprof"
 	"strings"
 	"sync"
 	"syscall"
 	"time"
+
+	"net/http"
+	_ "net/http/pprof"
 
 	hkexsh "blitter.com/go/hkexsh"
 	"blitter.com/go/hkexsh/hkexnet"
@@ -40,6 +44,9 @@ var (
 	wg sync.WaitGroup
 	// Log defaults to regular syslog output (no -d)
 	Log *logger.Writer
+
+	cpuprofile string
+	memprofile string
 )
 
 ////////////////////////////////////////////////////
@@ -412,7 +419,7 @@ func doShellMode(isInteractive bool, conn *hkexnet.Conn, oldState *hkexsh.State,
 			// gracefully here
 			if !strings.HasSuffix(inerr.Error(), "use of closed network connection") {
 				log.Println(inerr)
-				os.Exit(1)
+				exitWithStatus(1)
 			}
 		}
 
@@ -422,7 +429,7 @@ func doShellMode(isInteractive bool, conn *hkexnet.Conn, oldState *hkexsh.State,
 		if isInteractive {
 			log.Println("[* Got EOF *]")
 			_ = hkexsh.Restore(int(os.Stdin.Fd()), oldState) // #nosec
-			os.Exit(int(rec.Status()))
+			exitWithStatus(int(rec.Status()))
 		}
 	}
 	go shellRemoteToStdin()
@@ -451,7 +458,7 @@ func doShellMode(isInteractive bool, conn *hkexnet.Conn, oldState *hkexsh.State,
 				fmt.Println(outerr)
 				_ = hkexsh.Restore(int(os.Stdin.Fd()), oldState) // #nosec
 				log.Println("[Hanging up]")
-				os.Exit(0)
+				exitWithStatus(0)
 			}
 		}
 		go shellStdinToRemote()
@@ -621,6 +628,9 @@ func main() {
 	flag.UintVar(&chaffFreqMax, "F", 5000, "`msecs-max` chaff pkt freq max (msecs)")
 	flag.UintVar(&chaffBytesMax, "B", 64, "chaff pkt size max (bytes)")
 
+	flag.StringVar(&cpuprofile, "cpuprofile", "", "write cpu profile to `file`")
+	flag.StringVar(&memprofile, "memprofile", "", "write memory profile to `file`")
+
 	// Find out what program we are (shell or copier)
 	myPath := strings.Split(os.Args[0], string(os.PathSeparator))
 	if myPath[len(myPath)-1] != "hkexcp" && myPath[len(myPath)-1] != "hkexcp.exe" {
@@ -635,6 +645,22 @@ func main() {
 		flag.Usage = usageCp
 	}
 	flag.Parse()
+
+	if cpuprofile != "" {
+		f, err := os.Create(cpuprofile)
+		if err != nil {
+			log.Fatal("could not create CPU profile: ", err)
+		}
+		defer f.Close()
+		fmt.Println("StartCPUProfile()")
+		if err := pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("could not start CPU profile: ", err)
+		} else {
+			defer pprof.StopCPUProfile()
+		}
+
+		go func() { http.ListenAndServe("localhost:6060", nil) }()
+	}
 
 	remoteUser, remoteHost, tmpPath, pathIsDest, otherArgs :=
 		parseNonSwitchArgs(flag.Args())
@@ -692,12 +718,12 @@ func main() {
 	//fmt.Println("server finally is:", server)
 	if flag.NFlag() == 0 && server == "" {
 		flag.Usage()
-		os.Exit(0)
+		exitWithStatus(0)
 	}
 
 	if vopt {
 		fmt.Printf("version v%s\n", version)
-		os.Exit(0)
+		exitWithStatus(0)
 	}
 
 	if len(cmdStr) != 0 && (len(copySrc) != 0 || len(copyDst) != 0) {
@@ -781,7 +807,7 @@ func main() {
 	conn, err := hkexnet.Dial("tcp", server, cipherAlg, hmacAlg, kexAlg)
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(3)
+		exitWithStatus(3)
 	}
 	defer conn.Close() // nolint: errcheck
 	// From this point on, conn is a secure encrypted channel
@@ -861,7 +887,6 @@ func main() {
 
 		if shellMode {
 			launchTuns(&conn, remoteHost, tunSpecStr)
-
 			doShellMode(isInteractive, &conn, oldState, rec)
 		} else { // copyMode
 			s, _ := doCopyMode(&conn, pathIsDest, fileArgs, rec) // nolint: errcheck,gosec
@@ -877,5 +902,27 @@ func main() {
 	if oldState != nil {
 		_ = hkexsh.Restore(int(os.Stdin.Fd()), oldState) // nolint: gosec
 	}
-	os.Exit(int(rec.Status()))
+
+	exitWithStatus(int(rec.Status()))
+}
+
+// exitWithStatus wraps os.Exit() plus does any required pprof housekeeping
+func exitWithStatus(status int) {
+	if cpuprofile != "" {
+		pprof.StopCPUProfile()
+	}
+
+	if memprofile != "" {
+		f, err := os.Create(memprofile)
+		if err != nil {
+			log.Fatal("could not create memory profile: ", err)
+		}
+		defer f.Close()
+		runtime.GC() // get up-to-date statistics
+		if err := pprof.WriteHeapProfile(f); err != nil {
+			log.Fatal("could not write memory profile: ", err)
+		}
+	}
+
+	os.Exit(status)
 }

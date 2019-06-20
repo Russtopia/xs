@@ -40,7 +40,7 @@ import (
 	"sync"
 	"time"
 
-	"blitter.com/go/herradurakex"
+	hkex "blitter.com/go/herradurakex"
 	"blitter.com/go/hkexsh/logger"
 	kyber "git.schwanenlied.me/yawning/kyber.git"
 	newhope "git.schwanenlied.me/yawning/newhope.git"
@@ -70,10 +70,14 @@ type (
 
 	// Conn is a connection wrapping net.Conn with KEX & session state
 	Conn struct {
-		kex        KEXAlg      // KEX/KEM propsal (client -> server)
-		m          *sync.Mutex // (internal)
-		c          *net.Conn   // which also implements io.Reader, io.Writer, ...
-		immClose   bool
+		kex      KEXAlg      // KEX/KEM propsal (client -> server)
+		m        *sync.Mutex // (internal)
+		c        *net.Conn   // which also implements io.Reader, io.Writer, ...
+		immClose bool
+
+		logCipherText bool // somewhat expensive, for debugging
+		logPlainText  bool // INSECURE and somewhat expensive, for debugging
+
 		cipheropts uint32 // post-KEx cipher/hmac options
 		opts       uint32 // post-KEx protocol options (caller-defined)
 		WinCh      chan WinSize
@@ -998,7 +1002,9 @@ func (hc Conn) Read(b []byte) (n int, err error) {
 			return 0, errors.New(etxt)
 		}
 
-		log.Printf("  <:ctext:\r\n%s\r\n", hex.Dump(payloadBytes[:n]))
+		if hc.logCipherText {
+			log.Printf("  <:ctext:\r\n%s\r\n", hex.Dump(payloadBytes[:n]))
+		}
 
 		db := bytes.NewBuffer(payloadBytes[:n]) //copying payloadBytes to db
 		// The StreamReader acts like a pipe, decrypting
@@ -1008,7 +1014,9 @@ func (hc Conn) Read(b []byte) (n int, err error) {
 		// The caller isn't necessarily reading the full payload so we need
 		// to decrypt to an intermediate buffer, draining it on demand of caller
 		decryptN, err := rs.Read(payloadBytes)
-		log.Printf("  <-ptext:\r\n%s\r\n", hex.Dump(payloadBytes[:n]))
+		if hc.logPlainText {
+			log.Printf("  <-ptext:\r\n%s\r\n", hex.Dump(payloadBytes[:n]))
+		}
 		if err != nil {
 			log.Println("hkexnet.Read():", err)
 			//panic(err)
@@ -1203,7 +1211,9 @@ func (hc *Conn) WritePacket(b []byte, ctrlStatOp byte) (n int, err error) {
 	hc.m.Lock()
 	payloadLen = uint32(len(b))
 	//!fmt.Printf("  --== payloadLen:%d\n", payloadLen)
-	log.Printf("  :>ptext:\r\n%s\r\n", hex.Dump(b[0:payloadLen]))
+	if hc.logPlainText {
+		log.Printf("  :>ptext:\r\n%s\r\n", hex.Dump(b[0:payloadLen]))
+	}
 
 	// Calculate hmac on payload
 	hc.wm.Write(b[0:payloadLen])
@@ -1219,7 +1229,9 @@ func (hc *Conn) WritePacket(b []byte, ctrlStatOp byte) (n int, err error) {
 	if err != nil {
 		panic(err)
 	}
-	log.Printf("  ->ctext:\r\n%s\r\n", hex.Dump(wb.Bytes()))
+	if hc.logCipherText {
+		log.Printf("  ->ctext:\r\n%s\r\n", hex.Dump(wb.Bytes()))
+	}
 
 	err = binary.Write(*hc.c, binary.BigEndian, &ctrlStatOp)
 	if err == nil {
