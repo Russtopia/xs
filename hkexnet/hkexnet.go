@@ -70,7 +70,7 @@ type (
 
 	// Conn is a connection wrapping net.Conn with KEX & session state
 	Conn struct {
-		kex      KEXAlg      // KEX/KEM propsal (client -> server)
+		kex      KEXAlg      // KEX/KEM proposal (client -> server)
 		m        *sync.Mutex // (internal)
 		c        *net.Conn   // which also implements io.Reader, io.Writer, ...
 		immClose bool

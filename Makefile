@@ -1,5 +1,13 @@
 .PHONY: lint vis clean common client server passwd subpkgs install uninstall reinstall
 
+#ifeq ($(MAKEOPTS),)
+  MAKEOPTS = $(MAKEOPTS)
+#endif
+
+#ifeq ($(BUILDOPTS),)
+  BUILDOPTS = $(BUILDOPTS)
+#endif
+
 SUBPKGS = logger spinsult hkexnet
 TOOLS = hkexpasswd hkexsh hkexshd
 SUBDIRS = $(LIBS) $(TOOLS)
