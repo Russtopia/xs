@@ -244,6 +244,24 @@ func (hc *Conn) StartServerTunnel(lport, rport uint16) {
 	go func() {
 		var wg sync.WaitGroup
 
+		//
+		// worker to age server tunnel and kill it if keepalives
+		// stop from client
+		//
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for {
+				time.Sleep(100 * time.Millisecond)
+				(*hc.tuns)[rport].KeepAlive += 1
+				if (*hc.tuns)[rport].KeepAlive > 25 {
+					(*hc.tuns)[rport].Died = true
+					logger.LogDebug("[ServerTun] worker A: Client died, hanging up.")
+					break
+				}
+			}
+		}()
+
 		for cmd := range (*hc.tuns)[rport].Ctl {
 			var c net.Conn
 			logger.LogDebug(fmt.Sprintf("[ServerTun] got Ctl '%c'.", cmd))
@@ -330,12 +348,12 @@ func (hc *Conn) StartServerTunnel(lport, rport uint16) {
 								hc.WritePacket(rBuf[:n+4], CSOTunData)
 							}
 
-							if (*hc.tuns)[rport].KeepAlive > 50 {
-								(*hc.tuns)[rport].Died = true
-								logger.LogDebug("[ServerTun] worker A: Client died, hanging up.")
-							} else {
-								(*hc.tuns)[rport].KeepAlive += 1
-							}
+							//if (*hc.tuns)[rport].KeepAlive > 50000 {
+							//	(*hc.tuns)[rport].Died = true
+							//	logger.LogDebug("[ServerTun] worker A: Client died, hanging up.")
+							//} else {
+							//	(*hc.tuns)[rport].KeepAlive += 1
+							//}
 
 						}
 						logger.LogDebug("[ServerTun] worker A: exiting")
