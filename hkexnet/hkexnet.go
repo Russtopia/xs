@@ -75,8 +75,9 @@ type (
 		c        *net.Conn   // which also implements io.Reader, io.Writer, ...
 		immClose bool
 
-		logCipherText bool // somewhat expensive, for debugging
-		logPlainText  bool // INSECURE and somewhat expensive, for debugging
+		logCipherText  bool // somewhat expensive, for debugging
+		logPlainText   bool // INSECURE and somewhat expensive, for debugging
+		logTunActivity bool
 
 		cipheropts uint32 // post-KEx cipher/hmac options
 		opts       uint32 // post-KEx protocol options (caller-defined)
@@ -1112,8 +1113,11 @@ func (hc Conn) Read(b []byte) (n int, err error) {
 				rport := binary.BigEndian.Uint16(payloadBytes[2:4])
 				//fmt.Printf("[Got CSOTunData: [lport %d:rport %d] data:%v\n", lport, rport, payloadBytes[4:])
 				if _, ok := (*hc.tuns)[rport]; ok {
-					logger.LogDebug(fmt.Sprintf("[Writing data to rport [%d:%d]", lport, rport))
+					if hc.logTunActivity {
+						logger.LogDebug(fmt.Sprintf("[Writing data to rport [%d:%d]", lport, rport))
+					}
 					(*hc.tuns)[rport].Data <- payloadBytes[4:]
+					(*hc.tuns)[rport].KeepAlive = 0
 				} else {
 					logger.LogDebug(fmt.Sprintf("[Attempt to write data to closed tun [%d:%d]", lport, rport))
 				}
