@@ -157,6 +157,7 @@ func (hc *Conn) StartClientTunnel(lport, rport uint16) {
 												close((*hc.tuns)[rport].Data)
 												(*hc.tuns)[rport].Data = nil
 											}
+											delete((*hc.tuns), rport)
 											break
 										} else if strings.Contains(e.Error(), "i/o timeout") {
 											if (*hc.tuns)[rport].Died {
@@ -165,6 +166,7 @@ func (hc *Conn) StartClientTunnel(lport, rport uint16) {
 													close((*hc.tuns)[rport].Data)
 													(*hc.tuns)[rport].Data = nil
 												}
+												delete((*hc.tuns), rport)
 												break
 											}
 										} else {
@@ -177,6 +179,7 @@ func (hc *Conn) StartClientTunnel(lport, rport uint16) {
 												close((*hc.tuns)[rport].Data)
 												(*hc.tuns)[rport].Data = nil
 											}
+											delete((*hc.tuns), rport)
 											break
 										}
 									}
@@ -253,6 +256,10 @@ func (hc *Conn) StartServerTunnel(lport, rport uint16) {
 			defer wg.Done()
 			for {
 				time.Sleep(100 * time.Millisecond)
+				if (*hc.tuns)[rport] == nil {
+					logger.LogDebug("[ServerTun] worker A: Client endpoint removed.")
+					break
+				}
 				(*hc.tuns)[rport].KeepAlive += 1
 				if (*hc.tuns)[rport].KeepAlive > 25 {
 					(*hc.tuns)[rport].Died = true
@@ -320,6 +327,7 @@ func (hc *Conn) StartServerTunnel(lport, rport uint16) {
 										close((*hc.tuns)[rport].Data)
 										(*hc.tuns)[rport].Data = nil
 									}
+									delete((*hc.tuns), rport)
 									break
 								} else if strings.Contains(e.Error(), "i/o timeout") {
 									if (*hc.tuns)[rport].Died {
@@ -328,6 +336,7 @@ func (hc *Conn) StartServerTunnel(lport, rport uint16) {
 											close((*hc.tuns)[rport].Data)
 											(*hc.tuns)[rport].Data = nil
 										}
+										delete((*hc.tuns), rport)
 										break
 									}
 								} else {
@@ -340,6 +349,7 @@ func (hc *Conn) StartServerTunnel(lport, rport uint16) {
 										close((*hc.tuns)[rport].Data)
 										(*hc.tuns)[rport].Data = nil
 									}
+									delete((*hc.tuns), rport)
 									break
 								}
 							}
