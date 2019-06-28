@@ -122,6 +122,14 @@ func Init(d bool, c string, f logger.Priority) {
 	_initLogging(d, c, f)
 }
 
+func (hc *Conn) Lock() {
+		hc.m.Lock()
+}
+
+func (hc *Conn) Unlock() {
+		hc.m.Unlock()
+}
+
 func (hc Conn) GetStatus() CSOType {
 	return *hc.closeStat
 }
@@ -1084,7 +1092,7 @@ func (hc Conn) Read(b []byte) (n int, err error) {
 				rport := binary.BigEndian.Uint16(payloadBytes[2:4])
 				logger.LogDebug(fmt.Sprintf("[Client] Got CSOTunRefused [%d:%d]", lport, rport))
 				if _, ok := (*hc.tuns)[rport]; ok {
-					(*hc.tuns)[rport].Died = true
+					hc.MarkTunDead(rport)
 				} else {
 					logger.LogDebug(fmt.Sprintf("[Client] CSOTunRefused on already-closed tun [%d:%d]", lport, rport))
 				}
@@ -1094,7 +1102,7 @@ func (hc Conn) Read(b []byte) (n int, err error) {
 				rport := binary.BigEndian.Uint16(payloadBytes[2:4])
 				logger.LogDebug(fmt.Sprintf("[Client] Got CSOTunDisconn [%d:%d]", lport, rport))
 				if _, ok := (*hc.tuns)[rport]; ok {
-					(*hc.tuns)[rport].Died = true
+					hc.MarkTunDead(rport)
 				} else {
 					logger.LogDebug(fmt.Sprintf("[Client] CSOTunDisconn on already-closed tun [%d:%d]", lport, rport))
 				}
@@ -1104,7 +1112,7 @@ func (hc Conn) Read(b []byte) (n int, err error) {
 				rport := binary.BigEndian.Uint16(payloadBytes[2:4])
 				logger.LogDebug(fmt.Sprintf("[Server] Got CSOTunHangup [%d:%d]", lport, rport))
 				if _, ok := (*hc.tuns)[rport]; ok {
-					(*hc.tuns)[rport].Died = true
+					hc.MarkTunDead(rport)
 				} else {
 					logger.LogDebug(fmt.Sprintf("[Server] CSOTunHangup to already-closed tun [%d:%d]", lport, rport))
 				}
@@ -1117,7 +1125,7 @@ func (hc Conn) Read(b []byte) (n int, err error) {
 						logger.LogDebug(fmt.Sprintf("[Writing data to rport [%d:%d]", lport, rport))
 					}
 					(*hc.tuns)[rport].Data <- payloadBytes[4:]
-					(*hc.tuns)[rport].KeepAlive = 0
+					hc.ResetTunnelAge(rport)
 				} else {
 					logger.LogDebug(fmt.Sprintf("[Attempt to write data to closed tun [%d:%d]", lport, rport))
 				}
@@ -1212,7 +1220,7 @@ func (hc *Conn) WritePacket(b []byte, ctrlStatOp byte) (n int, err error) {
 	//
 	// Would be nice to determine if the mutex scope
 	// could be tightened.
-	hc.m.Lock()
+	hc.Lock()
 	payloadLen = uint32(len(b))
 	//!fmt.Printf("  --== payloadLen:%d\n", payloadLen)
 	if hc.logPlainText {
@@ -1254,7 +1262,7 @@ func (hc *Conn) WritePacket(b []byte, ctrlStatOp byte) (n int, err error) {
 	} else {
 		//fmt.Println("[a]WriteError!")
 	}
-	hc.m.Unlock()
+	hc.Unlock()
 
 	if err != nil {
 		log.Println(err)
