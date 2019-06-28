@@ -349,8 +349,8 @@ func (hc *Conn) StartServerTunnel(lport, rport uint16) {
 									break
 								} else if strings.Contains(e.Error(), "i/o timeout") {
 									if !hc.TunIsAlive(rport) {
-											logger.LogDebug(fmt.Sprintf("[ServerTun] worker A: timeout: Server side died, hanging up %v", (*hc.tuns)[rport]))
-											hc.ShutdownTun(rport)
+										logger.LogDebug(fmt.Sprintf("[ServerTun] worker A: timeout: Server side died, hanging up %v", (*hc.tuns)[rport]))
+										hc.ShutdownTun(rport)
 										break
 									}
 								} else {
