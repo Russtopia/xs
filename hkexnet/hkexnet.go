@@ -123,11 +123,11 @@ func Init(d bool, c string, f logger.Priority) {
 }
 
 func (hc *Conn) Lock() {
-		hc.m.Lock()
+	hc.m.Lock()
 }
 
 func (hc *Conn) Unlock() {
-		hc.m.Unlock()
+	hc.m.Unlock()
 }
 
 func (hc Conn) GetStatus() CSOType {
@@ -1136,7 +1136,9 @@ func (hc Conn) Read(b []byte) (n int, err error) {
 				_ = binary.BigEndian.Uint16(payloadBytes[0:2])
 				//logger.LogDebug(fmt.Sprintf("[Server] Got CSOTunKeepAlive"))
 				for _, t := range *hc.tuns {
+					hc.Lock()
 					t.KeepAlive = 0
+					hc.Unlock()
 				}
 			} else if ctrlStatOp == CSONone {
 				hc.dBuf.Write(payloadBytes)
