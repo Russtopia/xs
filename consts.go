@@ -10,4 +10,4 @@ package hkexsh
 // common constants for the HKExSh
 
 // Version string returned by tools
-const Version = "0.8.1 (NO WARRANTY)"
+const Version = "0.8.3 (NO WARRANTY)"
