@@ -620,7 +620,7 @@ func main() {
 	flag.BoolVar(&dbg, "d", false, "debug logging")
 	flag.StringVar(&cipherAlg, "c", "C_AES_256", "`cipher` [\"C_AES_256\" | \"C_TWOFISH_128\" | \"C_BLOWFISH_64\" | \"C_CRYPTMT1\"]")
 	flag.StringVar(&hmacAlg, "m", "H_SHA256", "`hmac` [\"H_SHA256\" | \"H_SHA512\"]")
-	flag.StringVar(&kexAlg, "k", "KEX_HERRADURA256", "`kex` [\"KEX_HERRADURA{256/512/1024/2048}\" | \"KEX_KYBER{512/768/1024}\" | \"KEX_NEWHOPE\" | \"KEX_NEWHOPE_SIMPLE\"]")
+	flag.StringVar(&kexAlg, "k", "KEX_HERRADURA512", "`kex` [\"KEX_HERRADURA{256/512/1024/2048}\" | \"KEX_KYBER{512/768/1024}\" | \"KEX_NEWHOPE\" | \"KEX_NEWHOPE_SIMPLE\"]")
 	flag.UintVar(&port, "p", 2000, "`port`")
 	//flag.StringVar(&authCookie, "a", "", "auth cookie")
 	flag.BoolVar(&chaffEnabled, "e", true, "enable chaff pkts")
@@ -762,6 +762,17 @@ func main() {
 		} else {
 			log.Printf("[cannot read %s/.hkexsh_id]\n", u.HomeDir)
 		}
+	}
+
+	// Enforce some sane min/max vals on chaff flags
+	if chaffFreqMin < 2 {
+		chaffFreqMin = 2
+	}
+	if chaffFreqMax == 0 {
+		chaffFreqMax = chaffFreqMin + 1
+	}
+	if chaffBytesMax == 0 || chaffBytesMax > 4096 {
+		chaffBytesMax = 64
 	}
 
 	if shellMode {

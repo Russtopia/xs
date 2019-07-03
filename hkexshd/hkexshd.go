@@ -406,6 +406,17 @@ func main() {
 		}
 	}
 
+	// Enforce some sane min/max vals on chaff flags
+	if chaffFreqMin < 2 {
+		chaffFreqMin = 2
+	}
+	if chaffFreqMax == 0 {
+		chaffFreqMax = chaffFreqMin + 1
+	}
+	if chaffBytesMax == 0 || chaffBytesMax > 4096 {
+		chaffBytesMax = 64
+	}
+
 	Log, _ = logger.New(logger.LOG_DAEMON|logger.LOG_DEBUG|logger.LOG_NOTICE|logger.LOG_ERR, "hkexshd") // nolint: gosec
 	hkexnet.Init(dbg, "hkexshd", logger.LOG_DAEMON|logger.LOG_DEBUG|logger.LOG_NOTICE|logger.LOG_ERR)
 	if dbg {
