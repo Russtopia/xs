@@ -25,6 +25,7 @@ import (
 	"path"
 	"sync"
 	"syscall"
+	"unsafe"
 
 	"blitter.com/go/goutmp"
 	hkexsh "blitter.com/go/hkexsh"
@@ -37,6 +38,22 @@ var (
 	// Log - syslog output (with no -d)
 	Log *logger.Writer
 )
+
+func ioctl(fd, request, argp uintptr) error {
+	if _, _, e := syscall.Syscall6(syscall.SYS_IOCTL, fd, request, argp, 0, 0, 0); e != 0 {
+		return e
+	}
+	return nil
+}
+
+func ptsName(fd uintptr) (string, error) {
+	var n uintptr
+	err := ioctl(fd, syscall.TIOCGPTN, uintptr(unsafe.Pointer(&n)))
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("/dev/pts/%d", n), nil
+}
 
 /* -------------------------------------------------------------- */
 // Perform a client->server copy
@@ -230,7 +247,7 @@ func runServerToClientCopyAs(who, ttype string, conn *hkexnet.Conn, srcPath stri
 //
 // Uses ptys to support commands which expect a terminal.
 // nolint: gocyclo
-func runShellAs(who, ttype string, cmd string, interactive bool, conn *hkexnet.Conn, chaffing bool) (exitStatus uint32, err error) {
+func runShellAs(who, hname, ttype, cmd string, interactive bool, conn *hkexnet.Conn, chaffing bool) (exitStatus uint32, err error) {
 	var wg sync.WaitGroup
 	u, err := user.Lookup(who)
 	if err != nil {
@@ -278,6 +295,15 @@ func runShellAs(who, ttype string, cmd string, interactive bool, conn *hkexnet.C
 	// Make sure to close the pty at the end.
 	// #gv:s/label=\"runShellAs\$1\"/label=\"deferPtmxClose\"/
 	defer func() { _ = ptmx.Close() }() // nolint: gosec
+
+	// get pty info for system accounting (who, lastlog)
+	pts, pe := ptsName(ptmx.Fd())
+	if pe != nil {
+		return hkexnet.CSEPtyGetNameFail, err
+	}
+	utmpx := goutmp.Put_utmp(who, pts, hname)
+	defer func() { goutmp.Unput_utmp(utmpx) }()
+	goutmp.Put_lastlog_entry("hkexsh", who, pts, hname)
 
 	log.Printf("[%s]\n", cmd)
 	if err != nil {
@@ -571,7 +597,7 @@ func main() {
 					logger.LogNotice(fmt.Sprintf("[Generating autologin token for [%s@%s]]\n", rec.Who(), hname)) // nolint: gosec,errcheck
 					token := GenAuthToken(string(rec.Who()), string(rec.ConnHost()))
 					tokenCmd := fmt.Sprintf("echo \"%s\" | tee -a ~/.hkexsh_id", token)
-					cmdStatus, runErr := runShellAs(string(rec.Who()), string(rec.TermType()), tokenCmd, false, hc, chaffEnabled)
+					cmdStatus, runErr := runShellAs(string(rec.Who()), hname, string(rec.TermType()), tokenCmd, false, hc, chaffEnabled)
 					// Returned hopefully via an EOF or exit/logout;
 					// Clear current op so user can enter next, or EOF
 					rec.SetOp([]byte{0})
@@ -586,7 +612,7 @@ func main() {
 					addr := hc.RemoteAddr()
 					hname := goutmp.GetHost(addr.String())
 					logger.LogNotice(fmt.Sprintf("[Running command for [%s@%s]]\n", rec.Who(), hname)) // nolint: gosec,errcheck
-					cmdStatus, runErr := runShellAs(string(rec.Who()), string(rec.TermType()), string(rec.Cmd()), false, hc, chaffEnabled)
+					cmdStatus, runErr := runShellAs(string(rec.Who()), hname, string(rec.TermType()), string(rec.Cmd()), false, hc, chaffEnabled)
 					// Returned hopefully via an EOF or exit/logout;
 					// Clear current op so user can enter next, or EOF
 					rec.SetOp([]byte{0})
@@ -602,10 +628,7 @@ func main() {
 					hname := goutmp.GetHost(addr.String())
 					logger.LogNotice(fmt.Sprintf("[Running shell for [%s@%s]]\n", rec.Who(), hname)) // nolint: gosec,errcheck
 
-					utmpx := goutmp.Put_utmp(string(rec.Who()), hname)
-					defer func() { goutmp.Unput_utmp(utmpx) }()
-					goutmp.Put_lastlog_entry("hkexsh", string(rec.Who()), hname)
-					cmdStatus, runErr := runShellAs(string(rec.Who()), string(rec.TermType()), string(rec.Cmd()), true, hc, chaffEnabled)
+					cmdStatus, runErr := runShellAs(string(rec.Who()), hname, string(rec.TermType()), string(rec.Cmd()), true, hc, chaffEnabled)
 					// Returned hopefully via an EOF or exit/logout;
 					// Clear current op so user can enter next, or EOF
 					rec.SetOp([]byte{0})

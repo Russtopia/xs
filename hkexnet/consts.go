@@ -37,11 +37,12 @@ type KEXAlg uint8
 // Extended exit status codes - indicate comm/pty issues
 // rather than remote end normal UNIX exit codes
 const (
-	CSENone        = 1024 + iota
-	CSETruncCSO    // No CSOExitStatus in payload
-	CSEStillOpen   // Channel closed unexpectedly
-	CSEExecFail    // cmd.Start() (exec) failed
-	CSEPtyExecFail // pty.Start() (exec w/pty) failed
+	CSENone           = 1024 + iota
+	CSETruncCSO       // No CSOExitStatus in payload
+	CSEStillOpen      // Channel closed unexpectedly
+	CSEExecFail       // cmd.Start() (exec) failed
+	CSEPtyExecFail    // pty.Start() (exec w/pty) failed
+	CSEPtyGetNameFail // failed to obtain pty name
 )
 
 // Extended (>255 UNIX exit status) codes
