@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	blitter.com/go/cryptmt v1.0.0
-	blitter.com/go/goutmp v1.0.0
+	blitter.com/go/goutmp v1.0.1
 	blitter.com/go/herradurakex v1.0.0
 	blitter.com/go/mtwist v1.0.0 // indirect
 	git.schwanenlied.me/yawning/chacha20.git v0.0.0-20170904085104-e3b1f968fc63 // indirect
