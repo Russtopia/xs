@@ -16,6 +16,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net"
 	"os"
 	"os/exec"
@@ -888,13 +889,21 @@ func main() {
 		// Keepalive for any tunnels that may exist
 		// #gv:s/label=\"main\$1\"/label=\"tunKeepAlive\"/
 		// TODO:.gv:main:1:tunKeepAlive
+		//[1]: better to always send tunnel keepAlives even if client didn't specify
+		//     any, to prevent listeners from knowing this.
+		//[1] if tunSpecStr != "" {
 		keepAliveWorker := func() {
 			for {
-				time.Sleep(time.Duration(2) * time.Second)
+				// Add a bit of jitter to keepAlive so it doesn't stand out quite as much
+				time.Sleep(time.Duration(2000-rand.Intn(200)) * time.Millisecond)
+				// FIXME: keepAlives should probably have small random packet len/data as well
+				// to further obscure them vs. interactive or tunnel data
+				// ** Min pkt len is 2 due to hkex.Conn.WritePacket() padding logic? I forget.
 				conn.WritePacket([]byte{0, 0}, hkexnet.CSOTunKeepAlive) // nolint: errcheck,gosec
 			}
 		}
 		go keepAliveWorker()
+		//[1]}
 
 		if shellMode {
 			launchTuns(&conn, remoteHost, tunSpecStr)
