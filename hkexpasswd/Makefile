@@ -4,7 +4,7 @@ EXTPKGS = bytes,errors,flag,fmt,internal,io,log,net,os,path,runtime,time,strings
 EXE = $(notdir $(shell pwd))
 
 all:
-	go build .
+	go build $(BUILDOPTS) .
 
 clean:
 	$(RM) $(EXE) $(EXE).exe

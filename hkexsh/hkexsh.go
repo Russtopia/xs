@@ -41,6 +41,9 @@ import (
 )
 
 var (
+	version   string
+	gitCommit string // set in -ldflags by build
+
 	// wg controls when the goroutines handling client I/O complete
 	wg sync.WaitGroup
 	// Log defaults to regular syslog output (no -d)
@@ -592,7 +595,6 @@ func sendSessionParams(conn io.Writer /* *hkexnet.Conn*/, rec *hkexsh.Session) (
 
 // TODO: reduce gocyclo
 func main() {
-	version := hkexsh.Version
 	var vopt bool
 	var gopt bool //login via password, asking server to generate authToken
 	var dbg bool
@@ -723,7 +725,7 @@ func main() {
 	}
 
 	if vopt {
-		fmt.Printf("version v%s\n", version)
+		fmt.Printf("version %s (%s)\n", version, gitCommit)
 		exitWithStatus(0)
 	}
 

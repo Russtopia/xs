@@ -35,6 +35,9 @@ import (
 )
 
 var (
+	version   string
+	gitCommit string // set in -ldflags by build
+
 	// Log - syslog output (with no -d)
 	Log *logger.Writer
 )
@@ -401,8 +404,6 @@ func GenAuthToken(who string, connhost string) string {
 // Compare to 'serverp.go' in this directory to see the equivalence.
 // TODO: reduce gocyclo
 func main() {
-	version := hkexsh.Version
-
 	var vopt bool
 	var chaffEnabled bool
 	var chaffFreqMin uint
@@ -421,7 +422,7 @@ func main() {
 	flag.Parse()
 
 	if vopt {
-		fmt.Printf("version v%s\n", version)
+		fmt.Printf("version %s (%s)\n", version, gitCommit)
 		os.Exit(0)
 	}
 

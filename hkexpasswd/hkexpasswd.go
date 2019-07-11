@@ -21,16 +21,28 @@ import (
 	"github.com/jameskeane/bcrypt"
 )
 
+var (
+	version   string
+	gitCommit string
+)
+
 // nolint: gocyclo
 func main() {
+	var vopt bool
 	var pfName string
 	var newpw string
 	var confirmpw string
 	var userName string
 
+	flag.BoolVar(&vopt, "v", false, "show version")
 	flag.StringVar(&userName, "u", "", "username")
 	flag.StringVar(&pfName, "f", "/etc/hkexsh.passwd", "passwd file")
 	flag.Parse()
+
+	if vopt {
+		fmt.Printf("version %s (%s)\n", version, gitCommit)
+		os.Exit(0)
+	}
 
 	var uname string
 	if len(userName) == 0 {

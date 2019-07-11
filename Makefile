@@ -4,8 +4,10 @@
   MAKEOPTS = $(MAKEOPTS)
 #endif
 
+GIT_COMMIT := $(shell git rev-list -1 HEAD)
+VERSION := 0.8.4
 #ifeq ($(BUILDOPTS),)
-  BUILDOPTS = $(BUILDOPTS)
+BUILDOPTS :=$(BUILDOPTS)" -ldflags \"-X main.version=$(VERSION) -X main.gitCommit=$(GIT_COMMIT)\""
 #endif
 
 SUBPKGS = logger spinsult hkexnet
@@ -24,27 +26,28 @@ clean:
 
 subpkgs:
 	for d in $(SUBPKGS); do\
-	  $(MAKE) -C $$d all;\
+	  $(MAKE) BUILDOPTS=$(BUILDOPTS) -C $$d all;\
 	done
 
 tools:
 	for d in $(TOOLS); do\
-	  $(MAKE) -C $$d all;\
+	  $(MAKE) BUILDOPTS=$(BUILDOPTS) -C $$d all;\
 	done
 
 
 common:
+	go build .
 	go install .
 
 
 client: common
-	$(MAKE) -C hkexsh
+	$(MAKE) BUILDOPTS=$(BUILDOPTS) -C hkexsh
 
 
 ifeq ($(MSYSTEM),)
 ifneq ($(GOOS),windows)
 server: common
-	$(MAKE) -C hkexshd
+	$(MAKE) BUILDOPTS=$(BUILDOPTS) -C hkexshd
 else
 	echo "Cross-build of hkexshd server for Windows not yet supported"
 endif
@@ -55,7 +58,7 @@ endif
 
 
 passwd: common
-	$(MAKE) -C hkexpasswd
+	$(MAKE) BUILDOPTS=$(BUILDOPTS) -C hkexpasswd
 
 vis:
 	@which go-callvis >/dev/null 2>&1; \
