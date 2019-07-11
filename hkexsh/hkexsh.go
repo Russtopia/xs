@@ -898,7 +898,7 @@ func main() {
 				time.Sleep(time.Duration(2000-rand.Intn(200)) * time.Millisecond)
 				// FIXME: keepAlives should probably have small random packet len/data as well
 				// to further obscure them vs. interactive or tunnel data
-				// ** Min pkt len is 2 due to hkex.Conn.WritePacket() padding logic? I forget.
+				// keepAlives must be  >=2 bytes, due to processing elsewhere
 				conn.WritePacket([]byte{0, 0}, hkexnet.CSOTunKeepAlive) // nolint: errcheck,gosec
 			}
 		}
