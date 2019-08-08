@@ -276,6 +276,7 @@ func runShellAs(who, hname, ttype, cmd string, interactive bool, conn *hkexnet.C
 
 	var c *exec.Cmd
 	if interactive {
+		//c = exec.Command("/bin/login", "-f", "-p", who) // nolint: gosec
 		c = exec.Command("/bin/bash", "-i", "-l") // nolint: gosec
 	} else {
 		c = exec.Command("/bin/bash", "-c", cmd) // nolint: gosec
@@ -285,6 +286,7 @@ func runShellAs(who, hname, ttype, cmd string, interactive bool, conn *hkexnet.C
 	//c.Env = []string{"HOME=" + u.HomeDir, "SUDO_GID=", "SUDO_UID=", "SUDO_USER=", "SUDO_COMMAND=", "MAIL=", "LOGNAME="+who}
 	c.Dir = u.HomeDir
 	c.SysProcAttr = &syscall.SysProcAttr{}
+	//c.SysProcAttr.Credential = &syscall.Credential{}
 	c.SysProcAttr.Credential = &syscall.Credential{Uid: uid, Gid: gid}
 	c.Stdin = conn
 	c.Stdout = conn
@@ -293,11 +295,15 @@ func runShellAs(who, hname, ttype, cmd string, interactive bool, conn *hkexnet.C
 	// Start the command with a pty.
 	ptmx, err := pty.Start(c) // returns immediately with ptmx file
 	if err != nil {
+		log.Println(err)
 		return hkexnet.CSEPtyExecFail, err
 	}
 	// Make sure to close the pty at the end.
 	// #gv:s/label=\"runShellAs\$1\"/label=\"deferPtmxClose\"/
-	defer func() { _ = ptmx.Close() }() // nolint: gosec
+	defer func() {
+		//logger.LogDebug(fmt.Sprintf("[Exited process was %d]", c.Process.Pid))
+		_ = ptmx.Close()
+	}() // nolint: gosec
 
 	// get pty info for system accounting (who, lastlog)
 	pts, pe := ptsName(ptmx.Fd())
@@ -377,6 +383,12 @@ func runShellAs(who, hname, ttype, cmd string, interactive bool, conn *hkexnet.C
 				}
 			}
 			conn.SetStatus(hkexnet.CSOType(exitStatus))
+		} else {
+			logger.LogDebug("*** Main proc has exited. ***")
+			// Background jobs still may be running; close the
+			// pty anyway, so the client can return before
+			// wg.Wait() below completes (Issue #18)
+			_ = ptmx.Close()
 		}
 		wg.Wait() // Wait on pty->stdout completion to client
 	}
