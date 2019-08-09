@@ -35,9 +35,11 @@ import (
 )
 
 var (
-	version   string
-	gitCommit string // set in -ldflags by build
-
+	version     string
+	gitCommit   string // set in -ldflags by build
+	
+	useSysLogin bool
+	
 	// Log - syslog output (with no -d)
 	Log *logger.Writer
 )
@@ -276,8 +278,18 @@ func runShellAs(who, hname, ttype, cmd string, interactive bool, conn *hkexnet.C
 
 	var c *exec.Cmd
 	if interactive {
-		//c = exec.Command("/bin/login", "-f", "-p", who) // nolint: gosec
-		c = exec.Command("/bin/bash", "-i", "-l") // nolint: gosec
+		if useSysLogin {
+			// Use the server's login binary (post-auth
+			// which is still done via our own bcrypt file)
+			// Things UNIX login does, like print the 'motd',
+			// and use the shell specified by /etc/passwd, will be done
+			// automagically, at the cost of another external tool
+			// dependency.
+			//
+			c = exec.Command("/bin/login", "-f", "-p", who) // nolint: gosec
+		} else {
+			c = exec.Command("/bin/bash", "-i", "-l") // nolint: gosec
+		}
 	} else {
 		c = exec.Command("/bin/bash", "-c", cmd) // nolint: gosec
 	}
@@ -286,8 +298,13 @@ func runShellAs(who, hname, ttype, cmd string, interactive bool, conn *hkexnet.C
 	//c.Env = []string{"HOME=" + u.HomeDir, "SUDO_GID=", "SUDO_UID=", "SUDO_USER=", "SUDO_COMMAND=", "MAIL=", "LOGNAME="+who}
 	c.Dir = u.HomeDir
 	c.SysProcAttr = &syscall.SysProcAttr{}
-	//c.SysProcAttr.Credential = &syscall.Credential{}
-	c.SysProcAttr.Credential = &syscall.Credential{Uid: uid, Gid: gid}
+	if useSysLogin {
+		// If using server's login binary, drop to user creds
+		// is taken care of by it.
+		c.SysProcAttr.Credential = &syscall.Credential{}
+	} else {
+		c.SysProcAttr.Credential = &syscall.Credential{Uid: uid, Gid: gid}
+	}
 	c.Stdin = conn
 	c.Stdout = conn
 	c.Stderr = conn
@@ -426,6 +443,7 @@ func main() {
 
 	flag.BoolVar(&vopt, "v", false, "show version")
 	flag.StringVar(&laddr, "l", ":2000", "interface[:port] to listen")
+	flag.BoolVar(&useSysLogin, "L", false, "use system login")
 	flag.BoolVar(&chaffEnabled, "e", true, "enable chaff pkts")
 	flag.UintVar(&chaffFreqMin, "f", 100, "chaff pkt freq min (msecs)")
 	flag.UintVar(&chaffFreqMax, "F", 5000, "chaff pkt freq max (msecs)")
