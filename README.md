@@ -84,45 +84,65 @@ As of this time (Oct 2018) Kyber is one of the candidate algorithms submitted to
 
 ### Get source code
 
-* $ go get -u blitter.com/go/hkexsh
-* $ cd $GOPATH/src/blitter.com/go/hkexsh
-* $ go build ./... # install all dependent go pkgs
+```
+$ go get -u blitter.com/go/hkexsh
+$ cd $GOPATH/src/blitter.com/go/hkexsh
+$ go build ./... # install all dependent go pkgs
+```
 
 
 ### To build
 
-* $ cd $GOPATH/src/blitter.com/go/hkexsh
-* $ make clean all
+```
+$ cd $GOPATH/src/blitter.com/go/hkexsh
+$ make clean all
+```
 
 ### To install, uninstall, re-install
 
-* $ sudo make [install | uninstall | reinstall]
+```
+$ sudo make [install | uninstall | reinstall]
+```
 
 ### To manage service (assuming openrc init)
 
-* $ sudo rc-config [start | restart | stop] hkexshd
+An example init script (hkexshd.initrc) is provided. Consult your Linux distribution documentation for proper service/daemon installation. For openrc,
 
+```
+$ sudo cp hkexshd.initrc /etc/init.d/hkexshd
+$ sudo rc-config add hkexshd default
+```
 
-An example init script (hkexshd.initrc) is provided. Consult your Linux distribution documentation for proper service/daemon installation. Default assumes installation in /usr/local/sbin (hkexshd, hkexpasswd) and /usr/local/bin (hkexsh/hkexcp symlink).
+The make system assumes installation in /usr/local/sbin (hkexshd, hkexpasswd) and /usr/local/bin (hkexsh/hkexcp symlink).
 
+```
+$ sudo rc-config [start | restart | stop] hkexshd
+```
 
 ### To set accounts & passwords:
 
-* $ sudo touch /etc/hkexsh.passwd
-* $ sudo hkexpasswd/hkexpasswd -u joebloggs
-* $ &lt;enter a password, enter again to confirm&gt;
-
+```
+$ sudo touch /etc/hkexsh.passwd
+$ sudo hkexpasswd/hkexpasswd -u joebloggs
+$ <enter a password, enter again to confirm>
+```
 
 ### Testing Client and Server from $GOPATH dev tree (w/o 'make install')
 
 In separate shells A and B:
-* [A]$ cd hkexshd && sudo ./hkexshd &  # add -d for debugging
+```
+[A]$ cd hkexshd && sudo ./hkexshd &  # add -d for debugging
+```
 
 Interactive shell
-* [B]$ cd hkexsh && ./hkexsh joebloggs@host-or-ip # add -d for debugging
+```
+[B]$ cd hkexsh && ./hkexsh joebloggs@host-or-ip # add -d for debugging
+```
 
 One-shot command
-* [B]$ cd hkexsh && ./hkexsh -x "ls /tmp" joebloggs@host-or-ip
+```
+[B]$ cd hkexsh && ./hkexsh -x "ls /tmp" joebloggs@host-or-ip
+```
 
 WARNING WARNING WARNING: the -d debug flag will echo passwords to the log/console!
 Logging on Linux usually goes to /var/log/syslog and/or /var/log/debug, /var/log/daemon.log.
@@ -150,10 +170,14 @@ remote user. File operations are all performed as the remote user, so account pe
 as expected.
 
 Local (client) to remote (server) copy:
-* hkexcp fileA /some/where/fileB /some/where/else/dirC joebloggs@host-or-ip:remoteDir
+```
+$ hkexcp fileA /some/where/fileB /some/where/else/dirC joebloggs@host-or-ip:remoteDir
+```
 
 Remote (server) to local (client) copy:
-* hkexcp joebloggs@host-or-ip:/remoteDirOrFile /some/where/local/Dir
+```
+$ hkexcp joebloggs@host-or-ip:/remoteDirOrFile /some/where/local/Dir
+```
 
 hkexcp uses a 'tarpipe' to send file data over the encrypted channel. Use the -d flag on client or server to see the generated tar commands if you're curious.
 
@@ -168,7 +192,7 @@ Syntax: hkexsh -T=&lt;tunspec&gt;{,&lt;tunspec&gt;...}
 
 Example, tunnelling ssh through hkexsh
 
-* [server side] $ sudo /usr/sbin/sshd -p 7002
-* [client side, term A] $ hkexsh -T=6002:7002 user@server
-* [client side, term B] $ ssh user@localhost -p 6002
+* [server side] ```$ sudo /usr/sbin/sshd -p 7002```
+* [client side, term A] ```$ hkexsh -T=6002:7002 user@server```
+* [client side, term B] ```$ ssh user@localhost -p 6002```
 
