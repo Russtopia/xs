@@ -46,6 +46,9 @@ var (
 
 	// wg controls when the goroutines handling client I/O complete
 	wg sync.WaitGroup
+
+	kopt bool // set to use kcp (encrypted reliable UDP) instead of TCP
+
 	// Log defaults to regular syslog output (no -d)
 	Log *logger.Writer
 
@@ -624,6 +627,7 @@ func main() {
 	flag.StringVar(&cipherAlg, "c", "C_AES_256", "`cipher` [\"C_AES_256\" | \"C_TWOFISH_128\" | \"C_BLOWFISH_64\" | \"C_CRYPTMT1\"]")
 	flag.StringVar(&hmacAlg, "m", "H_SHA256", "`hmac` [\"H_SHA256\" | \"H_SHA512\"]")
 	flag.StringVar(&kexAlg, "k", "KEX_HERRADURA512", "`kex` [\"KEX_HERRADURA{256/512/1024/2048}\" | \"KEX_KYBER{512/768/1024}\" | \"KEX_NEWHOPE\" | \"KEX_NEWHOPE_SIMPLE\"]")
+	flag.BoolVar(&kopt, "K", false, "set true to use KCP (github.com/xtaci/kcp-go) reliable UDP instead of TCP")
 	flag.UintVar(&port, "p", 2000, "`port`")
 	//flag.StringVar(&authCookie, "a", "", "auth cookie")
 	flag.BoolVar(&chaffEnabled, "e", true, "enable chaff pkts")
@@ -818,7 +822,11 @@ func main() {
 		}
 	}
 
-	conn, err := hkexnet.Dial("tcp", server, cipherAlg, hmacAlg, kexAlg)
+	proto := "tcp"
+	if kopt {
+		proto = "kcp"
+	}
+	conn, err := hkexnet.Dial(proto, server, cipherAlg, hmacAlg, kexAlg)
 	if err != nil {
 		fmt.Println(err)
 		exitWithStatus(3)

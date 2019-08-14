@@ -25,6 +25,7 @@ package hkexnet
 import (
 	"bytes"
 	"crypto/cipher"
+	"crypto/sha1"
 	"encoding/binary"
 	"encoding/hex"
 	"errors"
@@ -39,6 +40,9 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	kcp "github.com/xtaci/kcp-go"
+	"golang.org/x/crypto/pbkdf2"
 
 	hkex "blitter.com/go/herradurakex"
 	"blitter.com/go/hkexsh/logger"
@@ -693,12 +697,21 @@ func Dial(protocol string, ipport string, extensions ...string) (hc Conn, err er
 		Init(false, "client", logger.LOG_DAEMON|logger.LOG_DEBUG)
 	}
 
-	// Open raw Conn c
-	c, err := net.Dial(protocol, ipport)
-	if err != nil {
-		return Conn{}, err
+	var c net.Conn
+	if protocol == "kcp" {
+		kcpKey := pbkdf2.Key([]byte("demo pass"), []byte("demo salt"), 1024, 32, sha1.New)
+		block, _ := kcp.NewNoneBlockCrypt(kcpKey)
+		c, err = kcp.DialWithOptions(ipport, block, 10, 3)
+		if err != nil {
+			return Conn{}, err
+		}
+	} else {
+		// Open raw Conn c
+		c, err = net.Dial(protocol, ipport)
+		if err != nil {
+			return Conn{}, err
+		}
 	}
-
 	// Init hkexnet.Conn hc over net.Conn c
 	ret, err := _new(getkexalgnum(extensions...), &c)
 	if err != nil {
@@ -819,23 +832,35 @@ func (hc *Conn) SetReadDeadline(t time.Time) error {
 //
 // See go doc net.Listener
 type HKExListener struct {
-	l net.Listener
+	l     net.Listener
+	proto string
 }
 
 // Listen for a connection
 //
 // See go doc net.Listen
-func Listen(protocol string, ipport string) (hl HKExListener, e error) {
+func Listen(proto string, ipport string) (hl HKExListener, e error) {
 	if Log == nil {
 		Init(false, "server", logger.LOG_DAEMON|logger.LOG_DEBUG)
 	}
 
-	l, err := net.Listen(protocol, ipport)
-	if err != nil {
-		return HKExListener{nil}, err
+	kcpKey := pbkdf2.Key([]byte("demo pass"), []byte("demo salt"), 1024, 32, sha1.New)
+	//var block kcp.BlockCrypt
+	var lErr error
+	var l net.Listener
+	
+	if proto == "kcp" {
+		block, _ := kcp.NewNoneBlockCrypt(kcpKey)
+		l, lErr = kcp.ListenWithOptions(ipport, block, 10, 3)
+	} else {
+		l, lErr = net.Listen(proto, ipport)
 	}
-	logger.LogDebug(fmt.Sprintf("[Listening on %s]\n", ipport))
+	if lErr != nil {
+		return HKExListener{nil, proto}, lErr
+	}
+	logger.LogDebug(fmt.Sprintf("[Listening (proto '%s') on %s]\n", proto, ipport))
 	hl.l = l
+	hl.proto = proto
 	return
 }
 
@@ -859,13 +884,23 @@ func (hl HKExListener) Addr() net.Addr {
 //
 // See go doc net.Listener.Accept
 func (hl *HKExListener) Accept() (hc Conn, err error) {
-	// Open raw Conn c
-	c, err := hl.l.Accept()
-	if err != nil {
-		return Conn{}, err
-	}
-	logger.LogDebug(fmt.Sprintln("[net.Listener Accepted]"))
+	var c net.Conn
+	if hl.proto == "kcp" {
+		c, err = hl.l.(*kcp.Listener).AcceptKCP()
+		if err != nil {
+			return Conn{}, err
+		}
 
+		logger.LogDebug(fmt.Sprintln("[kcp.Listener Accepted]"))
+	} else {
+		// Open raw Conn c
+		c, err = hl.l.Accept()
+		if err != nil {
+			return Conn{}, err
+		}
+
+		logger.LogDebug(fmt.Sprintln("[net.Listener Accepted]"))
+	}
 	// Read KEx alg proposed by client
 	var kexAlg KEXAlg
 	//! NB. Was using fmt.FScanln() here, but integers with a leading zero
