@@ -39,7 +39,7 @@ var (
 	gitCommit   string // set in -ldflags by build
 	
 	useSysLogin bool
-	kopt bool // set to use kcp (encrypted reliable UDP) instead of TCP
+	kcpMode string // set to a valid KCP BlockCrypt alg tag to use rather than TCP
 	
 	// Log - syslog output (with no -d)
 	Log *logger.Writer
@@ -444,7 +444,7 @@ func main() {
 
 	flag.BoolVar(&vopt, "v", false, "show version")
 	flag.StringVar(&laddr, "l", ":2000", "interface[:port] to listen")
-	flag.BoolVar(&kopt, "K", false, "set true to use KCP (github.com/xtaci/kcp-go) reliable UDP instead of TCP")
+	flag.StringVar(&kcpMode, "K", "unused", `set to one of ["KCP_NONE","KCP_AES", "KCP_BLOWFISH", "KCP_CAST5", "KCP_SM4", "KCP_SALSA20", "KCP_SIMPLEXOR", "KCP_TEA", "KCP_3DES", "KCP_TWOFISH", "KCP_XTEA"] to use KCP (github.com/xtaci/kcp-go) reliable UDP instead of TCP`)
 	flag.BoolVar(&useSysLogin, "L", false, "use system login")
 	flag.BoolVar(&chaffEnabled, "e", true, "enable chaff pkts")
 	flag.UintVar(&chaffFreqMin, "f", 100, "chaff pkt freq min (msecs)")
@@ -508,10 +508,10 @@ func main() {
 	}()
 
 	proto := "tcp"
-	if kopt {
+	if kcpMode != "unused" {
 		proto = "kcp"
 	}
-	l, err := hkexnet.Listen(proto, laddr)
+	l, err := hkexnet.Listen(proto, laddr, kcpMode)
 	if err != nil {
 		log.Fatal(err)
 	}

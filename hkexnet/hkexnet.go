@@ -25,7 +25,6 @@ package hkexnet
 import (
 	"bytes"
 	"crypto/cipher"
-	"crypto/sha1"
 	"encoding/binary"
 	"encoding/hex"
 	"errors"
@@ -40,9 +39,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	kcp "github.com/xtaci/kcp-go"
-	"golang.org/x/crypto/pbkdf2"
 
 	hkex "blitter.com/go/herradurakex"
 	"blitter.com/go/hkexsh/logger"
@@ -699,9 +695,7 @@ func Dial(protocol string, ipport string, extensions ...string) (hc Conn, err er
 
 	var c net.Conn
 	if protocol == "kcp" {
-		kcpKey := pbkdf2.Key([]byte("demo pass"), []byte("demo salt"), 1024, 32, sha1.New)
-		block, _ := kcp.NewNoneBlockCrypt(kcpKey)
-		c, err = kcp.DialWithOptions(ipport, block, 10, 3)
+		c, err = kcpDial(ipport, extensions)
 		if err != nil {
 			return Conn{}, err
 		}
@@ -839,19 +833,16 @@ type HKExListener struct {
 // Listen for a connection
 //
 // See go doc net.Listen
-func Listen(proto string, ipport string) (hl HKExListener, e error) {
+func Listen(proto string, ipport string, extensions ...string) (hl HKExListener, e error) {
 	if Log == nil {
 		Init(false, "server", logger.LOG_DAEMON|logger.LOG_DEBUG)
 	}
 
-	kcpKey := pbkdf2.Key([]byte("demo pass"), []byte("demo salt"), 1024, 32, sha1.New)
-	//var block kcp.BlockCrypt
 	var lErr error
 	var l net.Listener
-	
+
 	if proto == "kcp" {
-		block, _ := kcp.NewNoneBlockCrypt(kcpKey)
-		l, lErr = kcp.ListenWithOptions(ipport, block, 10, 3)
+		l, lErr = kcpListen(ipport, extensions)
 	} else {
 		l, lErr = net.Listen(proto, ipport)
 	}
@@ -886,11 +877,10 @@ func (hl HKExListener) Addr() net.Addr {
 func (hl *HKExListener) Accept() (hc Conn, err error) {
 	var c net.Conn
 	if hl.proto == "kcp" {
-		c, err = hl.l.(*kcp.Listener).AcceptKCP()
+		c, err = hl.AcceptKCP()
 		if err != nil {
 			return Conn{}, err
 		}
-
 		logger.LogDebug(fmt.Sprintln("[kcp.Listener Accepted]"))
 	} else {
 		// Open raw Conn c
