@@ -406,7 +406,9 @@ func runShellAs(who, hname, ttype, cmd string, interactive bool, conn *hkexnet.C
 			// Background jobs still may be running; close the
 			// pty anyway, so the client can return before
 			// wg.Wait() below completes (Issue #18)
-			_ = ptmx.Close()
+			if interactive {
+				_ = ptmx.Close()
+			}
 		}
 		wg.Wait() // Wait on pty->stdout completion to client
 	}
