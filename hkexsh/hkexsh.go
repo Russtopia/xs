@@ -624,27 +624,27 @@ func main() {
 
 	flag.BoolVar(&vopt, "v", false, "show version")
 	flag.BoolVar(&dbg, "d", false, "debug logging")
-	flag.StringVar(&cipherAlg, "c", "C_AES_256", "`cipher` [\"C_AES_256\" | \"C_TWOFISH_128\" | \"C_BLOWFISH_64\" | \"C_CRYPTMT1\"]")
-	flag.StringVar(&hmacAlg, "m", "H_SHA256", "`hmac` [\"H_SHA256\" | \"H_SHA512\"]")
-	flag.StringVar(&kexAlg, "k", "KEX_HERRADURA512", "`kex` [\"KEX_HERRADURA{256/512/1024/2048}\" | \"KEX_KYBER{512/768/1024}\" | \"KEX_NEWHOPE\" | \"KEX_NEWHOPE_SIMPLE\"]")
-	flag.StringVar(&kcpMode, "K", "unused", `set to one of ["KCP_NONE","KCP_AES", "KCP_BLOWFISH", "KCP_CAST5", "KCP_SM4", "KCP_SALSA20", "KCP_SIMPLEXOR", "KCP_TEA", "KCP_3DES", "KCP_TWOFISH", "KCP_XTEA"] to use KCP (github.com/xtaci/kcp-go) reliable UDP instead of TCP`)
-	flag.UintVar(&port, "p", 2000, "`port`")
+	flag.StringVar(&cipherAlg, "c", "C_AES_256", "session `cipher` [C_AES_256 | C_TWOFISH_128 | C_BLOWFISH_64 | C_CRYPTMT1]")
+	flag.StringVar(&hmacAlg, "m", "H_SHA256", "session `HMAC` [H_SHA256 | H_SHA512]")
+	flag.StringVar(&kexAlg, "k", "KEX_HERRADURA512", "KEx `alg` [KEX_HERRADURA{256/512/1024/2048} | KEX_KYBER{512/768/1024} | KEX_NEWHOPE | KEX_NEWHOPE_SIMPLE]")
+	flag.StringVar(&kcpMode, "K", "unused", "KCP `alg`, one of [KCP_NONE | KCP_AES | KCP_BLOWFISH | KCP_CAST5 | KCP_SM4 | KCP_SALSA20 | KCP_SIMPLEXOR | KCP_TEA | KCP_3DES | KCP_TWOFISH | KCP_XTEA] to use KCP (github.com/xtaci/kcp-go) reliable UDP instead of TCP")
+	flag.UintVar(&port, "p", 2000, "``port")
 	//flag.StringVar(&authCookie, "a", "", "auth cookie")
 	flag.BoolVar(&chaffEnabled, "e", true, "enable chaff pkts")
-	flag.UintVar(&chaffFreqMin, "f", 100, "`msecs-min` chaff pkt freq min (msecs)")
-	flag.UintVar(&chaffFreqMax, "F", 5000, "`msecs-max` chaff pkt freq max (msecs)")
-	flag.UintVar(&chaffBytesMax, "B", 64, "chaff pkt size max (bytes)")
+	flag.UintVar(&chaffFreqMin, "f", 100, "chaff pkt freq min `msecs`")
+	flag.UintVar(&chaffFreqMax, "F", 5000, "chaff pkt freq max `msecs`")
+	flag.UintVar(&chaffBytesMax, "B", 64, "chaff pkt size max `bytes`")
 
-	flag.StringVar(&cpuprofile, "cpuprofile", "", "write cpu profile to `file`")
-	flag.StringVar(&memprofile, "memprofile", "", "write memory profile to `file`")
+	flag.StringVar(&cpuprofile, "cpuprofile", "", "write cpu profile to <`file`>")
+	flag.StringVar(&memprofile, "memprofile", "", "write memory profile to <`file`>")
 
 	// Find out what program we are (shell or copier)
 	myPath := strings.Split(os.Args[0], string(os.PathSeparator))
 	if myPath[len(myPath)-1] != "hkexcp" && myPath[len(myPath)-1] != "hkexcp.exe" {
 		// hkexsh accepts a command (-x) but not
 		// a srcpath (-r) or dstpath (-t)
-		flag.StringVar(&cmdStr, "x", "", "`command` to run (if not specified run interactive shell)")
-		flag.StringVar(&tunSpecStr, "T", "", "`tunnelspec` localPort:remotePort[,localPort:remotePort,...]")
+		flag.StringVar(&cmdStr, "x", "", "run <`command`> (if not specified, run interactive shell)")
+		flag.StringVar(&tunSpecStr, "T", "", "``tunnelspec - localPort:remotePort[,localPort:remotePort,...]")
 		flag.BoolVar(&gopt, "g", false, "ask server to generate authtoken")
 		shellMode = true
 		flag.Usage = usageShell
