@@ -11,6 +11,7 @@ package hkexnet
 //
 // Specified (in string form) as the extensions parameter
 // to hkexnet.Dial()
+// Alg is sent in a uint8 so there are up to 256 possible
 const (
 	KEX_HERRADURA256 = iota // this MUST be first for default if omitted in ctor
 	KEX_HERRADURA512
