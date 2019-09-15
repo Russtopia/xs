@@ -213,7 +213,7 @@ func _new(kexAlg KEXAlg, conn *net.Conn) (hc *Conn, e error) {
 		log.Printf("[KEx alg %d accepted]\n", kexAlg)
 	default:
 		// UNREACHABLE: _getkexalgnum() guarantees a valid KEX value
-		hc.kex = KEX_HERRADURA256
+		hc.kex = KEX_HERRADURA512
 		log.Printf("[KEx alg %d ?? defaults to %d]\n", kexAlg, hc.kex)
 	}
 	return
@@ -273,7 +273,7 @@ func (hc *Conn) applyConnExtensions(extensions ...string) {
 }
 
 func getkexalgnum(extensions ...string) (k KEXAlg) {
-	k = KEX_HERRADURA256 // default
+	k = KEX_HERRADURA512 // default
 	for _, s := range extensions {
 		switch s {
 		case "KEX_HERRADURA256":
