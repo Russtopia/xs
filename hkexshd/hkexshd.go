@@ -35,12 +35,12 @@ import (
 )
 
 var (
-	version     string
-	gitCommit   string // set in -ldflags by build
-	
+	version   string
+	gitCommit string // set in -ldflags by build
+
 	useSysLogin bool
-	kcpMode string // set to a valid KCP BlockCrypt alg tag to use rather than TCP
-	
+	kcpMode     string // set to a valid KCP BlockCrypt alg tag to use rather than TCP
+
 	// Log - syslog output (with no -d)
 	Log *logger.Writer
 )

@@ -20,9 +20,11 @@ import (
 	"hash"
 	"log"
 
+	"blitter.com/go/cryptmt"
+	"blitter.com/go/wanderer"
 	"golang.org/x/crypto/blowfish"
 	"golang.org/x/crypto/twofish"
-	"blitter.com/go/cryptmt"
+
 	// hash algos must be manually imported thusly:
 	// (Would be nice if the golang pkg docs were more clear
 	// on this...)
@@ -75,7 +77,6 @@ func (hc Conn) getStream(keymat []byte) (rc cipher.Stream, mc hash.Hash, err err
 		iv = keymat[aes.BlockSize : aes.BlockSize+ivlen]
 		rc = cipher.NewOFB(block, iv)
 		log.Printf("[cipher AES_256 (%d)]\n", copts)
-		break
 	case CAlgTwofish128:
 		keymat = expandKeyMat(keymat, twofish.BlockSize)
 		key = keymat[0:twofish.BlockSize]
@@ -84,7 +85,6 @@ func (hc Conn) getStream(keymat []byte) (rc cipher.Stream, mc hash.Hash, err err
 		iv = keymat[twofish.BlockSize : twofish.BlockSize+ivlen]
 		rc = cipher.NewOFB(block, iv)
 		log.Printf("[cipher TWOFISH_128 (%d)]\n", copts)
-		break
 	case CAlgBlowfish64:
 		keymat = expandKeyMat(keymat, blowfish.BlockSize)
 		key = keymat[0:blowfish.BlockSize]
@@ -102,11 +102,12 @@ func (hc Conn) getStream(keymat []byte) (rc cipher.Stream, mc hash.Hash, err err
 		iv = keymat[blowfish.BlockSize : blowfish.BlockSize+ivlen]
 		rc = cipher.NewOFB(block, iv)
 		log.Printf("[cipher BLOWFISH_64 (%d)]\n", copts)
-		break
 	case CAlgCryptMT1:
 		rc = cryptmt.NewCipher(keymat)
 		log.Printf("[cipher CRYPTMT1 (%d)]\n", copts)
-		break
+	case CAlgWanderer:
+		rc = wanderer.NewCodec(nil, nil, keymat, 3, 3)
+		log.Printf("[cipher WANDERER (%d)]\n", copts)
 	default:
 		log.Printf("[invalid cipher (%d)]\n", copts)
 		fmt.Printf("DOOFUS SET A VALID CIPHER ALG (%d)\n", copts)
@@ -123,7 +124,6 @@ func (hc Conn) getStream(keymat []byte) (rc cipher.Stream, mc hash.Hash, err err
 		if !halg.Available() {
 			log.Fatal("hash not available!")
 		}
-		break
 	case HmacSHA512:
 		log.Printf("[hash HmacSHA512 (%d)]\n", hopts)
 		halg := crypto.SHA512
@@ -131,7 +131,6 @@ func (hc Conn) getStream(keymat []byte) (rc cipher.Stream, mc hash.Hash, err err
 		if !halg.Available() {
 			log.Fatal("hash not available!")
 		}
-		break
 	default:
 		log.Printf("[invalid hmac (%d)]\n", hopts)
 		fmt.Printf("DOOFUS SET A VALID HMAC ALG (%d)\n", hopts)
