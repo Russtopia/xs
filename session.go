@@ -1,8 +1,8 @@
-package hkexsh
+package xs
 
-// Package hkexsh - a secure terminal client/server written from scratch in Go
+// Package xs - a secure terminal client/server written from scratch in Go
 //
-// Copyright (c) 2017-2018 Russell Magee
+// Copyright (c) 2017-2019 Russell Magee
 // Licensed under the terms of the MIT license (see LICENSE.mit in this
 // distribution)
 //
@@ -28,7 +28,7 @@ type Session struct {
 
 // Output Session record as a string. Implements Stringer interface.
 func (h *Session) String() string {
-	return fmt.Sprintf("hkexsh.Session:\nOp:%v\nWho:%v\nCmd:%v\nAuthCookie:%v\nStatus:%v",
+	return fmt.Sprintf("xs.Session:\nOp:%v\nWho:%v\nCmd:%v\nAuthCookie:%v\nStatus:%v",
 		h.op, h.who, h.cmd, h.AuthCookie(false), h.status)
 }
 

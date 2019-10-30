@@ -1,12 +1,12 @@
-// hkextun.go - Tunnel setup using an established hkexnet.Conn
+// hkextun.go - Tunnel setup using an established xsnet.Conn
 
-// Copyright (c) 2017-2018 Russell Magee
+// Copyright (c) 2017-2019 Russell Magee
 // Licensed under the terms of the MIT license (see LICENSE.mit in this
 // distribution)
 //
 // golang implementation by Russ Magee (rmagee_at_gmail.com)
 
-package hkexnet
+package xsnet
 
 import (
 	"bytes"
@@ -18,7 +18,7 @@ import (
 	"sync"
 	"time"
 
-	"blitter.com/go/hkexsh/logger"
+	"blitter.com/go/xs/logger"
 )
 
 type (

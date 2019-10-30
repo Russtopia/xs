@@ -1,8 +1,8 @@
-package hkexsh
+package xs
 
-// Package hkexsh - a secure terminal client/server written from scratch in Go
+// Package xs - a secure terminal client/server written from scratch in Go
 //
-// Copyright (c) 2017-2018 Russell Magee
+// Copyright (c) 2017-2019 Russell Magee
 // Licensed under the terms of the MIT license (see LICENSE.mit in this
 // distribution)
 //
@@ -30,7 +30,7 @@ func userExistsOnSystem(who string) bool {
 }
 
 // AuthUserByPasswd checks user login information using a password.
-// This checks /etc/hkexsh.passwd for auth info, and system /etc/passwd
+// This checks /etc/xs.passwd for auth info, and system /etc/passwd
 // to cross-check the user actually exists.
 // nolint: gocyclo
 func AuthUserByPasswd(username string, auth string, fname string) (valid bool, allowedCmds string) {
@@ -85,7 +85,7 @@ func AuthUserByPasswd(username string, auth string, fname string) (valid bool, a
 }
 
 // AuthUserByToken checks user login information against an auth token.
-// Auth tokens are stored in each user's $HOME/.hkexsh_id and are requested
+// Auth tokens are stored in each user's $HOME/.xs_id and are requested
 // via the -g option.
 // The function also check system /etc/passwd to cross-check the user
 // actually exists.
@@ -96,9 +96,9 @@ func AuthUserByToken(username string, connhostname string, auth string) (valid b
 		return false
 	}
 
-	b, e := ioutil.ReadFile(fmt.Sprintf("%s/.hkexsh_id", u.HomeDir))
+	b, e := ioutil.ReadFile(fmt.Sprintf("%s/.xs_id", u.HomeDir))
 	if e != nil {
-		log.Printf("INFO: Cannot read %s/.hkexsh_id\n", u.HomeDir)
+		log.Printf("INFO: Cannot read %s/.xs_id\n", u.HomeDir)
 		return false
 	}
 

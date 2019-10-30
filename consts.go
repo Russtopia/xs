@@ -1,10 +1,10 @@
-// Package hkexsh - a secure terminal client/server written from scratch in Go
+// Package xs - a secure terminal client/server written from scratch in Go
 //
-// Copyright (c) 2017-2018 Russell Magee
+// Copyright (c) 2017-2019 Russell Magee
 // Licensed under the terms of the MIT license (see LICENSE.mit in this
 // distribution)
 //
 // golang implementation by Russ Magee (rmagee_at_gmail.com)
-package hkexsh
+package xs
 
-// common constants for the HKExSh
+// common constants for the XS (Xperimental Shell)

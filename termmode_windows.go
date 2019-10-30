@@ -1,7 +1,7 @@
 // +build windows
 //
 // Note the terminal manipulation functions herein are mostly stubs. They
-// don't really do anything and the hkexsh demo client depends on a wrapper
+// don't really do anything and the xs demo client depends on a wrapper
 // script using the 'stty' tool to actually set the proper mode for
 // password login and raw mode required, then restoring it upon logout/exit.
 //
@@ -12,7 +12,7 @@
 // here; the wrapper does the bare minimum to make the client workable
 // under MSYS+mintty which is what I use.
 
-package hkexsh
+package xs
 
 import (
 	"io"

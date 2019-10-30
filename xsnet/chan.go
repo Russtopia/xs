@@ -1,6 +1,6 @@
-package hkexnet
+package xsnet
 
-// Copyright (c) 2017-2018 Russell Magee
+// Copyright (c) 2017-2019 Russell Magee
 // Licensed under the terms of the MIT license (see LICENSE.mit in this
 // distribution)
 //
@@ -57,7 +57,7 @@ func expandKeyMat(keymat []byte, blocksize int) []byte {
 }
 
 /* Support functionality to set up encryption after a channel has
-been negotiated via hkexnet.go
+been negotiated via xsnet.go
 */
 func (hc Conn) getStream(keymat []byte) (rc cipher.Stream, mc hash.Hash, err error) {
 	var key []byte

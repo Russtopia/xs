@@ -1,19 +1,19 @@
-[![GoDoc](https://godoc.org/blitter.com/go/hkexsh?status.svg)](https://godoc.org/blitter.com/go/hkexsh)
+[![GoDoc](https://godoc.org/blitter.com/go/xs?status.svg)](https://godoc.org/blitter.com/go/xs)
 
 
-# HKExSh
+# XS
 --
 
-HKExSh (**H**erradura**K**yber**Ex** **Sh**ell) is a golang implementation of a simple
-remote shell client and server, similar in role to ssh, offering
-encrypted interactive and non-interactive sessions, file copying and tunnels with traffic obfuscation ('chaffing').
+XS (**X**perimental **S**hell) is a golang implementation of a simple remote shell client and
+server, similar in role to ssh, offering encrypted interactive and non-interactive sessions,
+file copying and tunnels with traffic obfuscation ('chaffing').
 
 ***
 **NOTE: Due to the experimental nature of the KEX/KEM algorithms used, and the novelty of the overall codebase, this package SHOULD BE CONSIDERED EXTREMELY EXPERIMENTAL and USED WITH CAUTION. It DEFINITELY SHOULD NOT be used for any sensitive applications. USE AT YOUR OWN RISK. NEITHER WARRANTY NOR CLAIM OF FITNESS FOR PURPOSE IS EXPRESSED OR IMPLIED.**
 
 ***
 
-The client and server programs (hkexsh and hkexshd) use a mostly drop-in
+The client and server programs (xs and xsd) use a mostly drop-in
 replacement for golang's standard golang/pkg/net facilities (net.Dial(), net.Listen(), net.Accept()
 and the net.Conn type), which automatically negotiate keying material for
 secure sockets using one of a selectable set of experimental key exchange (KEX) or
@@ -42,10 +42,10 @@ Currently supported session algorithms:
 
 
 ### Conn
-Calls to hkexnet.Dial() and hkexnet.Listen()/Accept() are generally the same as calls to the equivalents within the _net_ package; however upon connection a key exchange automatically occurs whereby client and server independently derive the same keying material, and all following traffic is secured by a symmetric encryption algorithm.
+Calls to xsnet.Dial() and xsnet.Listen()/Accept() are generally the same as calls to the equivalents within the _net_ package; however upon connection a key exchange automatically occurs whereby client and server independently derive the same keying material, and all following traffic is secured by a symmetric encryption algorithm.
 
 ### Session Negotiation
-Above the hkexnet.Conn layer, the server and client apps in this repository (hkexshd/ and hkexsh/ respectively) negotiate session settings (cipher/hmac algorithms, interactive/non-interactive mode, tunnel specifiers, etc.) to be used for communication.
+Above the xsnet.Conn layer, the server and client apps in this repository (xsd/ and xs/ respectively) negotiate session settings (cipher/hmac algorithms, interactive/non-interactive mode, tunnel specifiers, etc.) to be used for communication.
 
 ### Padding and Chaffing
 Packets are subject to padding (random size, randomly applied as prefix or postfix), and optionally the client and server channels can both send _chaff_ packets at random defineable intervals to help thwart analysis of session activity (applicable to interactive and non-interactive command sessions, file copies and tunnels).
@@ -54,7 +54,7 @@ Packets are subject to padding (random size, randomly applied as prefix or postf
 Chaffing and tunnels, if specified, are set up during initial client->server connection. Packets from the client local port(s) are sent through the main secured connection to the server's remote port(s), and vice versa, tagged with a chaff or tunnel specifier so that they can be discarded as chaff or de-multiplexed and delivered to the proper tunnel endpoints, respectively.
 
 ### Accounts and Passwords
-Within the hkexpasswd/ directory is a password-setting utility. HKExSh uses its own password file distinct from the system /etc/passwd to authenticate clients, using standard bcrypt+salt storage. This is currently done to allow alternate login credentials via hkexsh vs. console/ssh login, due to the experimental nature of the program. At some point in the future an option to use the system's /etc/passwd and /etc/shadow may be implemented, making the use of the auxilliary hkexpasswd utility optional or obsolete.
+Within the xspasswd/ directory is a password-setting utility. XS uses its own password file distinct from the system /etc/passwd to authenticate clients, using standard bcrypt+salt storage. This is currently done to allow alternate login credentials via xs vs. console/ssh login, due to the experimental nature of the program. At some point in the future an option to use the system's /etc/passwd and /etc/shadow may be implemented, making the use of the auxilliary xspasswd utility optional or obsolete.
 
 
 HERRADURA KEX
@@ -85,8 +85,8 @@ As of this time (Oct 2018) Kyber is one of the candidate algorithms submitted to
 ### Get source code
 
 ```
-$ go get -u blitter.com/go/hkexsh
-$ cd $GOPATH/src/blitter.com/go/hkexsh
+$ go get -u blitter.com/go/xs
+$ cd $GOPATH/src/blitter.com/go/xs
 $ go build ./... # install all dependent go pkgs
 ```
 
@@ -94,7 +94,7 @@ $ go build ./... # install all dependent go pkgs
 ### To build
 
 ```
-$ cd $GOPATH/src/blitter.com/go/hkexsh
+$ cd $GOPATH/src/blitter.com/go/xs
 $ make clean all
 ```
 
@@ -106,24 +106,24 @@ $ sudo make [install | uninstall | reinstall]
 
 ### To manage service (assuming openrc init)
 
-An example init script (hkexshd.initrc) is provided. Consult your Linux distribution documentation for proper service/daemon installation. For openrc,
+An example init script (xsd.initrc) is provided. Consult your Linux distribution documentation for proper service/daemon installation. For openrc,
 
 ```
-$ sudo cp hkexshd.initrc /etc/init.d/hkexshd
-$ sudo rc-config add hkexshd default
+$ sudo cp xsd.initrc /etc/init.d/xsd
+$ sudo rc-config add xsd default
 ```
 
-The make system assumes installation in /usr/local/sbin (hkexshd, hkexpasswd) and /usr/local/bin (hkexsh/hkexcp symlink).
+The make system assumes installation in /usr/local/sbin (xsd, xspasswd) and /usr/local/bin (xs/xc symlink).
 
 ```
-$ sudo rc-config [start | restart | stop] hkexshd
+$ sudo rc-config [start | restart | stop] xsd
 ```
 
 ### To set accounts & passwords:
 
 ```
-$ sudo touch /etc/hkexsh.passwd
-$ sudo hkexpasswd/hkexpasswd -u joebloggs
+$ sudo touch /etc/xs.passwd
+$ sudo xspasswd/xspasswd -u joebloggs
 $ <enter a password, enter again to confirm>
 ```
 
@@ -131,36 +131,36 @@ $ <enter a password, enter again to confirm>
 
 In separate shells A and B:
 ```
-[A]$ cd hkexshd && sudo ./hkexshd &  # add -d for debugging
+[A]$ cd xsd && sudo ./xsd &  # add -d for debugging
 ```
 
 Interactive shell
 ```
-[B]$ cd hkexsh && ./hkexsh joebloggs@host-or-ip # add -d for debugging
+[B]$ cd xs && ./xs joebloggs@host-or-ip # add -d for debugging
 ```
 
 One-shot command
 ```
-[B]$ cd hkexsh && ./hkexsh -x "ls /tmp" joebloggs@host-or-ip
+[B]$ cd xs && ./xs -x "ls /tmp" joebloggs@host-or-ip
 ```
 
 WARNING WARNING WARNING: the -d debug flag will echo passwords to the log/console!
 Logging on Linux usually goes to /var/log/syslog and/or /var/log/debug, /var/log/daemon.log.
 
-NOTE if running client (hkexsh) with -d, one will likely need to run 'reset' afterwards
+NOTE if running client (xs) with -d, one will likely need to run 'reset' afterwards
 to fix up the shell tty afterwards, as stty echo may not be restored if client crashes
 or is interrupted.
 
 ### Setting up an 'authtoken' for scripted (password-free) logins
 
-Use the -g option of hkexsh to request a token from the remote server, which will return a
-hostname:token string. Place this string into $HOME/.hkexsh_id to allow logins without
-entering a password (obviously, $HOME/.hkexsh_id on both server and client for the user
+Use the -g option of xs to request a token from the remote server, which will return a
+hostname:token string. Place this string into $HOME/.xs_id to allow logins without
+entering a password (obviously, $HOME/.xs_id on both server and client for the user
 should *not* be world-readable.)
 
-### File Copying using hkexcp
+### File Copying using xc
 
-hkexcp is a symlink to hkexsh, and the binary checks its own filename to determine whether
+xc is a symlink to xs, and the binary checks its own filename to determine whether
 it is being invoked in 'shell' or 'copy' mode. Refer to the '-h' output for differences in
 accepted options.
 
@@ -171,15 +171,15 @@ as expected.
 
 Local (client) to remote (server) copy:
 ```
-$ hkexcp fileA /some/where/fileB /some/where/else/dirC joebloggs@host-or-ip:remoteDir
+$ xc fileA /some/where/fileB /some/where/else/dirC joebloggs@host-or-ip:remoteDir
 ```
 
 Remote (server) to local (client) copy:
 ```
-$ hkexcp joebloggs@host-or-ip:/remoteDirOrFile /some/where/local/Dir
+$ xc joebloggs@host-or-ip:/remoteDirOrFile /some/where/local/Dir
 ```
 
-hkexcp uses a 'tarpipe' to send file data over the encrypted channel. Use the -d flag on client or server to see the generated tar commands if you're curious.
+xc uses a 'tarpipe' to send file data over the encrypted channel. Use the -d flag on client or server to see the generated tar commands if you're curious.
 
 NOTE: Renaming while copying (eg., 'cp /foo/bar/fileA ./fileB') is NOT supported. Put another way, the destination (whether local or remote) must ALWAYS be a directory.
 
@@ -187,12 +187,12 @@ NOTE: Renaming while copying (eg., 'cp /foo/bar/fileA ./fileB') is NOT supported
 
 Simple tunnels (client -> server, no reverse tunnels for now) are supported.
 
-Syntax: hkexsh -T=&lt;tunspec&gt;{,&lt;tunspec&gt;...}
+Syntax: xs -T=&lt;tunspec&gt;{,&lt;tunspec&gt;...}
 .. where &lt;tunspec&gt; is &lt;localport:remoteport&gt;
 
-Example, tunnelling ssh through hkexsh
+Example, tunnelling ssh through xs
 
 * [server side] ```$ sudo /usr/sbin/sshd -p 7002```
-* [client side, term A] ```$ hkexsh -T=6002:7002 user@server```
+* [client side, term A] ```$ xs -T=6002:7002 user@server```
 * [client side, term B] ```$ ssh user@localhost -p 6002```
 

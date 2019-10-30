@@ -1,4 +1,4 @@
-// hkexsh client
+// xs client
 //
 // Copyright (c) 2017-2019 Russell Magee
 // Licensed under the terms of the MIT license (see LICENSE.mit in this
@@ -33,10 +33,10 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 
-	hkexsh "blitter.com/go/hkexsh"
-	"blitter.com/go/hkexsh/hkexnet"
-	"blitter.com/go/hkexsh/logger"
-	"blitter.com/go/hkexsh/spinsult"
+	xs "blitter.com/go/xs"
+	"blitter.com/go/xs/xsnet"
+	"blitter.com/go/xs/logger"
+	"blitter.com/go/xs/spinsult"
 	isatty "github.com/mattn/go-isatty"
 )
 
@@ -110,7 +110,7 @@ type (
 // some client escape sequences to trigger special actions during
 // interactive sessions.
 //
-// (See go doc hkexsh/hkexsh.{escSeqs,escHandler})
+// (See go doc xs/xs.{escSeqs,escHandler})
 func Copy(dst io.Writer, src io.Reader) (written int64, err error) {
 	written, err = copyBuffer(dst, src, nil)
 	return
@@ -123,7 +123,7 @@ func Copy(dst io.Writer, src io.Reader) (written int64, err error) {
 // go stdlib pkg/io, with escape sequence interpretation to trigger
 // some special client-side actions.
 //
-// (See go doc hkexsh/hkexsh.{escSeqs,escHandler})
+// (See go doc xs/xs.{escSeqs,escHandler})
 func copyBuffer(dst io.Writer, src io.Reader, buf []byte) (written int64, err error) {
 	// NOTE: using dst.Write() in these esc funcs will cause the output
 	// to function as a 'macro', outputting as if user typed the sequence
@@ -240,10 +240,10 @@ func GetSize() (cols, rows int, err error) {
 	return
 }
 
-// doCopyMode begins a secure hkexsh local<->remote file copy operation.
+// doCopyMode begins a secure xs local<->remote file copy operation.
 //
 // TODO: reduce gocyclo
-func doCopyMode(conn *hkexnet.Conn, remoteDest bool, files string, rec *hkexsh.Session) (exitStatus uint32, err error) {
+func doCopyMode(conn *xsnet.Conn, remoteDest bool, files string, rec *xs.Session) (exitStatus uint32, err error) {
 	if remoteDest {
 		log.Println("local files:", files, "remote filepath:", string(rec.Cmd()))
 
@@ -328,7 +328,7 @@ func doCopyMode(conn *hkexnet.Conn, remoteDest bool, files string, rec *hkexsh.S
 			log.Println("Sending local exitStatus:", exitStatus)
 			r := make([]byte, 4)
 			binary.BigEndian.PutUint32(r, exitStatus)
-			_, we := conn.WritePacket(r, hkexnet.CSOExitStatus)
+			_, we := conn.WritePacket(r, xsnet.CSOExitStatus)
 			if we != nil {
 				fmt.Println("Error:", we)
 			}
@@ -398,9 +398,9 @@ func doCopyMode(conn *hkexnet.Conn, remoteDest bool, files string, rec *hkexsh.S
 	return
 }
 
-// doShellMode begins an hkexsh shell session (one-shot command or
+// doShellMode begins an xs shell session (one-shot command or
 // interactive).
-func doShellMode(isInteractive bool, conn *hkexnet.Conn, oldState *hkexsh.State, rec *hkexsh.Session) {
+func doShellMode(isInteractive bool, conn *xsnet.Conn, oldState *xs.State, rec *xs.Session) {
 	//client reader (from server) goroutine
 	//Read remote end's stdout
 
@@ -420,7 +420,7 @@ func doShellMode(isInteractive bool, conn *hkexnet.Conn, oldState *hkexsh.State,
 		// exit with inerr == nil
 		_, inerr := io.Copy(os.Stdout, conn)
 		if inerr != nil {
-			_ = hkexsh.Restore(int(os.Stdin.Fd()), oldState) // #nosec
+			_ = xs.Restore(int(os.Stdin.Fd()), oldState) // #nosec
 			// Copy operations and user logging off will cause
 			// a "use of closed network connection" so handle that
 			// gracefully here
@@ -435,7 +435,7 @@ func doShellMode(isInteractive bool, conn *hkexnet.Conn, oldState *hkexsh.State,
 
 		if isInteractive {
 			log.Println("[* Got EOF *]")
-			_ = hkexsh.Restore(int(os.Stdin.Fd()), oldState) // #nosec
+			_ = xs.Restore(int(os.Stdin.Fd()), oldState) // #nosec
 			exitWithStatus(int(rec.Status()))
 		}
 	}
@@ -453,7 +453,7 @@ func doShellMode(isInteractive bool, conn *hkexnet.Conn, oldState *hkexsh.State,
 		// TODO:.gv:doShellMode:2:shellStdinToRemote
 		shellStdinToRemote := func() {
 			defer wg.Done()
-			_, outerr := func(conn *hkexnet.Conn, r io.Reader) (w int64, e error) {
+			_, outerr := func(conn *xsnet.Conn, r io.Reader) (w int64, e error) {
 				// Copy() expects EOF so this will
 				// exit with outerr == nil
 				w, e = Copy(conn, r)
@@ -463,7 +463,7 @@ func doShellMode(isInteractive bool, conn *hkexnet.Conn, oldState *hkexsh.State,
 			if outerr != nil {
 				log.Println(outerr)
 				fmt.Println(outerr)
-				_ = hkexsh.Restore(int(os.Stdin.Fd()), oldState) // #nosec
+				_ = xs.Restore(int(os.Stdin.Fd()), oldState) // #nosec
 				log.Println("[Hanging up]")
 				exitWithStatus(0)
 			}
@@ -500,8 +500,8 @@ func rejectUserMsg() string {
 // Transmit request to server for it to set up the remote end of a tunnel
 //
 // Server responds with [CSOTunAck:rport] or [CSOTunRefused:rport]
-// (handled in hkexnet.Read())
-func reqTunnel(hc *hkexnet.Conn, lp uint16, p string /*net.Addr*/, rp uint16) {
+// (handled in xsnet.Read())
+func reqTunnel(hc *xsnet.Conn, lp uint16, p string /*net.Addr*/, rp uint16) {
 	// Write request to server so it can attempt to set up its end
 	var bTmp bytes.Buffer
 	if e := binary.Write(&bTmp, binary.BigEndian, lp); e != nil {
@@ -511,7 +511,7 @@ func reqTunnel(hc *hkexnet.Conn, lp uint16, p string /*net.Addr*/, rp uint16) {
 		fmt.Fprintln(os.Stderr, "reqTunnel:", e) // nolint: errcheck
 	}
 	_ = logger.LogDebug(fmt.Sprintln("[Client sending CSOTunSetup]")) // nolint: gosec
-	if n, e := hc.WritePacket(bTmp.Bytes(), hkexnet.CSOTunSetup); e != nil || n != len(bTmp.Bytes()) {
+	if n, e := hc.WritePacket(bTmp.Bytes(), xsnet.CSOTunSetup); e != nil || n != len(bTmp.Bytes()) {
 		fmt.Fprintln(os.Stderr, "reqTunnel:", e) // nolint: errcheck
 	}
 }
@@ -551,7 +551,7 @@ func parseNonSwitchArgs(a []string) (user, host, path string, isDest bool, other
 	return fancyUser, fancyHost, fancyPath, isDest, otherArgs
 }
 
-func launchTuns(conn *hkexnet.Conn, remoteHost string, tuns string) {
+func launchTuns(conn *xsnet.Conn, remoteHost string, tuns string) {
 	remAddrs, _ := net.LookupHost(remoteHost) // nolint: gosec
 
 	if tuns == "" {
@@ -566,7 +566,7 @@ func launchTuns(conn *hkexnet.Conn, remoteHost string, tuns string) {
 	}
 }
 
-func sendSessionParams(conn io.Writer /* *hkexnet.Conn*/, rec *hkexsh.Session) (e error) {
+func sendSessionParams(conn io.Writer /* *xsnet.Conn*/, rec *xs.Session) (e error) {
 	_, e = fmt.Fprintf(conn, "%d %d %d %d %d %d\n",
 		len(rec.Op()), len(rec.Who()), len(rec.ConnHost()), len(rec.TermType()), len(rec.Cmd()), len(rec.AuthCookie(true)))
 	if e != nil {
@@ -641,7 +641,7 @@ func main() {
 	// Find out what program we are (shell or copier)
 	myPath := strings.Split(os.Args[0], string(os.PathSeparator))
 	if myPath[len(myPath)-1] != "hkexcp" && myPath[len(myPath)-1] != "hkexcp.exe" {
-		// hkexsh accepts a command (-x) but not
+		// xs accepts a command (-x) but not
 		// a srcpath (-r) or dstpath (-t)
 		flag.StringVar(&cmdStr, "x", "", "run <`command`> (if not specified, run interactive shell)")
 		flag.StringVar(&tunSpecStr, "T", "", "``tunnelspec - localPort:remotePort[,localPort:remotePort,...]")
@@ -742,8 +742,8 @@ func main() {
 	// either the shell session or copy operation.
 	_ = shellMode
 
-	Log, _ = logger.New(logger.LOG_USER|logger.LOG_DEBUG|logger.LOG_NOTICE|logger.LOG_ERR, "hkexsh") // nolint: errcheck,gosec
-	hkexnet.Init(dbg, "hkexsh", logger.LOG_USER|logger.LOG_DEBUG|logger.LOG_NOTICE|logger.LOG_ERR)
+	Log, _ = logger.New(logger.LOG_USER|logger.LOG_DEBUG|logger.LOG_NOTICE|logger.LOG_ERR, "xs") // nolint: errcheck,gosec
+	xsnet.Init(dbg, "xs", logger.LOG_USER|logger.LOG_DEBUG|logger.LOG_NOTICE|logger.LOG_ERR)
 	if dbg {
 		log.SetOutput(Log)
 	} else {
@@ -753,7 +753,7 @@ func main() {
 	if !gopt {
 		// See if we can log in via an auth token
 		u, _ := user.Current() // nolint: gosec
-		ab, aerr := ioutil.ReadFile(fmt.Sprintf("%s/.hkexsh_id", u.HomeDir))
+		ab, aerr := ioutil.ReadFile(fmt.Sprintf("%s/.xs_id", u.HomeDir))
 		if aerr == nil {
 			idx := strings.Index(string(ab), remoteHost)
 			if idx >= 0 {
@@ -767,7 +767,7 @@ func main() {
 				_, _ = fmt.Fprintln(os.Stderr, "[no authtoken, use -g to request one from server]")
 			}
 		} else {
-			log.Printf("[cannot read %s/.hkexsh_id]\n", u.HomeDir)
+			log.Printf("[cannot read %s/.xs_id]\n", u.HomeDir)
 		}
 	}
 
@@ -826,7 +826,7 @@ func main() {
 	if kcpMode != "unused" {
 			proto = "kcp"
 	}
-	conn, err := hkexnet.Dial(proto, server, cipherAlg, hmacAlg, kexAlg, kcpMode)
+	conn, err := xsnet.Dial(proto, server, cipherAlg, hmacAlg, kexAlg, kcpMode)
 	if err != nil {
 		fmt.Println(err)
 		exitWithStatus(3)
@@ -837,16 +837,16 @@ func main() {
 	// Set stdin in raw mode if it's an interactive session
 	// TODO: send flag to server side indicating this
 	//  affects shell command used
-	var oldState *hkexsh.State
+	var oldState *xs.State
 	if shellMode {
 		if isatty.IsTerminal(os.Stdin.Fd()) {
-			oldState, err = hkexsh.MakeRaw(int(os.Stdin.Fd()))
+			oldState, err = xs.MakeRaw(int(os.Stdin.Fd()))
 			if err != nil {
 				panic(err)
 			}
 			// #gv:s/label=\"main\$1\"/label=\"deferRestore\"/
 			// TODO:.gv:main:1:deferRestore
-			defer func() { _ = hkexsh.Restore(int(os.Stdin.Fd()), oldState) }() // nolint: errcheck,gosec
+			defer func() { _ = xs.Restore(int(os.Stdin.Fd()), oldState) }() // nolint: errcheck,gosec
 		} else {
 			log.Println("NOT A TTY")
 		}
@@ -855,7 +855,7 @@ func main() {
 	if len(authCookie) == 0 {
 		//No auth token, prompt for password
 		fmt.Printf("Gimme cookie:")
-		ab, e := hkexsh.ReadPassword(int(os.Stdin.Fd()))
+		ab, e := xs.ReadPassword(int(os.Stdin.Fd()))
 		fmt.Printf("\r\n")
 		if e != nil {
 			panic(e)
@@ -866,7 +866,7 @@ func main() {
 	runtime.GC()
 
 	// Set up session params and send over to server
-	rec := hkexsh.NewSession(op, []byte(uname), []byte(remoteHost), []byte(os.Getenv("TERM")), []byte(cmdStr), []byte(authCookie), 0)
+	rec := xs.NewSession(op, []byte(uname), []byte(remoteHost), []byte(os.Getenv("TERM")), []byte(cmdStr), []byte(authCookie), 0)
 	sendErr := sendSessionParams(&conn, rec)
 	if sendErr != nil {
 		log.Fatal(sendErr)
@@ -909,7 +909,7 @@ func main() {
 				// FIXME: keepAlives should probably have small random packet len/data as well
 				// to further obscure them vs. interactive or tunnel data
 				// keepAlives must be  >=2 bytes, due to processing elsewhere
-				conn.WritePacket([]byte{0, 0}, hkexnet.CSOTunKeepAlive) // nolint: errcheck,gosec
+				conn.WritePacket([]byte{0, 0}, xsnet.CSOTunKeepAlive) // nolint: errcheck,gosec
 			}
 		}
 		go keepAliveWorker()
@@ -924,13 +924,13 @@ func main() {
 		}
 
 		if rec.Status() != 0 {
-			_ = hkexsh.Restore(int(os.Stdin.Fd()), oldState)                     // nolint: errcheck,gosec
+			_ = xs.Restore(int(os.Stdin.Fd()), oldState)                     // nolint: errcheck,gosec
 			fmt.Fprintln(os.Stderr, "Session exited with status:", rec.Status()) // nolint: errcheck
 		}
 	}
 
 	if oldState != nil {
-		_ = hkexsh.Restore(int(os.Stdin.Fd()), oldState) // nolint: gosec
+		_ = xs.Restore(int(os.Stdin.Fd()), oldState) // nolint: gosec
 	}
 
 	exitWithStatus(int(rec.Status()))

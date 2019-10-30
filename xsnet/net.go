@@ -1,13 +1,13 @@
-// hkexnet.go - net.Conn compatible channel setup with encrypted/HMAC
+// xsnet.go - net.Conn compatible channel setup with encrypted/HMAC
 // negotiation
 
-// Copyright (c) 2017-2018 Russell Magee
+// Copyright (c) 2017-2019 Russell Magee
 // Licensed under the terms of the MIT license (see LICENSE.mit in this
 // distribution)
 //
 // golang implementation by Russ Magee (rmagee_at_gmail.com)
 
-package hkexnet
+package xsnet
 
 // Implementation of HKEx-wrapped versions of the golang standard
 // net package interfaces, allowing clients and servers to simply replace
@@ -41,7 +41,7 @@ import (
 	"time"
 
 	hkex "blitter.com/go/herradurakex"
-	"blitter.com/go/hkexsh/logger"
+	"blitter.com/go/xs/logger"
 	kyber "git.schwanenlied.me/yawning/kyber.git"
 	newhope "git.schwanenlied.me/yawning/newhope.git"
 )
@@ -107,7 +107,7 @@ func (t *TunEndpoint) String() string {
 
 func _initLogging(d bool, c string, f logger.Priority) {
 	if Log == nil {
-		Log, _ = logger.New(f, fmt.Sprintf("%s:hkexnet", c))
+		Log, _ = logger.New(f, fmt.Sprintf("%s:xsnet", c))
 	}
 	if d {
 		log.SetFlags(0) // syslog will have date,time
@@ -175,7 +175,7 @@ func (hc *Conn) SetOpts(opts uint32) {
 	hc.opts = opts
 }
 
-// Return a new hkexnet.Conn
+// Return a new xsnet.Conn
 //
 // Note this is internal: use Dial() or Accept()
 func _new(kexAlg KEXAlg, conn *net.Conn) (hc *Conn, e error) {
@@ -323,7 +323,7 @@ func (r randReader) Read(b []byte) (n int, e error) {
 }
 
 func NewHopeDialSetup(c io.ReadWriter, hc *Conn) (err error) {
-	// Send hkexnet.Conn parameters to remote side
+	// Send xsnet.Conn parameters to remote side
 
 	// Alice, step 1: Generate a key pair.
 	r := new(randReader)
@@ -368,7 +368,7 @@ func NewHopeDialSetup(c io.ReadWriter, hc *Conn) (err error) {
 }
 
 func NewHopeSimpleDialSetup(c io.ReadWriter, hc *Conn) (err error) {
-	// Send hkexnet.Conn parameters to remote side
+	// Send xsnet.Conn parameters to remote side
 
 	// Alice, step 1: Generate a key pair.
 	r := new(randReader)
@@ -412,7 +412,7 @@ func NewHopeSimpleDialSetup(c io.ReadWriter, hc *Conn) (err error) {
 }
 
 func KyberDialSetup(c io.ReadWriter /*net.Conn*/, hc *Conn) (err error) {
-	// Send hkexnet.Conn parameters to remote side
+	// Send xsnet.Conn parameters to remote side
 
 	// Alice, step 1: Generate a key pair.
 	r := new(randReader)
@@ -477,7 +477,7 @@ func HKExDialSetup(c io.ReadWriter /*net.Conn*/, hc *Conn) (err error) {
 		h = hkex.New(256, 64)
 	}
 
-	// Send hkexnet.Conn parameters to remote side
+	// Send xsnet.Conn parameters to remote side
 	// d is value for Herradura key exchange
 	fmt.Fprintf(c, "0x%s\n0x%x:0x%x\n", h.D().Text(16),
 		hc.cipheropts, hc.opts)
@@ -647,7 +647,7 @@ func HKExAcceptSetup(c *net.Conn, hc *Conn) (err error) {
 		h = hkex.New(256, 64)
 	}
 
-	// Read in hkexnet.Conn parameters over raw Conn c
+	// Read in xsnet.Conn parameters over raw Conn c
 	// d is value for Herradura key exchange
 	d := big.NewInt(0)
 	_, err = fmt.Fscanln(*c, d)
@@ -686,7 +686,7 @@ func HKExAcceptSetup(c *net.Conn, hc *Conn) (err error) {
 //
 //   "H_SHA256" | "H_SHA512" | ...
 //
-// See go doc -u hkexnet.applyConnExtensions
+// See go doc -u xsnet.applyConnExtensions
 func Dial(protocol string, ipport string, extensions ...string) (hc Conn, err error) {
 	if Log == nil {
 		Init(false, "client", logger.LOG_DAEMON|logger.LOG_DEBUG)
@@ -705,7 +705,7 @@ func Dial(protocol string, ipport string, extensions ...string) (hc Conn, err er
 			return Conn{}, err
 		}
 	}
-	// Init hkexnet.Conn hc over net.Conn c
+	// Init xsnet.Conn hc over net.Conn c
 	ret, err := _new(getkexalgnum(extensions...), &c)
 	if err != nil {
 		return Conn{}, err
@@ -1045,7 +1045,7 @@ func (hc Conn) Read(b []byte) (n int, err error) {
 			log.Printf("  <-ptext:\r\n%s\r\n", hex.Dump(payloadBytes[:n]))
 		}
 		if err != nil {
-			log.Println("hkexnet.Read():", err)
+			log.Println("xsnet.Read():", err)
 			//panic(err)
 		} else {
 			hc.rm.Write(payloadBytes) // Calc hmac on received data

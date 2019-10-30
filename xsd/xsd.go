@@ -1,6 +1,6 @@
-// hkexshd server
+// xsd server
 //
-// Copyright (c) 2017-2018 Russell Magee
+// Copyright (c) 2017-2019 Russell Magee
 // Licensed under the terms of the MIT license (see LICENSE.mit in this
 // distribution)
 //
@@ -28,9 +28,9 @@ import (
 	"unsafe"
 
 	"blitter.com/go/goutmp"
-	hkexsh "blitter.com/go/hkexsh"
-	"blitter.com/go/hkexsh/hkexnet"
-	"blitter.com/go/hkexsh/logger"
+	xs "blitter.com/go/xs"
+	"blitter.com/go/xs/xsnet"
+	"blitter.com/go/xs/logger"
 	"github.com/kr/pty"
 )
 
@@ -63,7 +63,7 @@ func ptsName(fd uintptr) (string, error) {
 
 /* -------------------------------------------------------------- */
 // Perform a client->server copy
-func runClientToServerCopyAs(who, ttype string, conn *hkexnet.Conn, fpath string, chaffing bool) (exitStatus uint32, err error) {
+func runClientToServerCopyAs(who, ttype string, conn *xsnet.Conn, fpath string, chaffing bool) (exitStatus uint32, err error) {
 	u, _ := user.Lookup(who) // nolint: gosec
 	var uid, gid uint32
 	fmt.Sscanf(u.Uid, "%d", &uid) // nolint: gosec,errcheck
@@ -139,7 +139,7 @@ func runClientToServerCopyAs(who, ttype string, conn *hkexnet.Conn, fpath string
 		log.Println("cmd exited immediately. Cannot get cmd.Wait().ExitStatus()")
 		err = errors.New("cmd exited prematurely")
 		//exitStatus = uint32(254)
-		exitStatus = hkexnet.CSEExecFail
+		exitStatus = xsnet.CSEExecFail
 	} else {
 		if err := c.Wait(); err != nil {
 			//fmt.Println("*** c.Wait() done ***")
@@ -163,7 +163,7 @@ func runClientToServerCopyAs(who, ttype string, conn *hkexnet.Conn, fpath string
 }
 
 // Perform a server->client copy
-func runServerToClientCopyAs(who, ttype string, conn *hkexnet.Conn, srcPath string, chaffing bool) (exitStatus uint32, err error) {
+func runServerToClientCopyAs(who, ttype string, conn *xsnet.Conn, srcPath string, chaffing bool) (exitStatus uint32, err error) {
 	u, err := user.Lookup(who)
 	if err != nil {
 		exitStatus = 1
@@ -225,7 +225,7 @@ func runServerToClientCopyAs(who, ttype string, conn *hkexnet.Conn, srcPath stri
 	err = c.Start() // returns immediately
 	if err != nil {
 		log.Printf("Command finished with error: %v", err)
-		return hkexnet.CSEExecFail, err // !?
+		return xsnet.CSEExecFail, err // !?
 	}
 	if err := c.Wait(); err != nil {
 		//fmt.Println("*** c.Wait() done ***")
@@ -253,7 +253,7 @@ func runServerToClientCopyAs(who, ttype string, conn *hkexnet.Conn, srcPath stri
 //
 // Uses ptys to support commands which expect a terminal.
 // nolint: gocyclo
-func runShellAs(who, hname, ttype, cmd string, interactive bool, conn *hkexnet.Conn, chaffing bool) (exitStatus uint32, err error) {
+func runShellAs(who, hname, ttype, cmd string, interactive bool, conn *xsnet.Conn, chaffing bool) (exitStatus uint32, err error) {
 	var wg sync.WaitGroup
 	u, err := user.Lookup(who)
 	if err != nil {
@@ -314,7 +314,7 @@ func runShellAs(who, hname, ttype, cmd string, interactive bool, conn *hkexnet.C
 	ptmx, err := pty.Start(c) // returns immediately with ptmx file
 	if err != nil {
 		log.Println(err)
-		return hkexnet.CSEPtyExecFail, err
+		return xsnet.CSEPtyExecFail, err
 	}
 	// Make sure to close the pty at the end.
 	// #gv:s/label=\"runShellAs\$1\"/label=\"deferPtmxClose\"/
@@ -326,11 +326,11 @@ func runShellAs(who, hname, ttype, cmd string, interactive bool, conn *hkexnet.C
 	// get pty info for system accounting (who, lastlog)
 	pts, pe := ptsName(ptmx.Fd())
 	if pe != nil {
-		return hkexnet.CSEPtyGetNameFail, err
+		return xsnet.CSEPtyGetNameFail, err
 	}
 	utmpx := goutmp.Put_utmp(who, pts, hname)
 	defer func() { goutmp.Unput_utmp(utmpx) }()
-	goutmp.Put_lastlog_entry("hkexsh", who, pts, hname)
+	goutmp.Put_lastlog_entry("xs", who, pts, hname)
 
 	log.Printf("[%s]\n", cmd)
 	if err != nil {
@@ -400,7 +400,7 @@ func runShellAs(who, hname, ttype, cmd string, interactive bool, conn *hkexnet.C
 					log.Printf("Exit Status: %d", exitStatus)
 				}
 			}
-			conn.SetStatus(hkexnet.CSOType(exitStatus))
+			conn.SetStatus(xsnet.CSOType(exitStatus))
 		} else {
 			logger.LogDebug("*** Main proc has exited. ***")
 			// Background jobs still may be running; close the
@@ -431,7 +431,7 @@ func GenAuthToken(who string, connhost string) string {
 
 // Demo of a simple server that listens and spawns goroutines for each
 // connecting client. Note this code is identical to standard tcp
-// server code, save for declaring 'hkex' rather than 'net'
+// server code, save for declaring 'xsnet' rather than 'net'
 // Listener and Conns. The KEx and encrypt/decrypt is done within the type.
 // Compare to 'serverp.go' in this directory to see the equivalence.
 // TODO: reduce gocyclo
@@ -478,8 +478,8 @@ func main() {
 		chaffBytesMax = 64
 	}
 
-	Log, _ = logger.New(logger.LOG_DAEMON|logger.LOG_DEBUG|logger.LOG_NOTICE|logger.LOG_ERR, "hkexshd") // nolint: gosec
-	hkexnet.Init(dbg, "hkexshd", logger.LOG_DAEMON|logger.LOG_DEBUG|logger.LOG_NOTICE|logger.LOG_ERR)
+	Log, _ = logger.New(logger.LOG_DAEMON|logger.LOG_DEBUG|logger.LOG_NOTICE|logger.LOG_ERR, "xsd") // nolint: gosec
+	xsnet.Init(dbg, "xsd", logger.LOG_DAEMON|logger.LOG_DEBUG|logger.LOG_NOTICE|logger.LOG_ERR)
 	if dbg {
 		log.SetOutput(Log)
 	} else {
@@ -513,7 +513,7 @@ func main() {
 	if kcpMode != "unused" {
 		proto = "kcp"
 	}
-	l, err := hkexnet.Listen(proto, laddr, kcpMode)
+	l, err := xsnet.Listen(proto, laddr, kcpMode)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -536,28 +536,28 @@ func main() {
 			// Handle the connection in a new goroutine.
 			// The loop then returns to accepting, so that
 			// multiple connections may be served concurrently.
-			go func(hc *hkexnet.Conn) (e error) {
+			go func(hc *xsnet.Conn) (e error) {
 				defer hc.Close() // nolint: errcheck
 
 				//We use io.ReadFull() here to guarantee we consume
-				//just the data we want for the hkexsh.Session, and no more.
+				//just the data we want for the xs.Session, and no more.
 				//Otherwise data will be sitting in the channel that isn't
 				//passed down to the command handlers.
-				var rec hkexsh.Session
+				var rec xs.Session
 				var len1, len2, len3, len4, len5, len6 uint32
 
 				n, err := fmt.Fscanf(hc, "%d %d %d %d %d %d\n", &len1, &len2, &len3, &len4, &len5, &len6)
-				log.Printf("hkexsh.Session read:%d %d %d %d %d %d\n", len1, len2, len3, len4, len5, len6)
+				log.Printf("xs.Session read:%d %d %d %d %d %d\n", len1, len2, len3, len4, len5, len6)
 
 				if err != nil || n < 6 {
-					log.Println("[Bad hkexsh.Session fmt]")
+					log.Println("[Bad xs.Session fmt]")
 					return err
 				}
 
 				tmp := make([]byte, len1)
 				_, err = io.ReadFull(hc, tmp)
 				if err != nil {
-					log.Println("[Bad hkexsh.Session.Op]")
+					log.Println("[Bad xs.Session.Op]")
 					return err
 				}
 				rec.SetOp(tmp)
@@ -565,7 +565,7 @@ func main() {
 				tmp = make([]byte, len2)
 				_, err = io.ReadFull(hc, tmp)
 				if err != nil {
-					log.Println("[Bad hkexsh.Session.Who]")
+					log.Println("[Bad xs.Session.Who]")
 					return err
 				}
 				rec.SetWho(tmp)
@@ -573,7 +573,7 @@ func main() {
 				tmp = make([]byte, len3)
 				_, err = io.ReadFull(hc, tmp)
 				if err != nil {
-					log.Println("[Bad hkexsh.Session.ConnHost]")
+					log.Println("[Bad xs.Session.ConnHost]")
 					return err
 				}
 				rec.SetConnHost(tmp)
@@ -581,7 +581,7 @@ func main() {
 				tmp = make([]byte, len4)
 				_, err = io.ReadFull(hc, tmp)
 				if err != nil {
-					log.Println("[Bad hkexsh.Session.TermType]")
+					log.Println("[Bad xs.Session.TermType]")
 					return err
 				}
 				rec.SetTermType(tmp)
@@ -589,7 +589,7 @@ func main() {
 				tmp = make([]byte, len5)
 				_, err = io.ReadFull(hc, tmp)
 				if err != nil {
-					log.Println("[Bad hkexsh.Session.Cmd]")
+					log.Println("[Bad xs.Session.Cmd]")
 					return err
 				}
 				rec.SetCmd(tmp)
@@ -597,20 +597,20 @@ func main() {
 				tmp = make([]byte, len6)
 				_, err = io.ReadFull(hc, tmp)
 				if err != nil {
-					log.Println("[Bad hkexsh.Session.AuthCookie]")
+					log.Println("[Bad xs.Session.AuthCookie]")
 					return err
 				}
 				rec.SetAuthCookie(tmp)
 
-				log.Printf("[hkexsh.Session: op:%c who:%s connhost:%s cmd:%s auth:****]\n",
+				log.Printf("[xs.Session: op:%c who:%s connhost:%s cmd:%s auth:****]\n",
 					rec.Op()[0], string(rec.Who()), string(rec.ConnHost()), string(rec.Cmd()))
 
 				var valid bool
 				var allowedCmds string // Currently unused
-				if hkexsh.AuthUserByToken(string(rec.Who()), string(rec.ConnHost()), string(rec.AuthCookie(true))) {
+				if xs.AuthUserByToken(string(rec.Who()), string(rec.ConnHost()), string(rec.AuthCookie(true))) {
 					valid = true
 				} else {
-					valid, allowedCmds = hkexsh.AuthUserByPasswd(string(rec.Who()), string(rec.AuthCookie(true)), "/etc/hkexsh.passwd")
+					valid, allowedCmds = xs.AuthUserByPasswd(string(rec.Who()), string(rec.AuthCookie(true)), "/etc/xs.passwd")
 				}
 
 				// Security scrub
@@ -633,7 +633,7 @@ func main() {
 					hname := goutmp.GetHost(addr.String())
 					logger.LogNotice(fmt.Sprintf("[Generating autologin token for [%s@%s]]\n", rec.Who(), hname)) // nolint: gosec,errcheck
 					token := GenAuthToken(string(rec.Who()), string(rec.ConnHost()))
-					tokenCmd := fmt.Sprintf("echo \"%s\" | tee -a ~/.hkexsh_id", token)
+					tokenCmd := fmt.Sprintf("echo \"%s\" | tee -a ~/.xs_id", token)
 					cmdStatus, runErr := runShellAs(string(rec.Who()), hname, string(rec.TermType()), tokenCmd, false, hc, chaffEnabled)
 					// Returned hopefully via an EOF or exit/logout;
 					// Clear current op so user can enter next, or EOF
@@ -642,7 +642,7 @@ func main() {
 						logger.LogErr(fmt.Sprintf("[Error generating autologin token for %s@%s]\n", rec.Who(), hname)) // nolint: gosec,errcheck
 					} else {
 						log.Printf("[Autologin token generation completed for %s@%s, status %d]\n", rec.Who(), hname, cmdStatus)
-						hc.SetStatus(hkexnet.CSOType(cmdStatus))
+						hc.SetStatus(xsnet.CSOType(cmdStatus))
 					}
 				} else if rec.Op()[0] == 'c' {
 					// Non-interactive command
@@ -657,7 +657,7 @@ func main() {
 						logger.LogErr(fmt.Sprintf("[Error spawning cmd for %s@%s]\n", rec.Who(), hname)) // nolint: gosec,errcheck
 					} else {
 						logger.LogNotice(fmt.Sprintf("[Command completed for %s@%s, status %d]\n", rec.Who(), hname, cmdStatus)) // nolint: gosec,errcheck
-						hc.SetStatus(hkexnet.CSOType(cmdStatus))
+						hc.SetStatus(xsnet.CSOType(cmdStatus))
 					}
 				} else if rec.Op()[0] == 's' {
 					// Interactive session
@@ -673,7 +673,7 @@ func main() {
 						Log.Err(fmt.Sprintf("[Error spawning shell for %s@%s]\n", rec.Who(), hname)) // nolint: gosec,errcheck
 					} else {
 						logger.LogNotice(fmt.Sprintf("[Shell completed for %s@%s, status %d]\n", rec.Who(), hname, cmdStatus)) // nolint: gosec,errcheck
-						hc.SetStatus(hkexnet.CSOType(cmdStatus))
+						hc.SetStatus(xsnet.CSOType(cmdStatus))
 					}
 				} else if rec.Op()[0] == 'D' {
 					// File copy (destination) operation - client copy to server
@@ -690,13 +690,13 @@ func main() {
 					} else {
 						logger.LogNotice(fmt.Sprintf("[Command completed for %s@%s, status %d]\n", rec.Who(), hname, cmdStatus)) // nolint: gosec,errcheck
 					}
-					hc.SetStatus(hkexnet.CSOType(cmdStatus))
+					hc.SetStatus(xsnet.CSOType(cmdStatus))
 
 					// Send CSOExitStatus *before* client closes channel
 					s := make([]byte, 4)
 					binary.BigEndian.PutUint32(s, cmdStatus)
 					log.Printf("** cp writing closeStat %d at Close()\n", cmdStatus)
-					hc.WritePacket(s, hkexnet.CSOExitStatus) // nolint: gosec,errcheck
+					hc.WritePacket(s, xsnet.CSOExitStatus) // nolint: gosec,errcheck
 				} else if rec.Op()[0] == 'S' {
 					// File copy (src) operation - server copy to client
 					log.Printf("[Server->Client copy]\n")
@@ -712,12 +712,12 @@ func main() {
 					}
 					// Clear current op so user can enter next, or EOF
 					rec.SetOp([]byte{0})
-					hc.SetStatus(hkexnet.CSOType(cmdStatus))
+					hc.SetStatus(xsnet.CSOType(cmdStatus))
 					//fmt.Println("Waiting for EOF from other end.")
 					//_, _ = hc.Read(nil /*ackByte*/)
 					//fmt.Println("Got remote end ack.")
 				} else {
-					logger.LogErr(fmt.Sprintln("[Bad hkexsh.Session]")) // nolint: gosec,errcheck
+					logger.LogErr(fmt.Sprintln("[Bad xs.Session]")) // nolint: gosec,errcheck
 				}
 				return
 			}(&conn) // nolint: errcheck

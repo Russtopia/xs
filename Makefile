@@ -5,13 +5,13 @@
 #endif
 
 GIT_COMMIT := $(shell git rev-list -1 HEAD)
-VERSION := 0.8.7-kcp
+VERSION := 0.8.8
 #ifeq ($(BUILDOPTS),)
 BUILDOPTS :=$(BUILDOPTS)" -ldflags \"-X main.version=$(VERSION) -X main.gitCommit=$(GIT_COMMIT)\""
 #endif
 
-SUBPKGS = logger spinsult hkexnet
-TOOLS = hkexpasswd hkexsh hkexshd
+SUBPKGS = logger spinsult xsnet
+TOOLS = xspasswd xs xsd
 SUBDIRS = $(LIBS) $(TOOLS)
 
 INSTPREFIX = /usr/local
@@ -41,63 +41,63 @@ common:
 
 
 client: common
-	$(MAKE) BUILDOPTS=$(BUILDOPTS) -C hkexsh
+	$(MAKE) BUILDOPTS=$(BUILDOPTS) -C xs
 
 
 ifeq ($(MSYSTEM),)
 ifneq ($(GOOS),windows)
 server: common
-	$(MAKE) BUILDOPTS=$(BUILDOPTS) -C hkexshd
+	$(MAKE) BUILDOPTS=$(BUILDOPTS) -C xsd
 else
-	echo "Cross-build of hkexshd server for Windows not yet supported"
+	echo "Cross-build of xsd server for Windows not yet supported"
 endif
 else
 server: common
-	echo "hkexshd server not (yet) supported on Windows"
+	echo "xsd server not (yet) supported on Windows"
 endif
 
 
 passwd: common
-	$(MAKE) BUILDOPTS=$(BUILDOPTS) -C hkexpasswd
+	$(MAKE) BUILDOPTS=$(BUILDOPTS) -C xspasswd
 
 vis:
 	@which go-callvis >/dev/null 2>&1; \
 	stat=$$?; if [ $$stat -ne "0" ]; then \
 	  /bin/echo "go-callvis not found. Run go get github.com/Russtopia/go-callvis to install."; \
 	else \
-	  make -C hkexsh vis;\
-	  make -C hkexshd vis;\
-	  make -C hkexpasswd vis; \
+	  make -C xs vis;\
+	  make -C xsd vis;\
+	  make -C xspasswd vis; \
 	fi
 
 lint:
-	make -C hkexpasswd lint
-	make -C hkexshd lint
-	make -C hkexsh lint
+	make -C xspasswd lint
+	make -C xsd lint
+	make -C xs lint
 
 reinstall: uninstall install
 
 install:
-	cp hkexsh/hkexsh $(INSTPREFIX)/bin
+	cp xs/xs $(INSTPREFIX)/bin
 ifeq ($(MSYSTEM),)
 ifneq ($(GOOS),windows)
-	cp hkexshd/hkexshd hkexpasswd/hkexpasswd $(INSTPREFIX)/sbin
+	cp xsd/xsd xspasswd/xspasswd $(INSTPREFIX)/sbin
 else
-	mv $(INSTPREFIX)/bin/hkexsh $(INSTPREFIX)/bin/_hkexsh
-	cp hkexsh/mintty_wrapper.sh $(INSTPREFIX)/bin/hkexsh
-	echo "Cross-build of hkexshd server for Windows not yet supported"
+	mv $(INSTPREFIX)/bin/xs $(INSTPREFIX)/bin/_xs
+	cp xs/mintty_wrapper.sh $(INSTPREFIX)/bin/xs
+	echo "Cross-build of xsd server for Windows not yet supported"
 endif
 else
-	echo "Cross-build of hkexshd server for Windows not yet supported"
+	echo "Cross-build of xsd server for Windows not yet supported"
 endif
-	cd $(INSTPREFIX)/bin && ln -s hkexsh hkexcp && cd -
+	cd $(INSTPREFIX)/bin && ln -s xs xc && cd -
 
 
 uninstall:
-	rm -f $(INSTPREFIX)/bin/hkexsh $(INSTPREFIX)/bin/hkexcp $(INSTPREFIX)/bin/_hkexsh
+	rm -f $(INSTPREFIX)/bin/xs $(INSTPREFIX)/bin/xc $(INSTPREFIX)/bin/_xs
 ifeq ($(MSYSTEM),)
 ifneq ($(GOOS),windows)
-	rm -f $(INSTPREFIX)/sbin/hkexshd $(INSTPREFIX)/sbin/hkexpasswd
+	rm -f $(INSTPREFIX)/sbin/xsd $(INSTPREFIX)/sbin/xspasswd
 else
 endif
 else

@@ -1,16 +1,16 @@
-// consts.go - consts for hkexnet
+// consts.go - consts for xsnet
 
-// Copyright (c) 2017-2018 Russell Magee
+// Copyright (c) 2017-2019 Russell Magee
 // Licensed under the terms of the MIT license (see LICENSE.mit in this
 // distribution)
 //
 // golang implementation by Russ Magee (rmagee_at_gmail.com)
-package hkexnet
+package xsnet
 
 // KEX algorithm values
 //
 // Specified (in string form) as the extensions parameter
-// to hkexnet.Dial()
+// to xsnet.Dial()
 // Alg is sent in a uint8 so there are up to 256 possible
 const (
 	KEX_HERRADURA256 = iota // this MUST be first for default if omitted in ctor
@@ -32,7 +32,7 @@ const (
 )
 
 // Sent from client to server in order to specify which
-// algo shall be used (see hkexnet.KEX_HERRADURA256, ...)
+// algo shall be used (see xsnet.KEX_HERRADURA256, ...)
 type KEXAlg uint8
 
 // Extended exit status codes - indicate comm/pty issues

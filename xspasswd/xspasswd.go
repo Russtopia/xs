@@ -1,7 +1,7 @@
 // Util to generate/store passwords for users in a file akin to /etc/passwd
 // suitable for the demo hkexsh server, using bcrypt.
 //
-// Copyright (c) 2017-2018 Russell Magee
+// Copyright (c) 2017-2019 Russell Magee
 // Licensed under the terms of the MIT license (see LICENSE.mit in this
 // distribution)
 //
@@ -36,7 +36,7 @@ func main() {
 
 	flag.BoolVar(&vopt, "v", false, "show version")
 	flag.StringVar(&userName, "u", "", "username")
-	flag.StringVar(&pfName, "f", "/etc/hkexsh.passwd", "passwd file")
+	flag.StringVar(&pfName, "f", "/etc/xs.passwd", "passwd file")
 	flag.Parse()
 
 	if vopt {
@@ -130,7 +130,7 @@ func main() {
 		records = append(records, newRec)
 	}
 
-	outFile, err := ioutil.TempFile("", "hkexsh-passwd")
+	outFile, err := ioutil.TempFile("", "xs-passwd")
 	if err != nil {
 		log.Fatal(err)
 	}

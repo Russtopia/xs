@@ -1,4 +1,4 @@
-package hkexnet
+package xsnet
 
 import (
 	"crypto/sha1"
@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net"
 
-	"blitter.com/go/hkexsh/logger"
+	"blitter.com/go/xs/logger"
 	kcp "github.com/xtaci/kcp-go"
 	"golang.org/x/crypto/pbkdf2"
 )

@@ -1,6 +1,6 @@
 // +build linux
 
-package hkexsh
+package xs
 
 import (
 	"errors"
@@ -12,7 +12,7 @@ import (
 /* -------------
  * minimal terminal APIs brought in from ssh/terminal
  * (they have no real business being there as they aren't specific to
- * ssh, but as of Go v1.10, early 2018, core go stdlib hasn't yet done
+ * ssh, but as of Go v1.10, late 2019, core go stdlib hasn't yet done
  * the planned terminal lib reorgs.)
  * ------------- */
 

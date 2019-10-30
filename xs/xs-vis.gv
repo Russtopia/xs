@@ -1,0 +1,549 @@
+digraph gocallvis {
+    label="blitter.com/go/xs/xs";
+    labeljust="l";
+    fontname="Arial";
+    fontsize="14";
+    rankdir="LR";
+    bgcolor="lightgray";
+    style="solid";
+    penwidth="0.5";
+    pad="0.0";
+    nodesep="0.35";
+
+    node [shape="ellipse" style="filled" fillcolor="honeydew" fontname="Verdana" penwidth="1.0" margin="0.05,0.0"];
+    edge [minlen="2"]
+
+    subgraph "cluster_focus" {
+        bgcolor="#e6ecfa";
+label="main";
+labelloc="t";
+labeljust="c";
+fontsize="18";
+        
+        "blitter.com/go/xs/xs.reqTunnel" [ fillcolor="lightblue" label="reqTunnel" penwidth="0.5" ]
+        "blitter.com/go/xs/xs.launchTuns" [ label="launchTuns" penwidth="0.5" fillcolor="lightblue" ]
+        "blitter.com/go/xs/xs.main$3" [ fillcolor="lightblue" label="main$3" style="dotted,filled" ]
+        "blitter.com/go/xs/xs.doCopyMode" [ fillcolor="lightblue" label="doCopyMode" penwidth="0.5" ]
+        "blitter.com/go/xs/xs.copyBuffer" [ fillcolor="lightblue" label="copyBuffer" penwidth="0.5" ]
+        "blitter.com/go/xs/xs.copyBuffer$1" [ label="copyBuffer$1" style="dotted,filled" fillcolor="lightblue" ]
+        "blitter.com/go/xs/xs.copyBuffer$2" [ label="copyBuffer$2" style="dotted,filled" fillcolor="lightblue" ]
+        "blitter.com/go/xs/xs.copyBuffer$3" [ fillcolor="lightblue" label="copyBuffer$3" style="dotted,filled" ]
+        "blitter.com/go/xs/xs.Copy" [ label="Copy" penwidth="1.5" fillcolor="lightblue" ]
+        "blitter.com/go/xs/xs.doShellMode$1" [ fillcolor="lightblue" label="shellRemoteToStdin" style="dotted,filled" ]
+        "blitter.com/go/xs/xs.doShellMode$1$1" [ fillcolor="lightblue" label="doShellMode$1$1" style="dotted,filled" ]
+        "blitter.com/go/xs/xs.exitWithStatus" [ fillcolor="lightblue" label="exitWithStatus" penwidth="0.5" ]
+        "blitter.com/go/xs/xs.doShellMode" [ label="doShellMode" penwidth="0.5" fillcolor="lightblue" ]
+        "blitter.com/go/xs/xs.handleTermResizes$1" [ fillcolor="lightblue" label="handleTermResizes$1" style="dotted,filled" ]
+        "blitter.com/go/xs/xs.GetSize" [ fillcolor="lightblue" label="GetSize" penwidth="1.5" ]
+        "blitter.com/go/xs/xs.handleTermResizes" [ label="handleTermResizes" penwidth="0.5" fillcolor="lightblue" ]
+        "blitter.com/go/xs/xs.doShellMode$2$1" [ fillcolor="lightblue" label="doShellMode$2$1" style="dotted,filled" ]
+        "blitter.com/go/xs/xs.doShellMode$2" [ fillcolor="lightblue" label="shellStdinToRemote" style="dotted,filled" ]
+        "blitter.com/go/xs/xs.sendSessionParams" [ fillcolor="lightblue" label="sendSessionParams" penwidth="0.5" ]
+        "blitter.com/go/xs/xs.main" [ label="main" penwidth="0.5" fillcolor="lightblue" ]
+        "blitter.com/go/xs/xs.parseNonSwitchArgs" [ fillcolor="lightblue" label="parseNonSwitchArgs" penwidth="0.5" ]
+        "blitter.com/go/xs/xs.main$1" [ fillcolor="lightblue" label="deferRestore" style="dotted,filled" ]
+        "blitter.com/go/xs/xs.main$2" [ fillcolor="lightblue" label="deferCloseChaff" style="dotted,filled" ]
+        "blitter.com/go/xs/xs.rejectUserMsg" [ fillcolor="lightblue" label="rejectUserMsg" penwidth="0.5" ]
+        "blitter.com/go/xs/xs.usageShell" [ fillcolor="lightblue" label="usageShell" penwidth="0.5" ]
+        "blitter.com/go/xs/xs.usageCp" [ label="usageCp" penwidth="0.5" fillcolor="lightblue" ]
+        
+        subgraph "cluster_blitter.com/go/xs" {
+        penwidth="0.8";
+style="filled";
+rank="sink";
+tooltip="package: blitter.com/go/xs";
+fontsize="16";
+fillcolor="lightyellow";
+fontname="bold";
+label="[xs]";
+URL="/?f=blitter.com/go/xs";
+        
+        "blitter.com/go/xs.Restore" [ fillcolor="moccasin" label="Restore" penwidth="1.5" ]
+        "blitter.com/go/xs.MakeRaw" [ penwidth="1.5" fillcolor="moccasin" label="MakeRaw" ]
+        "blitter.com/go/xs.ReadPassword" [ fillcolor="moccasin" label="ReadPassword" penwidth="1.5" ]
+        "blitter.com/go/xs.NewSession" [ fillcolor="moccasin" label="NewSession" penwidth="1.5" ]
+        
+        subgraph "cluster_*blitter.com/go/xs.Session" {
+        fontsize="15";
+fontcolor="#222222";
+labelloc="b";
+style="rounded,filled";
+fillcolor="wheat2";
+label="(*Session)";
+tooltip="type: *blitter.com/go/xs.Session";
+penwidth="0.5";
+        
+        "(*blitter.com/go/xs.Session).SetStatus" [ fillcolor="moccasin" label="SetStatus" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_blitter.com/go/xs.Session" {
+        style="rounded,filled";
+fillcolor="wheat2";
+label="(Session)";
+tooltip="type: blitter.com/go/xs.Session";
+penwidth="0.5";
+fontsize="15";
+fontcolor="#222222";
+labelloc="b";
+        
+        "(blitter.com/go/xs.Session).Cmd" [ fillcolor="moccasin" label="Cmd" penwidth="1.5" ]
+        "(blitter.com/go/xs.Session).Status" [ penwidth="1.5" fillcolor="moccasin" label="Status" ]
+        "(blitter.com/go/xs.Session).Op" [ fillcolor="moccasin" label="Op" penwidth="1.5" ]
+        "(blitter.com/go/xs.Session).Who" [ fillcolor="moccasin" label="Who" penwidth="1.5" ]
+        "(blitter.com/go/xs.Session).ConnHost" [ fillcolor="moccasin" label="ConnHost" penwidth="1.5" ]
+        "(blitter.com/go/xs.Session).TermType" [ fillcolor="moccasin" label="TermType" penwidth="1.5" ]
+        "(blitter.com/go/xs.Session).AuthCookie" [ label="AuthCookie" penwidth="1.5" fillcolor="moccasin" ]
+        
+    }
+
+    }
+
+        subgraph "cluster_blitter.com/go/xs/logger" {
+        fontsize="16";
+URL="/?f=blitter.com/go/xs/logger";
+penwidth="0.8";
+style="filled";
+fillcolor="lightyellow";
+fontname="bold";
+rank="sink";
+label="[logger]";
+tooltip="package: blitter.com/go/xs/logger";
+        
+        "blitter.com/go/xs/logger.LogDebug" [ fillcolor="moccasin" label="LogDebug" penwidth="1.5" ]
+        "blitter.com/go/xs/logger.New" [ fillcolor="moccasin" label="New" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_blitter.com/go/xs/spinsult" {
+        fillcolor="lightyellow";
+fontname="bold";
+label="[spinsult]";
+URL="/?f=blitter.com/go/xs/spinsult";
+tooltip="package: blitter.com/go/xs/spinsult";
+penwidth="0.8";
+fontsize="16";
+style="filled";
+rank="sink";
+        
+        "blitter.com/go/xs/spinsult.GetSentence" [ fillcolor="moccasin" label="GetSentence" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_blitter.com/go/xs/xsnet" {
+        penwidth="0.8";
+fillcolor="lightyellow";
+fontname="bold";
+rank="sink";
+URL="/?f=blitter.com/go/xs/xsnet";
+fontsize="16";
+style="filled";
+label="[xsnet]";
+tooltip="package: blitter.com/go/xs/xsnet";
+        
+        "blitter.com/go/xs/xsnet.Init" [ fillcolor="moccasin" label="Init" penwidth="1.5" ]
+        "blitter.com/go/xs/xsnet.Dial" [ label="Dial" penwidth="1.5" fillcolor="moccasin" ]
+        
+        subgraph "cluster_*blitter.com/go/xs/xsnet.Conn" {
+        fontcolor="#222222";
+labelloc="b";
+style="rounded,filled";
+fillcolor="wheat2";
+label="(*Conn)";
+tooltip="type: *blitter.com/go/xs/xsnet.Conn";
+penwidth="0.5";
+fontsize="15";
+        
+        "(*blitter.com/go/xs/xsnet.Conn).WritePacket" [ penwidth="1.5" fillcolor="moccasin" label="WritePacket" ]
+        "(*blitter.com/go/xs/xsnet.Conn).SetStatus" [ fillcolor="moccasin" label="SetStatus" penwidth="1.5" ]
+        "(*blitter.com/go/xs/xsnet.Conn).Close" [ penwidth="1.5" fillcolor="moccasin" label="Close" ]
+        "(*blitter.com/go/xs/xsnet.Conn).SetupChaff" [ penwidth="1.5" fillcolor="moccasin" label="SetupChaff" ]
+        "(*blitter.com/go/xs/xsnet.Conn).EnableChaff" [ fillcolor="moccasin" label="EnableChaff" penwidth="1.5" ]
+        "(*blitter.com/go/xs/xsnet.Conn).DisableChaff" [ fillcolor="moccasin" label="DisableChaff" penwidth="1.5" ]
+        "(*blitter.com/go/xs/xsnet.Conn).ShutdownChaff" [ fillcolor="moccasin" label="ShutdownChaff" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_blitter.com/go/xs/xsnet.Conn" {
+        labelloc="b";
+style="rounded,filled";
+fillcolor="wheat2";
+label="(Conn)";
+tooltip="type: blitter.com/go/xs/xsnet.Conn";
+penwidth="0.5";
+fontsize="15";
+fontcolor="#222222";
+        
+        "(blitter.com/go/xs/xsnet.Conn).Read" [ label="Read" penwidth="1.5" fillcolor="moccasin" ]
+        "(blitter.com/go/xs/xsnet.Conn).GetStatus" [ fillcolor="moccasin" label="GetStatus" penwidth="1.5" ]
+        "(blitter.com/go/xs/xsnet.Conn).Write" [ label="Write" penwidth="1.5" fillcolor="moccasin" ]
+        
+    }
+
+    }
+
+        subgraph "cluster_compress/flate" {
+        fontsize="16";
+fillcolor="#E0FFE1";
+label="[compress/flate]";
+URL="/?f=compress/flate";
+penwidth="0.8";
+style="filled";
+fontname="bold";
+rank="sink";
+tooltip="package: compress/flate";
+        
+        
+        subgraph "cluster_compress/flate.CorruptInputError" {
+        tooltip="type: compress/flate.CorruptInputError";
+penwidth="0.5";
+fontsize="15";
+fontcolor="#222222";
+labelloc="b";
+style="rounded,filled";
+fillcolor="#c2e3c2";
+label="(CorruptInputError)";
+        
+        "(compress/flate.CorruptInputError).Error" [ penwidth="1.5" fillcolor="#adedad" label="Error" ]
+        
+    }
+
+        subgraph "cluster_compress/flate.InternalError" {
+        fontsize="15";
+fontcolor="#222222";
+labelloc="b";
+style="rounded,filled";
+fillcolor="#c2e3c2";
+label="(InternalError)";
+tooltip="type: compress/flate.InternalError";
+penwidth="0.5";
+        
+        "(compress/flate.InternalError).Error" [ fillcolor="#adedad" label="Error" penwidth="1.5" ]
+        
+    }
+
+    }
+
+        subgraph "cluster_context" {
+        fontsize="16";
+style="filled";
+penwidth="0.8";
+fontname="bold";
+rank="sink";
+label="[context]";
+URL="/?f=context";
+tooltip="package: context";
+fillcolor="#E0FFE1";
+        
+        
+        subgraph "cluster_context.deadlineExceededError" {
+        fontsize="15";
+fontcolor="#222222";
+labelloc="b";
+style="rounded,filled";
+fillcolor="#c2e3c2";
+label="(deadlineExceededError)";
+tooltip="type: context.deadlineExceededError";
+penwidth="0.5";
+        
+        "(context.deadlineExceededError).Error" [ fillcolor="#adedad" label="Error" penwidth="1.5" ]
+        
+    }
+
+    }
+
+        subgraph "cluster_crypto/aes" {
+        style="filled";
+fillcolor="#E0FFE1";
+rank="sink";
+label="[crypto/aes]";
+penwidth="0.8";
+fontsize="16";
+fontname="bold";
+URL="/?f=crypto/aes";
+tooltip="package: crypto/aes";
+        
+        
+        subgraph "cluster_crypto/aes.KeySizeError" {
+        fontcolor="#222222";
+labelloc="b";
+style="rounded,filled";
+fillcolor="#c2e3c2";
+label="(KeySizeError)";
+tooltip="type: crypto/aes.KeySizeError";
+penwidth="0.5";
+fontsize="15";
+        
+        "(crypto/aes.KeySizeError).Error" [ fillcolor="#adedad" label="Error" penwidth="1.5" ]
+        
+    }
+
+    }
+
+        subgraph "cluster_crypto/tls" {
+        tooltip="package: crypto/tls";
+fontsize="16";
+style="filled";
+fontname="bold";
+rank="sink";
+label="[crypto/tls]";
+URL="/?f=crypto/tls";
+penwidth="0.8";
+fillcolor="#E0FFE1";
+        
+        
+        subgraph "cluster_crypto/tls.RecordHeaderError" {
+        fontcolor="#222222";
+labelloc="b";
+style="rounded,filled";
+fillcolor="#c2e3c2";
+label="(RecordHeaderError)";
+tooltip="type: crypto/tls.RecordHeaderError";
+penwidth="0.5";
+fontsize="15";
+        
+        "(crypto/tls.RecordHeaderError).Error" [ fillcolor="#adedad" label="Error" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_crypto/tls.alert" {
+        penwidth="0.5";
+fontsize="15";
+fontcolor="#222222";
+labelloc="b";
+style="rounded,filled";
+fillcolor="#c2e3c2";
+label="(alert)";
+tooltip="type: crypto/tls.alert";
+        
+        "(crypto/tls.alert).Error" [ fillcolor="#adedad" label="Error" penwidth="1.5" ]
+        
+    }
+
+    }
+
+        subgraph "cluster_crypto/x509" {
+        penwidth="0.8";
+tooltip="package: crypto/x509";
+fontsize="16";
+style="filled";
+fillcolor="#E0FFE1";
+fontname="bold";
+rank="sink";
+label="[crypto/x509]";
+URL="/?f=crypto/x509";
+        
+        
+        subgraph "cluster_crypto/x509.CertificateInvalidError" {
+        penwidth="0.5";
+fontsize="15";
+fontcolor="#222222";
+labelloc="b";
+style="rounded,filled";
+fillcolor="#c2e3c2";
+label="(CertificateInvalidError)";
+tooltip="type: crypto/x509.CertificateInvalidError";
+        
+        "(crypto/x509.CertificateInvalidError).Error" [ fillcolor="#adedad" label="Error" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_crypto/x509.HostnameError" {
+        labelloc="b";
+style="rounded,filled";
+fillcolor="#c2e3c2";
+label="(HostnameError)";
+tooltip="type: crypto/x509.HostnameError";
+penwidth="0.5";
+fontsize="15";
+fontcolor="#222222";
+        
+        "(crypto/x509.HostnameError).Error" [ fillcolor="#adedad" label="Error" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_crypto/x509.SystemRootsError" {
+        fontsize="15";
+fontcolor="#222222";
+labelloc="b";
+style="rounded,filled";
+fillcolor="#c2e3c2";
+label="(SystemRootsError)";
+tooltip="type: crypto/x509.SystemRootsError";
+penwidth="0.5";
+        
+        "(crypto/x509.SystemRootsError).Error" [ fillcolor="#adedad" label="Error" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_crypto/x509.UnhandledCriticalExtension" {
+        style="rounded,filled";
+fillcolor="#c2e3c2";
+label="(UnhandledCriticalExtension)";
+tooltip="type: crypto/x509.UnhandledCriticalExtension";
+penwidth="0.5";
+fontsize="15";
+fontcolor="#222222";
+labelloc="b";
+        
+        "(crypto/x509.UnhandledCriticalExtension).Error" [ fillcolor="#adedad" label="Error" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_crypto/x509.UnknownAuthorityError" {
+        style="rounded,filled";
+fillcolor="#c2e3c2";
+label="(UnknownAuthorityError)";
+tooltip="type: crypto/x509.UnknownAuthorityError";
+penwidth="0.5";
+fontsize="15";
+fontcolor="#222222";
+labelloc="b";
+        
+        "(crypto/x509.UnknownAuthorityError).Error" [ fillcolor="#adedad" label="Error" penwidth="1.5" ]
+        
+    }
+
+    }
+
+        subgraph "cluster_github.com/mattn/go-isatty" {
+        fontname="bold";
+penwidth="0.8";
+fillcolor="lightyellow";
+rank="sink";
+label="[isatty]";
+URL="/?f=github.com/mattn/go-isatty";
+tooltip="package: github.com/mattn/go-isatty";
+fontsize="16";
+style="filled";
+        
+        "github.com/mattn/go-isatty.IsTerminal" [ label="IsTerminal" penwidth="1.5" fillcolor="moccasin" ]
+        
+    }
+
+        subgraph "cluster_github.com/pkg/errors" {
+        style="filled";
+fillcolor="lightyellow";
+URL="/?f=github.com/pkg/errors";
+rank="sink";
+label="[errors]";
+tooltip="package: github.com/pkg/errors";
+penwidth="0.8";
+fontsize="16";
+fontname="bold";
+        
+        
+        subgraph "cluster_*github.com/pkg/errors.fundamental" {
+        label="(*fundamental)";
+tooltip="type: *github.com/pkg/errors.fundamental";
+penwidth="0.5";
+fontsize="15";
+fontcolor="#222222";
+labelloc="b";
+style="rounded,filled";
+fillcolor="wheat2";
+        
+        "(*github.com/pkg/errors.fundamental).Error" [ penwidth="1.5" fillcolor="moccasin" label="Error" ]
+        
+    }
+
+    }
+
+        subgraph "cluster_math/rand" {
+        penwidth="0.8";
+fillcolor="#E0FFE1";
+rank="sink";
+URL="/?f=math/rand";
+fontsize="16";
+style="filled";
+fontname="bold";
+label="[math/rand]";
+tooltip="package: math/rand";
+        
+        "math/rand.Intn" [ fillcolor="#adedad" label="Intn" penwidth="1.5" ]
+        
+    }
+
+    }
+
+    "blitter.com/go/xs/xs.reqTunnel" -> "blitter.com/go/xs/logger.LogDebug" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.reqTunnel" -> "(*blitter.com/go/xs/xsnet.Conn).WritePacket" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.launchTuns" -> "blitter.com/go/xs/xs.reqTunnel" [  ]
+    "blitter.com/go/xs/xs.main$3" -> "math/rand.Intn" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.main$3" -> "(*blitter.com/go/xs/xsnet.Conn).WritePacket" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doCopyMode" -> "(blitter.com/go/xs.Session).Cmd" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doCopyMode" -> "(*blitter.com/go/xs/xsnet.Conn).WritePacket" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doCopyMode" -> "(blitter.com/go/xs/xsnet.Conn).Read" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doCopyMode" -> "(*blitter.com/go/xs/xsnet.Conn).SetStatus" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doCopyMode" -> "(blitter.com/go/xs/xsnet.Conn).GetStatus" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.copyBuffer" -> "(blitter.com/go/xs/xsnet.Conn).Write" [ color="saddlebrown" style="dashed" ]
+    "blitter.com/go/xs/xs.copyBuffer" -> "blitter.com/go/xs/xs.copyBuffer$1" [ style="dashed" ]
+    "blitter.com/go/xs/xs.copyBuffer" -> "blitter.com/go/xs/xs.copyBuffer$2" [ style="dashed" ]
+    "blitter.com/go/xs/xs.copyBuffer" -> "blitter.com/go/xs/xs.copyBuffer$3" [ style="dashed" ]
+    "blitter.com/go/xs/xs.Copy" -> "blitter.com/go/xs/xs.copyBuffer" [  ]
+    "blitter.com/go/xs/xs.doShellMode$1" -> "blitter.com/go/xs/xs.doShellMode$1$1" [ arrowhead="normalnoneodiamond" ]
+    "blitter.com/go/xs/xs.doShellMode$1" -> "blitter.com/go/xs.Restore" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doShellMode$1" -> "(blitter.com/go/xs/xsnet.Conn).GetStatus" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doShellMode$1" -> "(*blitter.com/go/xs.Session).SetStatus" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doShellMode$1" -> "(blitter.com/go/xs.Session).Status" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doShellMode$1" -> "blitter.com/go/xs/xs.exitWithStatus" [  ]
+    "blitter.com/go/xs/xs.doShellMode$1" -> "(crypto/x509.CertificateInvalidError).Error" [ style="dashed" color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doShellMode$1" -> "(crypto/aes.KeySizeError).Error" [ style="dashed" color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doShellMode$1" -> "(crypto/x509.HostnameError).Error" [ color="saddlebrown" style="dashed" ]
+    "blitter.com/go/xs/xs.doShellMode$1" -> "(crypto/x509.UnhandledCriticalExtension).Error" [ style="dashed" color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doShellMode$1" -> "(context.deadlineExceededError).Error" [ style="dashed" color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doShellMode$1" -> "(compress/flate.CorruptInputError).Error" [ style="dashed" color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doShellMode$1" -> "(crypto/tls.RecordHeaderError).Error" [ style="dashed" color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doShellMode$1" -> "(crypto/x509.UnknownAuthorityError).Error" [ style="dashed" color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doShellMode$1" -> "(crypto/x509.SystemRootsError).Error" [ style="dashed" color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doShellMode$1" -> "(compress/flate.InternalError).Error" [ style="dashed" color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doShellMode$1" -> "(crypto/tls.alert).Error" [ style="dashed" color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doShellMode$1" -> "(*github.com/pkg/errors.fundamental).Error" [ style="dashed" color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doShellMode" -> "blitter.com/go/xs/xs.doShellMode$1" [ arrowhead="normalnoneodot" ]
+    "blitter.com/go/xs/xs.handleTermResizes$1" -> "blitter.com/go/xs/xs.GetSize" [  ]
+    "blitter.com/go/xs/xs.handleTermResizes$1" -> "(*blitter.com/go/xs/xsnet.Conn).WritePacket" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.handleTermResizes" -> "blitter.com/go/xs/xs.handleTermResizes$1" [ arrowhead="normalnoneodot" ]
+    "blitter.com/go/xs/xs.doShellMode" -> "blitter.com/go/xs/xs.handleTermResizes" [  ]
+    "blitter.com/go/xs/xs.doShellMode$2$1" -> "blitter.com/go/xs/xs.Copy" [  ]
+    "blitter.com/go/xs/xs.doShellMode$2" -> "blitter.com/go/xs/xs.doShellMode$2$1" [  ]
+    "blitter.com/go/xs/xs.doShellMode$2" -> "blitter.com/go/xs.Restore" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.doShellMode$2" -> "blitter.com/go/xs/xs.exitWithStatus" [  ]
+    "blitter.com/go/xs/xs.doShellMode" -> "blitter.com/go/xs/xs.doShellMode$2" [ arrowhead="normalnoneodot" ]
+    "blitter.com/go/xs/xs.sendSessionParams" -> "(blitter.com/go/xs.Session).Op" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.sendSessionParams" -> "(blitter.com/go/xs.Session).Who" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.sendSessionParams" -> "(blitter.com/go/xs.Session).ConnHost" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.sendSessionParams" -> "(blitter.com/go/xs.Session).TermType" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.sendSessionParams" -> "(blitter.com/go/xs.Session).Cmd" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.sendSessionParams" -> "(blitter.com/go/xs.Session).AuthCookie" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.sendSessionParams" -> "(blitter.com/go/xs/xsnet.Conn).Write" [ style="dashed" color="saddlebrown" ]
+    "blitter.com/go/xs/xs.main" -> "blitter.com/go/xs/xs.parseNonSwitchArgs" [  ]
+    "blitter.com/go/xs/xs.main" -> "blitter.com/go/xs/xs.main$1" [ arrowhead="normalnoneodot" ]
+    "blitter.com/go/xs/xs.main" -> "blitter.com/go/xs/xs.exitWithStatus" [  ]
+    "blitter.com/go/xs/xs.main" -> "blitter.com/go/xs/logger.New" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.main" -> "blitter.com/go/xs/xsnet.Init" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.main" -> "blitter.com/go/xs/xsnet.Dial" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.main" -> "(*blitter.com/go/xs/xsnet.Conn).Close" [ arrowhead="normalnoneodiamond" color="saddlebrown" ]
+    "blitter.com/go/xs/xs.main" -> "github.com/mattn/go-isatty.IsTerminal" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.main" -> "blitter.com/go/xs.MakeRaw" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.main$2" -> "blitter.com/go/xs.Restore" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.main" -> "blitter.com/go/xs/xs.main$2" [ arrowhead="normalnoneodiamond" ]
+    "blitter.com/go/xs/xs.main" -> "blitter.com/go/xs.ReadPassword" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.main" -> "blitter.com/go/xs.NewSession" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.main" -> "blitter.com/go/xs/xs.sendSessionParams" [  ]
+    "blitter.com/go/xs/xs.main" -> "(blitter.com/go/xs/xsnet.Conn).Read" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.main" -> "(*blitter.com/go/xs.Session).SetStatus" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.rejectUserMsg" -> "blitter.com/go/xs/spinsult.GetSentence" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.main" -> "blitter.com/go/xs/xs.rejectUserMsg" [  ]
+    "blitter.com/go/xs/xs.main" -> "(*blitter.com/go/xs/xsnet.Conn).SetupChaff" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.main" -> "(*blitter.com/go/xs/xsnet.Conn).EnableChaff" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.main" -> "(*blitter.com/go/xs/xsnet.Conn).DisableChaff" [ arrowhead="normalnoneodiamond" color="saddlebrown" ]
+    "blitter.com/go/xs/xs.main" -> "(*blitter.com/go/xs/xsnet.Conn).ShutdownChaff" [ arrowhead="normalnoneodiamond" color="saddlebrown" ]
+    "blitter.com/go/xs/xs.main" -> "blitter.com/go/xs/xs.main$3" [ arrowhead="normalnoneodot" ]
+    "blitter.com/go/xs/xs.main" -> "blitter.com/go/xs/xs.launchTuns" [  ]
+    "blitter.com/go/xs/xs.main" -> "blitter.com/go/xs/xs.doShellMode" [  ]
+    "blitter.com/go/xs/xs.main" -> "(blitter.com/go/xs.Session).Status" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.main" -> "blitter.com/go/xs/xs.doCopyMode" [  ]
+    "blitter.com/go/xs/xs.main" -> "blitter.com/go/xs.Restore" [ color="saddlebrown" ]
+    "blitter.com/go/xs/xs.main" -> "blitter.com/go/xs/xs.usageShell" [ style="dashed" ]
+    "blitter.com/go/xs/xs.main" -> "blitter.com/go/xs/xs.usageCp" [ style="dashed" ]
+}

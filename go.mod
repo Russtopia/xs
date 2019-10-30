@@ -1,4 +1,4 @@
-module blitter.com/go/hkexsh
+module blitter.com/go/xs
 
 go 1.12
 

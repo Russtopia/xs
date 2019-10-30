@@ -4,15 +4,13 @@ EXTPKGS = bytes,errors,flag,fmt,internal,io,log,net,os,path,runtime,time,strings
 EXE = $(notdir $(shell pwd))
 
 all:
-	echo "BUILDOPTS:" $(BUILDOPTS)
 	go build $(BUILDOPTS) .
 
 clean:
 	$(RM) $(EXE) $(EXE).exe
 
 vis:
-	go-callvis -file hkexsh-vis -format png -ignore $(EXTPKGS) -group pkg,type .
-	../fixup-gv.sh hkexsh.go && cat hkexsh-vis.gv | dot -Tpng -ohkexsh-vis-fixedup.png
+	go-callvis -format png -file xspasswd-vis -ignore $(EXTPKGS) -group pkg,type .
 
 lint:
 	-gometalinter --deadline=60s | sort

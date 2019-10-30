@@ -9,11 +9,11 @@ import (
 	"os/signal"
 	"syscall"
 
-	"blitter.com/go/hkexsh/hkexnet"
+	"blitter.com/go/xs/xsnet"
 )
 
 // Handle pty resizes (notify server side)
-func handleTermResizes(conn *hkexnet.Conn) {
+func handleTermResizes(conn *xsnet.Conn) {
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, syscall.SIGWINCH)
 	wg.Add(1)
@@ -30,7 +30,7 @@ func handleTermResizes(conn *hkexnet.Conn) {
 				log.Println(err)
 			}
 			termSzPacket := fmt.Sprintf("%d %d", rows, cols)
-			conn.WritePacket([]byte(termSzPacket), hkexnet.CSOTermSize) // nolint: errcheck,gosec
+			conn.WritePacket([]byte(termSzPacket), xsnet.CSOTermSize) // nolint: errcheck,gosec
 		}
 	}()
 	ch <- syscall.SIGWINCH // Initial resize.

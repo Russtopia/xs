@@ -1,11 +1,11 @@
 #!/sbin/openrc-run
 
-SVCNAME=hkexshd
-HKEXSHD_PIDFILE=/var/run/hkexshd.pid
-HKEXSHD_USER=root
-HKEXSHD_HOME=/var/run
+SVCNAME=xsd
+XSD_PIDFILE=/var/run/xsd.pid
+XSD_USER=root
+XSD_HOME=/var/run
 INST_PREFIX=/usr/local
-COMMAND=$INST_PREFIX/sbin/hkexshd
+COMMAND=$INST_PREFIX/sbin/xsd
 ARGS=""
 
 depend() {
@@ -25,8 +25,8 @@ start() {
 
     ebegin "Starting ${SVCNAME}"
     start-stop-daemon \
-        -d ${HKEXSHD_HOME} \
-        --make-pidfile --pidfile ${HKEXSHD_PIDFILE} \
+        -d ${XSD_HOME} \
+        --make-pidfile --pidfile ${XSD_PIDFILE} \
         --start --quiet --background \
         --exec "${COMMAND}" "${ARGS}"
     eend $?
@@ -34,6 +34,6 @@ start() {
 
 stop() {
     ebegin "Stopping ${SVCNAME}"
-    start-stop-daemon --stop --quiet --pidfile $HKEXSHD_PIDFILE
+    start-stop-daemon --stop --quiet --pidfile $XSD_PIDFILE
     eend $?
 }

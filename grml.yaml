@@ -1,5 +1,5 @@
 env:
-  project: hkexsh
+  project: xs
   version: 0.8.0
   buildDir: build/
   docDir: doc/
@@ -38,7 +38,7 @@ commands:
 
   app:
     aliases: [ build ]
-    help: build the hkexsh tools
+    help: build the xs tools
     exec: |
       make clean
       make all
