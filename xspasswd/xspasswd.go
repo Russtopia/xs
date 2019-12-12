@@ -17,7 +17,7 @@ import (
 	"log"
 	"os"
 
-	hkexsh "blitter.com/go/hkexsh"
+	xs "blitter.com/go/xs"
 	"github.com/jameskeane/bcrypt"
 )
 
@@ -59,7 +59,7 @@ func main() {
 	uname = userName
 
 	fmt.Printf("New Password:")
-	ab, err := hkexsh.ReadPassword(int(os.Stdin.Fd()))
+	ab, err := xs.ReadPassword(int(os.Stdin.Fd()))
 	fmt.Printf("\r\n")
 	if err != nil {
 		log.Fatal(err)
@@ -68,7 +68,7 @@ func main() {
 	newpw = string(ab)
 
 	fmt.Printf("Confirm:")
-	ab, err = hkexsh.ReadPassword(int(os.Stdin.Fd()))
+	ab, err = xs.ReadPassword(int(os.Stdin.Fd()))
 	fmt.Printf("\r\n")
 	if err != nil {
 		log.Fatal(err)
