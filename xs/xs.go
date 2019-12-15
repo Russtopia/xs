@@ -34,9 +34,9 @@ import (
 	_ "net/http/pprof"
 
 	xs "blitter.com/go/xs"
-	"blitter.com/go/xs/xsnet"
 	"blitter.com/go/xs/logger"
 	"blitter.com/go/xs/spinsult"
+	"blitter.com/go/xs/xsnet"
 	isatty "github.com/mattn/go-isatty"
 )
 
@@ -821,23 +821,25 @@ func main() {
 			cmdStr = string(copySrc)
 		}
 	}
-	
+
 	proto := "tcp"
 	if kcpMode != "unused" {
-			proto = "kcp"
+		proto = "kcp"
 	}
 	conn, err := xsnet.Dial(proto, server, cipherAlg, hmacAlg, kexAlg, kcpMode)
 	if err != nil {
 		fmt.Println(err)
 		exitWithStatus(3)
 	}
-	defer conn.Close() // nolint: errcheck
-	// From this point on, conn is a secure encrypted channel
 
 	// Set stdin in raw mode if it's an interactive session
 	// TODO: send flag to server side indicating this
 	//  affects shell command used
 	var oldState *xs.State
+	defer conn.Close() // nolint: errcheck
+
+	// From this point on, conn is a secure encrypted channel
+
 	if shellMode {
 		if isatty.IsTerminal(os.Stdin.Fd()) {
 			oldState, err = xs.MakeRaw(int(os.Stdin.Fd()))
@@ -869,7 +871,11 @@ func main() {
 	rec := xs.NewSession(op, []byte(uname), []byte(remoteHost), []byte(os.Getenv("TERM")), []byte(cmdStr), []byte(authCookie), 0)
 	sendErr := sendSessionParams(&conn, rec)
 	if sendErr != nil {
-		log.Fatal(sendErr)
+		_ = xs.Restore(int(os.Stdin.Fd()), oldState) // nolint: errcheck,gosec
+		rec.SetStatus(254)
+		fmt.Fprintln(os.Stderr, "Error: server rejected secure proposal params") // nolint: errcheck
+		exitWithStatus(int(rec.Status()))
+		//log.Fatal(sendErr)
 	}
 
 	//Security scrub
@@ -924,13 +930,14 @@ func main() {
 		}
 
 		if rec.Status() != 0 {
-			_ = xs.Restore(int(os.Stdin.Fd()), oldState)                     // nolint: errcheck,gosec
+			_ = xs.Restore(int(os.Stdin.Fd()), oldState)                         // nolint: errcheck,gosec
 			fmt.Fprintln(os.Stderr, "Session exited with status:", rec.Status()) // nolint: errcheck
 		}
 	}
 
 	if oldState != nil {
 		_ = xs.Restore(int(os.Stdin.Fd()), oldState) // nolint: gosec
+		oldState = nil
 	}
 
 	exitWithStatus(int(rec.Status()))

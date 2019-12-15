@@ -23,14 +23,15 @@ import (
 	"os/signal"
 	"os/user"
 	"path"
+	"strings"
 	"sync"
 	"syscall"
 	"unsafe"
 
 	"blitter.com/go/goutmp"
 	xs "blitter.com/go/xs"
-	"blitter.com/go/xs/xsnet"
 	"blitter.com/go/xs/logger"
+	"blitter.com/go/xs/xsnet"
 	"github.com/kr/pty"
 )
 
@@ -429,9 +430,73 @@ func GenAuthToken(who string, connhost string) string {
 	return fmt.Sprintf("%s:%s", tokenA, hex.EncodeToString(tokenB))
 }
 
-// Demo of a simple server that listens and spawns goroutines for each
-// connecting client. Note this code is identical to standard tcp
-// server code, save for declaring 'xsnet' rather than 'net'
+var (
+	aKEXAlgs    allowedKEXAlgs
+	aCipherAlgs allowedCipherAlgs
+	aHMACAlgs   allowedHMACAlgs
+)
+
+type allowedKEXAlgs []string    // TODO
+type allowedCipherAlgs []string // TODO
+type allowedHMACAlgs []string   // TODO
+
+func (a allowedKEXAlgs) allowed(k xsnet.KEXAlg) bool {
+	for i := 0; i < len(a); i++ {
+		if a[i] == "KEX_all" || a[i] == k.String() {
+			return true
+		}
+	}
+	return false
+}
+
+func (a *allowedKEXAlgs) String() string {
+	return fmt.Sprintf("allowedKEXAlgs: %v", *a)
+}
+
+func (a *allowedKEXAlgs) Set(value string) error {
+	*a = append(*a, strings.TrimSpace(value))
+	return nil
+}
+
+func (a allowedCipherAlgs) allowed(c xsnet.CSCipherAlg) bool {
+	for i := 0; i < len(a); i++ {
+		if a[i] == "C_all" || a[i] == c.String() {
+			return true
+		}
+	}
+	return false
+}
+
+func (a *allowedCipherAlgs) String() string {
+	return fmt.Sprintf("allowedCipherAlgs: %v", *a)
+}
+
+func (a *allowedCipherAlgs) Set(value string) error {
+	*a = append(*a, strings.TrimSpace(value))
+	return nil
+}
+
+func (a allowedHMACAlgs) allowed(h xsnet.CSHmacAlg) bool {
+	for i := 0; i < len(a); i++ {
+		if a[i] == "H_all" || a[i] == h.String() {
+			return true
+		}
+	}
+	return false
+}
+
+func (a *allowedHMACAlgs) String() string {
+	return fmt.Sprintf("allowedHMACAlgs: %v", *a)
+}
+
+func (a *allowedHMACAlgs) Set(value string) error {
+	*a = append(*a, strings.TrimSpace(value))
+	return nil
+}
+
+// Main server that listens and spawns goroutines for each
+// connecting client. Note this code is mostly identical to standard
+// tcp server code, save for declaring 'xsnet' rather than 'net'
 // Listener and Conns. The KEx and encrypt/decrypt is done within the type.
 // Compare to 'serverp.go' in this directory to see the equivalence.
 // TODO: reduce gocyclo
@@ -453,6 +518,11 @@ func main() {
 	flag.UintVar(&chaffFreqMax, "F", 5000, "chaff pkt freq max (msecs)")
 	flag.UintVar(&chaffBytesMax, "B", 64, "chaff pkt size max (bytes)")
 	flag.BoolVar(&dbg, "d", false, "debug logging")
+
+	flag.Var(&aKEXAlgs, "aK", `List of allowed KEX algs (eg. 'KEXAlgA KEXAlgB ... KEXAlgN') (default allow all)`)
+	flag.Var(&aCipherAlgs, "aC", `List of allowed ciphers (eg. 'CipherAlgA CipherAlgB ... CipherAlgN') (default allow all)`)
+	flag.Var(&aHMACAlgs, "aH", `List of allowed HMACs (eg. 'HMACAlgA HMACAlgB ... HMACAlgN') (default allow all)`)
+
 	flag.Parse()
 
 	if vopt {
@@ -485,6 +555,22 @@ func main() {
 	} else {
 		log.SetOutput(ioutil.Discard)
 	}
+
+	// Set up allowed algs, if specified (default allow all)
+	if len(aKEXAlgs) == 0 {
+		aKEXAlgs = []string{"KEX_all"}
+	}
+	logger.LogNotice(fmt.Sprintf("Allowed KEXAlgs: %v\n", aKEXAlgs)) // nolint: gosec,errcheck
+
+	if len(aCipherAlgs) == 0 {
+		aCipherAlgs = []string{"C_all"}
+	}
+	logger.LogNotice(fmt.Sprintf("Allowed CipherAlgs: %v\n", aCipherAlgs)) // nolint: gosec,errcheck
+
+	if len(aHMACAlgs) == 0 {
+		aHMACAlgs = []string{"H_all"}
+	}
+	logger.LogNotice(fmt.Sprintf("Allowed HMACAlgs: %v\n", aHMACAlgs)) // nolint: gosec,errcheck
 
 	// Set up handler for daemon signalling
 	exitCh := make(chan os.Signal, 1)
@@ -522,9 +608,22 @@ func main() {
 	log.Println("Serving on", laddr)
 	for {
 		// Wait for a connection.
+		// Then check if client-proposed algs are allowed
 		conn, err := l.Accept()
 		if err != nil {
 			log.Printf("Accept() got error(%v), hanging up.\n", err)
+		} else if !aKEXAlgs.allowed(conn.KEX()) {
+			log.Printf("Accept() rejected for banned KEX alg %d, hanging up.\n", conn.KEX())
+			conn.SetStatus(xsnet.CSEKEXAlgDenied)
+			conn.Close()
+		} else if !aCipherAlgs.allowed(conn.CAlg()) {
+			log.Printf("Accept() rejected for banned Cipher alg %d, hanging up.\n", conn.CAlg())
+			conn.SetStatus(xsnet.CSECipherAlgDenied)
+			conn.Close()
+		} else if !aHMACAlgs.allowed(conn.HAlg()) {
+			log.Printf("Accept() rejected for banned HMAC alg %d, hanging up.\n", conn.HAlg())
+			conn.SetStatus(xsnet.CSEHMACAlgDenied)
+			conn.Close()
 		} else {
 			log.Println("Accepted client")
 

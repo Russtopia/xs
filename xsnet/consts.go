@@ -29,6 +29,7 @@ const (
 	KEX_NEWHOPE_SIMPLE // 'NewHopeLP-Simple' - https://eprint.iacr.org/2016/1157
 	KEX_resvd14
 	KEX_resvd15
+	KEX_invalid = 255
 )
 
 // Sent from client to server in order to specify which
@@ -38,12 +39,15 @@ type KEXAlg uint8
 // Extended exit status codes - indicate comm/pty issues
 // rather than remote end normal UNIX exit codes
 const (
-	CSENone           = 1024 + iota
-	CSETruncCSO       // No CSOExitStatus in payload
-	CSEStillOpen      // Channel closed unexpectedly
-	CSEExecFail       // cmd.Start() (exec) failed
-	CSEPtyExecFail    // pty.Start() (exec w/pty) failed
-	CSEPtyGetNameFail // failed to obtain pty name
+	CSENone            = 1024 + iota
+	CSETruncCSO        // No CSOExitStatus in payload
+	CSEStillOpen       // Channel closed unexpectedly
+	CSEExecFail        // cmd.Start() (exec) failed
+	CSEPtyExecFail     // pty.Start() (exec w/pty) failed
+	CSEPtyGetNameFail  // failed to obtain pty name
+	CSEKEXAlgDenied    // server rejected proposed KEX alg
+	CSECipherAlgDenied // server rejected proposed Cipher alg
+	CSEHMACAlgDenied   // server rejected proposed HMAC alg
 )
 
 // Extended (>255 UNIX exit status) codes

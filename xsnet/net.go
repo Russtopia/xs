@@ -70,9 +70,10 @@ type (
 
 	// Conn is a connection wrapping net.Conn with KEX & session state
 	Conn struct {
-		kex KEXAlg      // KEX/KEM proposal (client -> server)
-		m   *sync.Mutex // (internal)
-		c   *net.Conn   // which also implements io.Reader, io.Writer, ...
+		kex KEXAlg // KEX/KEM proposal (client -> server)
+
+		m *sync.Mutex // (internal)
+		c *net.Conn   // which also implements io.Reader, io.Writer, ...
 
 		logCipherText  bool // somewhat expensive, for debugging
 		logPlainText   bool // INSECURE and somewhat expensive, for debugging
@@ -105,6 +106,67 @@ func (t *TunEndpoint) String() string {
 	return fmt.Sprintf("[%d:%s:%d]", t.Lport, t.Peer, t.Rport)
 }
 
+func (k *KEXAlg) String() string {
+	switch *k {
+	case KEX_HERRADURA256:
+		return "KEX_HERRADURA256"
+	case KEX_HERRADURA512:
+		return "KEX_HERRADURA512"
+	case KEX_HERRADURA1024:
+		return "KEX_HERRADURA1024"
+	case KEX_HERRADURA2048:
+		return "KEX_HERRADURA2048"
+	case KEX_KYBER512:
+		return "KEX_KYBER512"
+	case KEX_KYBER768:
+		return "KEX_KYBER768"
+	case KEX_KYBER1024:
+		return "KEX_KYBER1024"
+	case KEX_NEWHOPE:
+		return "KEX_NEWHOPE"
+	case KEX_NEWHOPE_SIMPLE:
+		return "KEX_NEWHOPE_SIMPLE"
+	default:
+		return "KEX_ERR_UNK"
+	}
+}
+
+func (hc *Conn) CAlg() CSCipherAlg {
+	return CSCipherAlg(hc.cipheropts & 0x0FF)
+}
+
+func (c *CSCipherAlg) String() string {
+	switch *c & 0x0FF {
+	case CAlgAES256:
+		return "C_AES_256"
+	case CAlgTwofish128:
+		return "C_TWOFISH_128"
+	case CAlgBlowfish64:
+		return "C_BLOWFISH_64"
+	case CAlgCryptMT1:
+		return "C_CRYPTMT1"
+	case CAlgWanderer:
+		return "C_WANDERER"
+	default:
+		return "C_ERR_UNK"
+	}
+}
+
+func (hc *Conn) HAlg() CSHmacAlg {
+	return CSHmacAlg((hc.cipheropts >> 8) & 0x0FF)
+}
+
+func (h *CSHmacAlg) String() string {
+	switch (*h >> 8) & 0x0FF {
+	case HmacSHA256:
+		return "H_SHA256"
+	case HmacSHA512:
+		return "C_SHA512"
+	default:
+		return "H_ERR_UNK"
+	}
+}
+
 func _initLogging(d bool, c string, f logger.Priority) {
 	if Log == nil {
 		Log, _ = logger.New(f, fmt.Sprintf("%s:xsnet", c))
@@ -127,6 +189,10 @@ func (hc *Conn) Lock() {
 
 func (hc *Conn) Unlock() {
 	hc.m.Unlock()
+}
+
+func (hc Conn) KEX() KEXAlg {
+	return hc.kex
 }
 
 func (hc Conn) GetStatus() CSOType {
@@ -935,6 +1001,9 @@ func (hl *HKExListener) Accept() (hc Conn, err error) {
 	default:
 		return Conn{}, err
 	}
+
+	// Finally, ensure alg proposed by client is allowed by server config
+	//if hc.kex.String() {
 	log.Println("[hc.Accept successful]")
 	return
 }
