@@ -5,7 +5,7 @@
 #endif
 
 GIT_COMMIT := $(shell git rev-list -1 HEAD)
-VERSION := 0.8.8
+VERSION := 0.8.9
 #ifeq ($(BUILDOPTS),)
 BUILDOPTS :=$(BUILDOPTS)" -ldflags \"-X main.version=$(VERSION) -X main.gitCommit=$(GIT_COMMIT)\""
 #endif
