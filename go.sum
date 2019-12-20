@@ -45,3 +45,9 @@ golang.org/x/sys v0.0.0-20190403152447-81d4e9dc473e/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20190416152802-12500544f89f h1:1ZH9RnjNgLzh6YrsRp/c6ddZ8Lq0fq9xztNOoWJ2sz4=
 golang.org/x/sys v0.0.0-20190416152802-12500544f89f/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
+gopkg.in/hlandau/easymetric.v1 v1.0.0 h1:ZbfbH7W3giuVDjWUoFhDOjjv20hiPr5HZ2yMV5f9IeE=
+gopkg.in/hlandau/easymetric.v1 v1.0.0/go.mod h1:yh75hypuFzAxmvECh3ZKGCvFnIfapYJh2wv7ASaX2RE=
+gopkg.in/hlandau/measurable.v1 v1.0.1 h1:wH5UZKCRUnRr1iD+xIZfwhtxhmr+bprRJttqA1Rklf4=
+gopkg.in/hlandau/measurable.v1 v1.0.1/go.mod h1:6N+SYJGMTmetsx7wskULP+juuO+++tsHJkAgzvzsbuM=
+gopkg.in/hlandau/passlib.v1 v1.0.10 h1:q5xh9ZHp907XTjVw8/EqG03//fnlITnIYQmv4Gn7TpE=
+gopkg.in/hlandau/passlib.v1 v1.0.10/go.mod h1:wxGAv2CtQHlzWY8NJp+p045yl4WHyX7v2T6XbOcmqjM=

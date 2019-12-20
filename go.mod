@@ -24,4 +24,7 @@ require (
 	golang.org/x/crypto v0.0.0-20190417174047-f416ebab96af
 	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553 // indirect
 	golang.org/x/sys v0.0.0-20190416152802-12500544f89f
+	gopkg.in/hlandau/easymetric.v1 v1.0.0 // indirect
+	gopkg.in/hlandau/measurable.v1 v1.0.1 // indirect
+	gopkg.in/hlandau/passlib.v1 v1.0.10
 )
