@@ -18,6 +18,7 @@ Architecture
   (parts split out into hkexnet/*, hkexsession.go)
 (DONE) - Make KEx fully-pluggable: isolate all code to do with Herradura into a
   KEx-neutral pkg so it can be swapped out for other methods (eg., DH etc.)
+(DONE - test branch) - Use system password db (/etc/{passwd,shadow})
 
 Features
 (DONE) - Support for hkcp (hkex-cp) - secure file copy protocol

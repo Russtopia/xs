@@ -13,6 +13,7 @@ package xs
 import (
 	"bytes"
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -22,12 +23,48 @@ import (
 	"strings"
 
 	"github.com/jameskeane/bcrypt"
+	passlib "gopkg.in/hlandau/passlib.v1"
 )
 
-func userExistsOnSystem(who string) bool {
-	_, userErr := user.Lookup(who)
-	return userErr == nil
+// --------- System passwd/shadow auth routine(s) --------------
+// Verify a password against system standard shadow file
+// Note auxilliary fields for expiry policy are *not* inspected.
+func VerifyPass(user, password string) (bool, error) {
+	passlib.UseDefaults(passlib.Defaults20180601)
+	pwFileData, e := ioutil.ReadFile("/etc/shadow")
+	if e != nil {
+		return false, e
+	}
+	pwLines := strings.Split(string(pwFileData), "\n")
+	if len(pwLines) < 1 {
+		return false, errors.New("Empty shadow file!")
+	} else {
+		var line string
+		var hash string
+		var idx int
+		for idx = range pwLines {
+			line = pwLines[idx]
+			lFields := strings.Split(line, ":")
+			if lFields[0] == user {
+				hash = lFields[1]
+				break
+			}
+		}
+		if len(hash) == 0 {
+			return false, errors.New("nil hash!")
+		} else {
+			pe := passlib.VerifyNoUpgrade(password, hash)
+			if pe != nil {
+				return false, pe
+			}
+		}
+	}
+	return true, nil
 }
+
+// --------- End System passwd/shadow auth routine(s) ----------
+
+// ------------- xs-local passwd auth routine(s) ---------------
 
 // AuthUserByPasswd checks user login information using a password.
 // This checks /etc/xs.passwd for auth info, and system /etc/passwd
@@ -82,6 +119,13 @@ func AuthUserByPasswd(username string, auth string, fname string) (valid bool, a
 		valid = false
 	}
 	return
+}
+
+// ------------- End xs-local passwd auth routine(s) -----------
+
+func userExistsOnSystem(who string) bool {
+	_, userErr := user.Lookup(who)
+	return userErr == nil
 }
 
 // AuthUserByToken checks user login information against an auth token.

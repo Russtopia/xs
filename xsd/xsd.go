@@ -509,6 +509,8 @@ func main() {
 	var dbg bool
 	var laddr string
 
+	var useSystemPasswd bool
+
 	flag.BoolVar(&vopt, "v", false, "show version")
 	flag.StringVar(&laddr, "l", ":2000", "interface[:port] to listen")
 	flag.StringVar(&kcpMode, "K", "unused", `set to one of ["KCP_NONE","KCP_AES", "KCP_BLOWFISH", "KCP_CAST5", "KCP_SM4", "KCP_SALSA20", "KCP_SIMPLEXOR", "KCP_TEA", "KCP_3DES", "KCP_TWOFISH", "KCP_XTEA"] to use KCP (github.com/xtaci/kcp-go) reliable UDP instead of TCP`)
@@ -517,6 +519,7 @@ func main() {
 	flag.UintVar(&chaffFreqMin, "f", 100, "chaff pkt freq min (msecs)")
 	flag.UintVar(&chaffFreqMax, "F", 5000, "chaff pkt freq max (msecs)")
 	flag.UintVar(&chaffBytesMax, "B", 64, "chaff pkt size max (bytes)")
+	flag.BoolVar(&useSystemPasswd, "s", true, "use system shadow passwds")
 	flag.BoolVar(&dbg, "d", false, "debug logging")
 
 	flag.Var(&aKEXAlgs, "aK", `List of allowed KEX algs (eg. 'KEXAlgA KEXAlgB ... KEXAlgN') (default allow all)`)
@@ -709,7 +712,12 @@ func main() {
 				if xs.AuthUserByToken(string(rec.Who()), string(rec.ConnHost()), string(rec.AuthCookie(true))) {
 					valid = true
 				} else {
-					valid, allowedCmds = xs.AuthUserByPasswd(string(rec.Who()), string(rec.AuthCookie(true)), "/etc/xs.passwd")
+					if useSystemPasswd {
+						//var passErr error
+						valid, _ /*passErr*/ = xs.VerifyPass(string(rec.Who()), string(rec.AuthCookie(true)))
+					} else {
+						valid, allowedCmds = xs.AuthUserByPasswd(string(rec.Who()), string(rec.AuthCookie(true)), "/etc/xs.passwd")
+					}
 				}
 
 				// Security scrub
