@@ -495,10 +495,12 @@ func (a *allowedHMACAlgs) Set(value string) error {
 }
 
 // Main server that listens and spawns goroutines for each
-// connecting client. Note this code is mostly identical to standard
-// tcp server code, save for declaring 'xsnet' rather than 'net'
-// Listener and Conns. The KEx and encrypt/decrypt is done within the type.
-// Compare to 'serverp.go' in this directory to see the equivalence.
+// connecting client to serve interactive or file copy sessions
+// and any requested tunnels.
+// Note that this server does not do UNIX forks of itself to give
+// each client its own separate manager process, so if the main
+// daemon dies, all clients will be rudely disconnected.
+// Consider this when planning to restart or upgrade in-place an installation.
 // TODO: reduce gocyclo
 func main() {
 	var vopt bool
