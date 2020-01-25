@@ -7,7 +7,7 @@ require (
 	blitter.com/go/goutmp v1.0.1
 	blitter.com/go/herradurakex v1.0.0
 	blitter.com/go/mtwist v1.0.1 // indirect
-	blitter.com/go/wanderer v0.8.0
+	blitter.com/go/wanderer v0.8.1
 	git.schwanenlied.me/yawning/chacha20.git v0.0.0-20170904085104-e3b1f968fc63 // indirect
 	git.schwanenlied.me/yawning/kyber.git v0.0.0-20180530164001-a270899bd22c
 	git.schwanenlied.me/yawning/newhope.git v0.0.0-20170622154529-9598792ba8f2
