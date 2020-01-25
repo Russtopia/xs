@@ -106,8 +106,8 @@ func (hc Conn) getStream(keymat []byte) (rc cipher.Stream, mc hash.Hash, err err
 		rc = cryptmt.NewCipher(keymat)
 		log.Printf("[cipher CRYPTMT1 (%d)]\n", copts)
 	case CAlgWanderer:
-		rc = wanderer.NewCodec(nil, nil, keymat, 3, 3)
-		log.Printf("[cipher WANDERER (%d)]\n", copts)
+		rc = wanderer.NewCodec(nil, nil, 1, keymat, 3, 3)
+		log.Printf("[cipher WANDERER mode 1 (%d)]\n", copts)
 	default:
 		log.Printf("[invalid cipher (%d)]\n", copts)
 		fmt.Printf("DOOFUS SET A VALID CIPHER ALG (%d)\n", copts)
