@@ -6,8 +6,17 @@
 
 GIT_COMMIT := $(shell git rev-list -1 HEAD)
 VERSION := 0.8.11
+
+ifneq ($(VENDOR),)
+GOBUILDOPTS :=-v -mod vendor
+VTAG = "-vendor"
+else
+GOBUILDOPTS=
+VTAG =
+endif
+
 #ifeq ($(BUILDOPTS),)
-BUILDOPTS :=$(BUILDOPTS)" -ldflags \"-X main.version=$(VERSION) -X main.gitCommit=$(GIT_COMMIT)\""
+BUILDOPTS :=$(BUILDOPTS)"$(GOBUILDOPTS) -ldflags \"-X main.version=$(VERSION)$(VTAG) -X main.gitCommit=$(GIT_COMMIT)\""
 #endif
 
 SUBPKGS = logger spinsult xsnet
@@ -63,7 +72,7 @@ passwd: common
 vis:
 	@which go-callvis >/dev/null 2>&1; \
 	stat=$$?; if [ $$stat -ne "0" ]; then \
-	  /bin/echo "go-callvis not found. Run go get github.com/Russtopia/go-callvis to install."; \
+	  /bin/echo "go-callvis not found. Run go get https://github.com/TrueFurby/go-callvis to install."; \
 	else \
 	  make -C xs vis;\
 	  make -C xsd vis;\
