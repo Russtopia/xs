@@ -42,8 +42,8 @@ import (
 
 	hkex "blitter.com/go/herradurakex"
 	"blitter.com/go/xs/logger"
-	kyber "git.schwanenlied.me/yawning/kyber.git"
-	newhope "git.schwanenlied.me/yawning/newhope.git"
+	"blitter.com/go/kyber"
+	"blitter.com/go/newhope"
 )
 
 /*---------------------------------------------------------------------*/
