@@ -5,7 +5,7 @@
 #endif
 
 GIT_COMMIT := $(shell git rev-list -1 HEAD)
-VERSION := 0.8.11
+VERSION := 0.8.12
 
 ifneq ($(VENDOR),)
 GOBUILDOPTS :=-v -mod vendor
