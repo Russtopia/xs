@@ -64,7 +64,7 @@ stage "Test(C->S)"
 echo "TODO ..."
 
 stage "Lint"
-make lint >lint.out
+make lint
 
 stage "Artifacts"
 echo -n "Creating tarfile ..."
