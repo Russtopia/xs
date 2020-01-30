@@ -63,6 +63,9 @@ fi
 stage "Test(C->S)"
 echo "TODO ..."
 
+stage "Lint"
+make lint >lint.out
+
 stage "Artifacts"
 echo -n "Creating tarfile ..."
 tar -cz --exclude=.git --exclude=cptest -f ${BACILLUS_ARTFDIR}/xs.tgz .
