@@ -1,22 +1,28 @@
 .PHONY: lint vis clean common client server passwd subpkgs install uninstall reinstall
 
-#ifeq ($(MAKEOPTS),)
-  MAKEOPTS = $(MAKEOPTS)
-#endif
-
-GIT_COMMIT := $(shell git rev-list -1 HEAD)
-VERSION := 0.8.12
+## Tag version of binaries with build info wrt.
+## GO111MODULE(=on) and vendor/ setup vs. $GOPATH pkg builds
+############################################################
+ifeq ($(shell go env GOMOD),)
+MTAG=
+else
+MTAG="-m"
+endif
 
 ifneq ($(VENDOR),)
 GOBUILDOPTS :=-v -mod vendor
-VTAG = "-vendor"
+VTAG = "-v"
 else
 GOBUILDOPTS=
 VTAG =
 endif
+############################################################
+
+GIT_COMMIT := $(shell git rev-list -1 HEAD)
+VERSION := 0.8.12
 
 #ifeq ($(BUILDOPTS),)
-BUILDOPTS :=$(BUILDOPTS)"$(GOBUILDOPTS) -ldflags \"-X main.version=$(VERSION)$(VTAG) -X main.gitCommit=$(GIT_COMMIT)\""
+BUILDOPTS :=$(BUILDOPTS)"$(GOBUILDOPTS) -ldflags \"-X main.version=$(VERSION)$(MTAG)$(VTAG) -X main.gitCommit=$(GIT_COMMIT)\""
 #endif
 
 SUBPKGS = logger spinsult xsnet

@@ -13,4 +13,4 @@ vis:
 	go-callvis -format png -file xspasswd-vis -ignore $(EXTPKGS) -group pkg,type .
 
 lint:
-	-gometalinter --deadline=60s | sort
+	-golangci-lint run

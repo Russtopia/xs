@@ -15,4 +15,4 @@ vis:
 	../fixup-gv.sh xs.go && cat xs-vis.gv | dot -Tpng -oxs-vis-fixedup.png
 
 lint:
-	-gometalinter --deadline=60s | sort
+	-golangci-lint run
