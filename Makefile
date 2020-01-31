@@ -1,3 +1,4 @@
+VERSION := 0.8.13
 .PHONY: lint vis clean common client server passwd subpkgs install uninstall reinstall
 
 ## Tag version of binaries with build info wrt.
@@ -19,7 +20,6 @@ endif
 ############################################################
 
 GIT_COMMIT := $(shell git rev-list -1 HEAD)
-VERSION := 0.8.12
 
 #ifeq ($(BUILDOPTS),)
 BUILDOPTS :=$(BUILDOPTS)"$(GOBUILDOPTS) -ldflags \"-X main.version=$(VERSION)$(MTAG)$(VTAG) -X main.gitCommit=$(GIT_COMMIT)\""
