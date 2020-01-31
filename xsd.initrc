@@ -6,7 +6,7 @@ XSD_USER=root
 XSD_HOME=/var/run
 INST_PREFIX=/usr/local
 COMMAND=$INST_PREFIX/sbin/xsd
-ARGS=""
+ARGS="-L"
 
 depend() {
     need net
@@ -28,7 +28,7 @@ start() {
         -d ${XSD_HOME} \
         --make-pidfile --pidfile ${XSD_PIDFILE} \
         --start --quiet --background \
-        --exec "${COMMAND}" "${ARGS}"
+        --exec "${COMMAND}" -- "${ARGS}"
     eend $?
 }
 
