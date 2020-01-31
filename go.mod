@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	blitter.com/go/cryptmt v1.0.0
-	blitter.com/go/goutmp v1.0.1
+	blitter.com/go/goutmp v1.0.2
 	blitter.com/go/herradurakex v1.0.0
 	blitter.com/go/kyber v0.0.0-20200130200857-6f2021cb88d9
 	blitter.com/go/mtwist v1.0.1 // indirect

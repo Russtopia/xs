@@ -307,9 +307,6 @@ func runShellAs(who, hname, ttype, cmd string, interactive bool, conn *xsnet.Con
 	} else {
 		c.SysProcAttr.Credential = &syscall.Credential{Uid: uid, Gid: gid}
 	}
-	c.Stdin = conn
-	c.Stdout = conn
-	c.Stderr = conn
 
 	// Start the command with a pty.
 	ptmx, err := pty.Start(c) // returns immediately with ptmx file
