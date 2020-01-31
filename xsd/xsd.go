@@ -26,6 +26,7 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+	"time"
 	"unsafe"
 
 	"blitter.com/go/goutmp"
@@ -796,6 +797,8 @@ func main() {
 					} else {
 						logger.LogNotice(fmt.Sprintf("[Command completed for %s@%s, status %d]\n", rec.Who(), hname, cmdStatus)) // nolint: gosec,errcheck
 					}
+					// TODO: Test this with huge files.. see Bug #22 - do we need to
+					//   sync w/sender (client) that we've gotten all data?
 					hc.SetStatus(xsnet.CSOType(cmdStatus))
 
 					// Send CSOExitStatus *before* client closes channel
@@ -816,6 +819,10 @@ func main() {
 						// Returned hopefully via an EOF or exit/logout;
 						logger.LogNotice(fmt.Sprintf("[Command completed for %s@%s, status %d]\n", rec.Who(), hname, cmdStatus)) // nolint: gosec,errcheck
 					}
+					// HACK: Bug #22: (xc) Need to wait for rcvr to get final data
+					// TODO: Await specific msg from client to inform they have gotten all data from the tarpipe
+					time.Sleep(time.Duration(900 * time.Millisecond)) // Let rcvr set this on setup?
+
 					// Clear current op so user can enter next, or EOF
 					rec.SetOp([]byte{0})
 					hc.SetStatus(xsnet.CSOType(cmdStatus))

@@ -1320,10 +1320,6 @@ func (hc *Conn) WritePacket(b []byte, ctrlStatOp byte) (n int, err error) {
 	hmacOut = hc.wm.Sum(nil)[0:HMAC_CHK_SZ]
 
 	//log.Printf("  (%08x> HMAC(o):%s\r\n", payloadLen, hex.EncodeToString(hmacOut))
-	// HACK: Bug #22: (xc) Need flow control so sender can't overwhelm rcvr with data.
-	if payloadLen > 8192 {
-		time.Sleep(time.Duration(10 * time.Millisecond)) // Let rcvr set this on setup?
-	}
 
 	var wb bytes.Buffer
 	// The StreamWriter acts like a pipe, forwarding whatever is
