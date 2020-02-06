@@ -1,4 +1,4 @@
-// WANDERER - a crypto doodle that appears to give adequate
+// Package wanderer - a crypto doodle that appears to give adequate
 // protection to data in a stream cipher context
 //
 // Properties visualized using https://github.com/circulosmeos/circle
@@ -22,6 +22,20 @@ const (
 	keylen    = 512
 	sboxCount = keylen / 8
 )
+
+type Cipher struct {
+	prng   *mtwist.MT19937_64
+	r      io.Reader
+	w      io.Writer
+	k      []byte
+	kidx   uint
+	sboxen [][]byte
+	sw     int
+	sh     int
+	sctr   int // TODO: used to count down to re-keying & sbox regen
+	mode   int
+	n      byte
+}
 
 // Given input byte x (treated as 2-bit dirs),
 // 'walk' box applying XOR of each position (E/S/W/N) given box
@@ -74,53 +88,7 @@ func (c *Cipher) genSBoxen(n uint) {
 	//fmt.Fprintf(os.Stderr, "sboxen[0]:%v\n", c.sboxen[0])
 }
 
-// Mutate the session key (intended to be called as encryption
-// proceeds), so that the 'walk path' through sboxes also does so.
-func (c *Cipher) keyUpdate(perturb byte) {
-	c.k[c.kidx] = c.k[c.kidx] ^ c.k[(c.kidx+1)%uint(len(c.k))]
-	c.k[c.kidx] = c.k[c.kidx] ^ byte((c.prng.Int63()>>4)%256)
-	c.kidx = (c.kidx + uint(perturb)) % uint(len(c.k))
-}
-
-// slow - perturb a single octet of a single sbox for each octet
-// (CV = ~8.725% over 700 MiB of 0-byte pt)
-func (c *Cipher) sboxUpdateA(perturb byte) {
-	c.sboxen[perturb%sboxCount][int(perturb)%(c.sw+c.sh)] ^=
-		perturb
-}
-
-// slower - perturb a single sbox for each octet
-// (CV = ~?% over 700 MiB of 0-byte pt)
-func (c *Cipher) sboxUpdateB(perturb byte) {
-	lim := c.sw * c.sh
-	for idx := 0; idx < lim; idx++ {
-		c.sboxen[perturb%sboxCount][idx] ^= perturb
-	}
-}
-
-// slowest -- full sbox re-gen after each octet
-// (but lowest CV, ~0.05% over 700MiB of 0-byte pt)
-func (c *Cipher) sboxUpdateC(perturb byte) {
-	c.genSBoxen(sboxCount)
-	//c.sboxen[perturb%sboxCount][int(perturb)%(c.sw+c.sh)] ^=
-	//	perturb
-}
-
-type Cipher struct {
-	prng   *mtwist.MT19937_64
-	r      io.Reader
-	w      io.Writer
-	k      []byte
-	kidx   uint
-	sboxen [][]byte
-	sw     int
-	sh     int
-	sctr   int // TODO: used to count down to re-keying & sbox regen
-	mode   int
-	n      byte
-}
-
-func NewCodec(r io.Reader, w io.Writer, mode int, key []byte, width, height int) (c *Cipher) {
+func New(r io.Reader, w io.Writer, mode int, key []byte, width, height int) (c *Cipher) {
 	c = &Cipher{}
 	c.prng = mtwist.New()
 	if len(key) == 0 {
@@ -163,20 +131,55 @@ func (c *Cipher) Write(p []byte) (n int, err error) {
 	return n, err
 }
 
-func (c *Cipher) yield(pt byte) (ct byte) {
-	ct = walkingXOR(c.k, c.sboxen[c.n], c.sw, c.sh, pt)
+// Mutate the session key (intended to be called as encryption
+// proceeds), so that the 'walk path' through sboxes also does so.
+func (c *Cipher) keyUpdate(perturb byte) {
+	c.k[c.kidx] = c.k[c.kidx] ^ c.k[(c.kidx+1)%uint(len(c.k))]
+	c.k[c.kidx] = c.k[c.kidx] ^ byte((c.prng.Int63()>>4)%256)
+	c.kidx = (c.kidx + uint(perturb)) % uint(len(c.k))
+	//for idx := 0; idx < len(c.k); idx++ {
+	//	c.k[idx] = c.k[idx] ^ byte(c.prng.Int63() % 256)
+	//}
+}
+
+// slow - perturb a single octet of a single sbox for each octet
+// (CV = ~8.725% over 700 MiB of 0-byte pt)
+func (c *Cipher) sboxUpdateA(perturb byte) {
+	c.sboxen[perturb%sboxCount][int(perturb)%(c.sw+c.sh)] ^=
+		perturb
+}
+
+// slower - perturb a single sbox for each octet
+// (CV = ~5.6369% over 700 MiB of 0-byte pt)
+func (c *Cipher) sboxUpdateB(perturb byte) {
+	lim := c.sw * c.sh
+	for idx := 0; idx < lim; idx++ {
+		c.sboxen[perturb%sboxCount][idx] ^= perturb
+	}
+}
+
+// slowest -- full sbox re-gen after each octet
+// (but lowest CV, ~0.0554% over 700MiB of 0-byte pt)
+func (c *Cipher) sboxUpdateC(perturb byte) {
+	c.genSBoxen(sboxCount)
+	//c.sboxen[perturb%sboxCount][int(perturb)%(c.sw+c.sh)] ^=
+	//	perturb
+}
+
+func (c *Cipher) yield(ib byte) (ob byte) {
+	ob = walkingXOR(c.k, c.sboxen[c.n], c.sw, c.sh, ib)
 	c.n = (c.n + 1) % byte(len(c.sboxen))
-	c.keyUpdate(ct ^ pt) // must be equal in either encrypt/decrypt dirs
+	c.keyUpdate(ob ^ ib) // must be equal in either encrypt/decrypt dirs
 	switch c.mode {
 	case 0:
 		// [nothing - varA]
 		break
 	case 1:
-		c.sboxUpdateA(ct ^ pt) // varA
+		c.sboxUpdateA(ob ^ ib) // varA
 	case 2:
-		c.sboxUpdateB(ct ^ pt) // varB
+		c.sboxUpdateB(ob ^ ib) // varB
 	case 3:
-		c.sboxUpdateC(ct ^ pt) // varC
+		c.sboxUpdateC(ob ^ ib) // varC
 	default:
 		// [nothing]
 	}
@@ -185,7 +188,7 @@ func (c *Cipher) yield(pt byte) (ct byte) {
 	//		c.genSBoxen(sboxCount)
 	//		c.sctr = c.sw
 	//	}
-	return ct
+	return ob
 }
 
 // XORKeyStream XORs each byte in the given slice with a byte from the

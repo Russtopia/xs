@@ -3,9 +3,9 @@ blitter.com/go/chacha20
 blitter.com/go/chacha20/internal/api
 blitter.com/go/chacha20/internal/hardware
 blitter.com/go/chacha20/internal/ref
-# blitter.com/go/cryptmt v1.0.0
+# blitter.com/go/cryptmt v1.0.1
 blitter.com/go/cryptmt
-# blitter.com/go/goutmp v1.0.1
+# blitter.com/go/goutmp v1.0.2
 blitter.com/go/goutmp
 # blitter.com/go/herradurakex v1.0.0
 blitter.com/go/herradurakex
@@ -15,7 +15,7 @@ blitter.com/go/kyber
 blitter.com/go/mtwist
 # blitter.com/go/newhope v0.0.0-20200130200750-192fc08a8aae
 blitter.com/go/newhope
-# blitter.com/go/wanderer v0.8.1
+# blitter.com/go/wanderer v0.8.2
 blitter.com/go/wanderer
 # github.com/jameskeane/bcrypt v0.0.0-20120420032655-c3cd44c1e20f
 github.com/jameskeane/bcrypt
@@ -39,19 +39,19 @@ github.com/tjfoc/gmsm/sm4
 github.com/xtaci/kcp-go
 # golang.org/x/crypto v0.0.0-20200128174031-69ecbb4d6d5d
 golang.org/x/crypto/blowfish
-golang.org/x/crypto/pbkdf2
-golang.org/x/crypto/twofish
-golang.org/x/crypto/sha3
 golang.org/x/crypto/cast5
+golang.org/x/crypto/pbkdf2
 golang.org/x/crypto/salsa20
 golang.org/x/crypto/tea
+golang.org/x/crypto/twofish
 golang.org/x/crypto/xtea
-golang.org/x/crypto/argon2
-golang.org/x/crypto/bcrypt
+golang.org/x/crypto/blake2b
 golang.org/x/crypto/internal/subtle
 golang.org/x/crypto/salsa20/salsa
-golang.org/x/crypto/blake2b
+golang.org/x/crypto/argon2
+golang.org/x/crypto/bcrypt
 golang.org/x/crypto/scrypt
+golang.org/x/crypto/sha3
 # golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553
 golang.org/x/net/ipv4
 golang.org/x/net/ipv6
