@@ -103,7 +103,7 @@ func (hc Conn) getStream(keymat []byte) (rc cipher.Stream, mc hash.Hash, err err
 		rc = cipher.NewOFB(block, iv)
 		log.Printf("[cipher BLOWFISH_64 (%d)]\n", copts)
 	case CAlgCryptMT1:
-		rc = cryptmt.New(keymat)
+		rc = cryptmt.New(nil, nil, keymat)
 		log.Printf("[cipher CRYPTMT1 (%d)]\n", copts)
 	case CAlgWanderer:
 		rc = wanderer.New(nil, nil, 1, keymat, 3, 3)

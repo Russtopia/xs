@@ -39,19 +39,19 @@ github.com/tjfoc/gmsm/sm4
 github.com/xtaci/kcp-go
 # golang.org/x/crypto v0.0.0-20200128174031-69ecbb4d6d5d
 golang.org/x/crypto/blowfish
-golang.org/x/crypto/cast5
 golang.org/x/crypto/pbkdf2
+golang.org/x/crypto/twofish
+golang.org/x/crypto/sha3
+golang.org/x/crypto/cast5
 golang.org/x/crypto/salsa20
 golang.org/x/crypto/tea
-golang.org/x/crypto/twofish
 golang.org/x/crypto/xtea
-golang.org/x/crypto/blake2b
-golang.org/x/crypto/internal/subtle
-golang.org/x/crypto/salsa20/salsa
 golang.org/x/crypto/argon2
 golang.org/x/crypto/bcrypt
+golang.org/x/crypto/internal/subtle
+golang.org/x/crypto/salsa20/salsa
+golang.org/x/crypto/blake2b
 golang.org/x/crypto/scrypt
-golang.org/x/crypto/sha3
 # golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553
 golang.org/x/net/ipv4
 golang.org/x/net/ipv6
