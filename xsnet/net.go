@@ -145,8 +145,6 @@ func (c *CSCipherAlg) String() string {
 		return "C_BLOWFISH_64"
 	case CAlgCryptMT1:
 		return "C_CRYPTMT1"
-	case CAlgWanderer:
-		return "C_WANDERER"
 	default:
 		return "C_ERR_UNK"
 	}
@@ -324,10 +322,6 @@ func (hc *Conn) applyConnExtensions(extensions ...string) {
 			log.Println("[extension arg = C_CRYPTMT1]")
 			hc.cipheropts &= (0xFFFFFF00)
 			hc.cipheropts |= CAlgCryptMT1
-		case "C_WANDERER":
-			log.Println("[extension arg = C_WANDERER]")
-			hc.cipheropts &= (0xFFFFFF00)
-			hc.cipheropts |= CAlgWanderer
 		case "H_SHA256":
 			log.Println("[extension arg = H_SHA256]")
 			hc.cipheropts &= (0xFFFF00FF)

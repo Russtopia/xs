@@ -21,7 +21,6 @@ import (
 	"log"
 
 	"blitter.com/go/cryptmt"
-	"blitter.com/go/wanderer"
 	"golang.org/x/crypto/blowfish"
 	"golang.org/x/crypto/twofish"
 
@@ -105,9 +104,6 @@ func (hc Conn) getStream(keymat []byte) (rc cipher.Stream, mc hash.Hash, err err
 	case CAlgCryptMT1:
 		rc = cryptmt.New(nil, nil, keymat)
 		log.Printf("[cipher CRYPTMT1 (%d)]\n", copts)
-	case CAlgWanderer:
-		rc = wanderer.New(nil, nil, 1, keymat, 3, 3)
-		log.Printf("[cipher WANDERER mode 1 (%d)]\n", copts)
 	default:
 		log.Printf("[invalid cipher (%d)]\n", copts)
 		fmt.Printf("DOOFUS SET A VALID CIPHER ALG (%d)\n", copts)
