@@ -11,6 +11,7 @@ import (
 
 // Priority is the logger priority
 type Priority = sl.Priority
+
 // Writer is a syslog Writer
 type Writer = sl.Writer
 
@@ -75,50 +76,81 @@ func New(flags Priority, tag string) (w *Writer, e error) {
 
 // Alert returns a log Alert error
 func Alert(s string) error {
+	if l != nil {
 		return l.Alert(s)
+	}
+	return nil
+
 }
 
 // LogClose closes the log Writer.
 func LogClose() error {
+	if l != nil {
 		return l.Close()
+	}
+	return nil
 }
 
 // LogCrit returns a log Alert error
 func LogCrit(s string) error {
+	if l != nil {
 		return l.Crit(s)
+	}
+	return nil
 }
 
 // LogDebug returns a log Debug error
 func LogDebug(s string) error {
+	if l != nil {
 		return l.Debug(s)
+	}
+	return nil
 }
 
 // LogEmerg returns a log Emerg error
 func LogEmerg(s string) error {
+	if l != nil {
 		return l.Emerg(s)
+	}
+	return nil
 }
 
 // LogErr returns a log Err error
 func LogErr(s string) error {
+	if l != nil {
 		return l.Err(s)
+	}
+	return nil
 }
 
 // LogInfo returns a log Info error
 func LogInfo(s string) error {
+	if l != nil {
 		return l.Info(s)
+	}
+	return nil
 }
 
 // LogNotice returns a log Notice error
 func LogNotice(s string) error {
+	if l != nil {
 		return l.Notice(s)
+	}
+	return nil
 }
 
 // LogWarning returns a log Warning error
 func LogWarning(s string) error {
+	if l != nil {
 		return l.Warning(s)
+	}
+	return nil
 }
 
 // LogWrite writes to the logger at default level
 func LogWrite(b []byte) (int, error) {
+	if l != nil {
 		return l.Write(b)
+	}
+	return len(b),nil
 }

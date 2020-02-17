@@ -41,9 +41,9 @@ import (
 	"time"
 
 	hkex "blitter.com/go/herradurakex"
-	"blitter.com/go/xs/logger"
 	"blitter.com/go/kyber"
 	"blitter.com/go/newhope"
+	"blitter.com/go/xs/logger"
 )
 
 /*---------------------------------------------------------------------*/
