@@ -30,6 +30,9 @@ import (
 // Verify a password against system standard shadow file
 // Note auxilliary fields for expiry policy are *not* inspected.
 func VerifyPass(reader func(string) ([]byte, error), user, password string) (bool, error) {
+	if reader == nil {
+		reader = ioutil.ReadFile // dependency injection hides that this is required
+	}
 	passlib.UseDefaults(passlib.Defaults20180601)
 	pwFileData, e := reader("/etc/shadow")
 	if e != nil {
@@ -70,8 +73,11 @@ func VerifyPass(reader func(string) ([]byte, error), user, password string) (boo
 // This checks /etc/xs.passwd for auth info, and system /etc/passwd
 // to cross-check the user actually exists.
 // nolint: gocyclo
-func AuthUserByPasswd(username string, auth string, fname string) (valid bool, allowedCmds string) {
-	b, e := ioutil.ReadFile(fname) // nolint: gosec
+func AuthUserByPasswd(reader func(string) ([]byte, error), userlookup func(string) (*user.User, error), username string, auth string, fname string) (valid bool, allowedCmds string) {
+	if reader == nil {
+		reader = ioutil.ReadFile // dependency injection hides that this is required
+	}
+	b, e := reader(fname) // nolint: gosec
 	if e != nil {
 		valid = false
 		log.Printf("ERROR: Cannot read %s!\n", fname)
@@ -115,7 +121,8 @@ func AuthUserByPasswd(username string, auth string, fname string) (valid bool, a
 	r = nil
 	runtime.GC()
 
-	if !userExistsOnSystem(username) {
+	_, userErr := userlookup(username)
+	if userErr != nil {
 		valid = false
 	}
 	return
@@ -123,24 +130,26 @@ func AuthUserByPasswd(username string, auth string, fname string) (valid bool, a
 
 // ------------- End xs-local passwd auth routine(s) -----------
 
-func userExistsOnSystem(who string) bool {
-	_, userErr := user.Lookup(who)
-	return userErr == nil
-}
-
 // AuthUserByToken checks user login information against an auth token.
 // Auth tokens are stored in each user's $HOME/.xs_id and are requested
 // via the -g option.
 // The function also check system /etc/passwd to cross-check the user
 // actually exists.
-func AuthUserByToken(username string, connhostname string, auth string) (valid bool) {
+func AuthUserByToken(reader func(string) ([]byte, error), userlookup func(string) (*user.User, error), username string, connhostname string, auth string) (valid bool) {
+	if reader == nil {
+		reader = ioutil.ReadFile // dependency injection hides that this is required
+	}
+	if userlookup == nil {
+		userlookup = user.Lookup // again for dependency injection as dep is now hidden
+	}
+
 	auth = strings.TrimSpace(auth)
-	u, ue := user.Lookup(username)
+	u, ue := userlookup(username)
 	if ue != nil {
 		return false
 	}
 
-	b, e := ioutil.ReadFile(fmt.Sprintf("%s/.xs_id", u.HomeDir))
+	b, e := reader(fmt.Sprintf("%s/.xs_id", u.HomeDir))
 	if e != nil {
 		log.Printf("INFO: Cannot read %s/.xs_id\n", u.HomeDir)
 		return false
@@ -167,7 +176,8 @@ func AuthUserByToken(username string, connhostname string, auth string) (valid b
 			break
 		}
 	}
-	if !userExistsOnSystem(username) {
+	_, userErr := userlookup(username)
+	if userErr != nil {
 		valid = false
 	}
 	return

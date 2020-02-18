@@ -708,14 +708,14 @@ func main() {
 
 				var valid bool
 				var allowedCmds string // Currently unused
-				if xs.AuthUserByToken(string(rec.Who()), string(rec.ConnHost()), string(rec.AuthCookie(true))) {
+				if xs.AuthUserByToken(ioutil.ReadFile, user.Lookup, string(rec.Who()), string(rec.ConnHost()), string(rec.AuthCookie(true))) {
 					valid = true
 				} else {
 					if useSystemPasswd {
 						//var passErr error
 						valid, _ /*passErr*/ = xs.VerifyPass(ioutil.ReadFile, string(rec.Who()), string(rec.AuthCookie(true)))
 					} else {
-						valid, allowedCmds = xs.AuthUserByPasswd(string(rec.Who()), string(rec.AuthCookie(true)), "/etc/xs.passwd")
+						valid, allowedCmds = xs.AuthUserByPasswd(ioutil.ReadFile, user.Lookup, string(rec.Who()), string(rec.AuthCookie(true)), "/etc/xs.passwd")
 					}
 				}
 
