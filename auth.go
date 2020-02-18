@@ -29,9 +29,9 @@ import (
 // --------- System passwd/shadow auth routine(s) --------------
 // Verify a password against system standard shadow file
 // Note auxilliary fields for expiry policy are *not* inspected.
-func VerifyPass(user, password string) (bool, error) {
+func VerifyPass(reader func(string) ([]byte, error), user, password string) (bool, error) {
 	passlib.UseDefaults(passlib.Defaults20180601)
-	pwFileData, e := ioutil.ReadFile("/etc/shadow")
+	pwFileData, e := reader("/etc/shadow")
 	if e != nil {
 		return false, e
 	}

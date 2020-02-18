@@ -25,6 +25,9 @@ ls
 stage "Build"
 make all
 
+stage "UnitTests"
+go test -v .
+
 stage "Test(Authtoken)"
 echo "Clearing test user $USER ~/.xs_id file ..."
 rm -f ~/.xs_id

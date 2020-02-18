@@ -713,7 +713,7 @@ func main() {
 				} else {
 					if useSystemPasswd {
 						//var passErr error
-						valid, _ /*passErr*/ = xs.VerifyPass(string(rec.Who()), string(rec.AuthCookie(true)))
+						valid, _ /*passErr*/ = xs.VerifyPass(ioutil.ReadFile, string(rec.Who()), string(rec.AuthCookie(true)))
 					} else {
 						valid, allowedCmds = xs.AuthUserByPasswd(string(rec.Who()), string(rec.AuthCookie(true)), "/etc/xs.passwd")
 					}
