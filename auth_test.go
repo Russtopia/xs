@@ -31,6 +31,11 @@ disableduser:!:18310::::::`
 	readfile_arg_f   string
 )
 
+func newMockAuthCtx(reader func(string) ([]byte, error), userlookup func(string) (*user.User, error)) (ret *AuthCtx) {
+		ret = &AuthCtx{reader, userlookup}
+		return
+}
+
 func _mock_user_Lookup(username string) (*user.User, error) {
 	username = userlookup_arg_u
 	if username == "baduser" {
@@ -64,8 +69,9 @@ func _mock_ioutil_ReadFileHasError(f string) ([]byte, error) {
 
 func TestVerifyPass(t *testing.T) {
 	readfile_arg_f = "/etc/shadow"
+	ctx := newMockAuthCtx(_mock_ioutil_ReadFile, nil)
 	for idx, rec := range testGoodUsers {
-		stat, e := VerifyPass(_mock_ioutil_ReadFile, rec.user, rec.passwd)
+		stat, e := VerifyPass(ctx, rec.user, rec.passwd)
 		if rec.good && (!stat || e != nil) {
 			t.Fatalf("failed %d\n", idx)
 		}
@@ -73,21 +79,24 @@ func TestVerifyPass(t *testing.T) {
 }
 
 func TestVerifyPassFailsOnEmptyFile(t *testing.T) {
-	stat, e := VerifyPass(_mock_ioutil_ReadFileEmpty, "johndoe", "sompass")
+	ctx := newMockAuthCtx(_mock_ioutil_ReadFileEmpty, nil)
+	stat, e := VerifyPass(ctx, "johndoe", "somepass")
 	if stat || (e == nil) {
 		t.Fatal("failed to fail w/empty file")
 	}
 }
 
 func TestVerifyPassFailsOnFileError(t *testing.T) {
-	stat, e := VerifyPass(_mock_ioutil_ReadFileEmpty, "johndoe", "somepass")
+	ctx := newMockAuthCtx(_mock_ioutil_ReadFileEmpty, nil)
+	stat, e := VerifyPass(ctx, "johndoe", "somepass")
 	if stat || (e == nil) {
 		t.Fatal("failed to fail on ioutil.ReadFile error")
 	}
 }
 
 func TestVerifyPassFailsOnDisabledEntry(t *testing.T) {
-	stat, e := VerifyPass(_mock_ioutil_ReadFileEmpty, "disableduser", "!")
+	ctx := newMockAuthCtx(_mock_ioutil_ReadFileEmpty, nil)
+	stat, e := VerifyPass(ctx, "disableduser", "!")
 	if stat || (e == nil) {
 		t.Fatal("failed to fail on disabled user entry")
 	}
@@ -96,38 +105,43 @@ func TestVerifyPassFailsOnDisabledEntry(t *testing.T) {
 ////
 
 func TestAuthUserByTokenFailsOnMissingEntryForHost(t *testing.T) {
-	stat := AuthUserByToken(_mock_ioutil_ReadFile, _mock_user_Lookup, "johndoe", "hostZ", "abcdefg")
+	ctx := newMockAuthCtx(_mock_ioutil_ReadFile, _mock_user_Lookup)
+	stat := AuthUserByToken(ctx, "johndoe", "hostZ", "abcdefg")
 	if stat {
 		t.Fatal("failed to fail on missing/mismatched host entry")
 	}
 }
 
 func TestAuthUserByTokenFailsOnMissingEntryForUser(t *testing.T) {
-	stat := AuthUserByToken(_mock_ioutil_ReadFile, _mock_user_Lookup, "unkuser", "hostA", "abcdefg")
+	ctx := newMockAuthCtx(_mock_ioutil_ReadFile, _mock_user_Lookup)
+	stat := AuthUserByToken(ctx, "unkuser", "hostA", "abcdefg")
 	if stat {
 		t.Fatal("failed to fail on wrong user")
 	}
 }
 
 func TestAuthUserByTokenFailsOnUserLookupFailure(t *testing.T) {
+	ctx := newMockAuthCtx(_mock_ioutil_ReadFile, _mock_user_Lookup)
 	userlookup_arg_u = "baduser"
-	stat := AuthUserByToken(_mock_ioutil_ReadFile, _mock_user_Lookup, "johndoe", "hostA", "abcdefg")
+	stat := AuthUserByToken(ctx, "johndoe", "hostA", "abcdefg")
 	if stat {
 		t.Fatal("failed to fail with bad return from user.Lookup()")
 	}
 }
 
 func TestAuthUserByTokenFailsOnMismatchedTokenForUser(t *testing.T) {
-	stat := AuthUserByToken(_mock_ioutil_ReadFile, _mock_user_Lookup, "johndoe", "hostA", "badtoken")
+	ctx := newMockAuthCtx(_mock_ioutil_ReadFile, _mock_user_Lookup)
+	stat := AuthUserByToken(ctx, "johndoe", "hostA", "badtoken")
 	if stat {
 		t.Fatal("failed to fail with valid user, bad token")
 	}
 }
 
 func TestAuthUserByTokenSucceedsWithMatchedUserAndToken(t *testing.T) {
+	ctx := newMockAuthCtx(_mock_ioutil_ReadFile, _mock_user_Lookup)
 	userlookup_arg_u = "johndoe"
 	readfile_arg_f = "/.xs_id"
-	stat := AuthUserByToken(_mock_ioutil_ReadFile, _mock_user_Lookup, userlookup_arg_u, "hostA", "hostA:abcdefg")
+	stat := AuthUserByToken(ctx, userlookup_arg_u, "hostA", "hostA:abcdefg")
 	if !stat {
 		t.Fatal("failed with valid user and token")
 	}

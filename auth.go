@@ -26,15 +26,25 @@ import (
 	passlib "gopkg.in/hlandau/passlib.v1"
 )
 
+type AuthCtx struct {
+	reader     func(string) ([]byte, error)     // eg. ioutil.ReadFile()
+	userlookup func(string) (*user.User, error) // eg. os/user.Lookup()
+}
+
+func NewAuthCtx(/*reader func(string) ([]byte, error), userlookup func(string) (*user.User, error)*/) (ret *AuthCtx) {
+		ret = &AuthCtx{ioutil.ReadFile, user.Lookup}
+		return
+}
+
 // --------- System passwd/shadow auth routine(s) --------------
 // Verify a password against system standard shadow file
 // Note auxilliary fields for expiry policy are *not* inspected.
-func VerifyPass(reader func(string) ([]byte, error), user, password string) (bool, error) {
-	if reader == nil {
-		reader = ioutil.ReadFile // dependency injection hides that this is required
+func VerifyPass(ctx *AuthCtx, user, password string) (bool, error) {
+	if ctx.reader == nil {
+		ctx.reader = ioutil.ReadFile // dependency injection hides that this is required
 	}
 	passlib.UseDefaults(passlib.Defaults20180601)
-	pwFileData, e := reader("/etc/shadow")
+	pwFileData, e := ctx.reader("/etc/shadow")
 	if e != nil {
 		return false, e
 	}
@@ -73,11 +83,14 @@ func VerifyPass(reader func(string) ([]byte, error), user, password string) (boo
 // This checks /etc/xs.passwd for auth info, and system /etc/passwd
 // to cross-check the user actually exists.
 // nolint: gocyclo
-func AuthUserByPasswd(reader func(string) ([]byte, error), userlookup func(string) (*user.User, error), username string, auth string, fname string) (valid bool, allowedCmds string) {
-	if reader == nil {
-		reader = ioutil.ReadFile // dependency injection hides that this is required
+func AuthUserByPasswd(ctx *AuthCtx, username string, auth string, fname string) (valid bool, allowedCmds string) {
+	if ctx.reader == nil {
+		ctx.reader = ioutil.ReadFile // dependency injection hides that this is required
 	}
-	b, e := reader(fname) // nolint: gosec
+	if ctx.userlookup == nil {
+		ctx.userlookup = user.Lookup // again for dependency injection as dep is now hidden
+	}
+	b, e := ctx.reader(fname) // nolint: gosec
 	if e != nil {
 		valid = false
 		log.Printf("ERROR: Cannot read %s!\n", fname)
@@ -121,7 +134,7 @@ func AuthUserByPasswd(reader func(string) ([]byte, error), userlookup func(strin
 	r = nil
 	runtime.GC()
 
-	_, userErr := userlookup(username)
+	_, userErr := ctx.userlookup(username)
 	if userErr != nil {
 		valid = false
 	}
@@ -135,21 +148,21 @@ func AuthUserByPasswd(reader func(string) ([]byte, error), userlookup func(strin
 // via the -g option.
 // The function also check system /etc/passwd to cross-check the user
 // actually exists.
-func AuthUserByToken(reader func(string) ([]byte, error), userlookup func(string) (*user.User, error), username string, connhostname string, auth string) (valid bool) {
-	if reader == nil {
-		reader = ioutil.ReadFile // dependency injection hides that this is required
+func AuthUserByToken(ctx *AuthCtx, username string, connhostname string, auth string) (valid bool) {
+	if ctx.reader == nil {
+		ctx.reader = ioutil.ReadFile // dependency injection hides that this is required
 	}
-	if userlookup == nil {
-		userlookup = user.Lookup // again for dependency injection as dep is now hidden
+	if ctx.userlookup == nil {
+		ctx.userlookup = user.Lookup // again for dependency injection as dep is now hidden
 	}
 
 	auth = strings.TrimSpace(auth)
-	u, ue := userlookup(username)
+	u, ue := ctx.userlookup(username)
 	if ue != nil {
 		return false
 	}
 
-	b, e := reader(fmt.Sprintf("%s/.xs_id", u.HomeDir))
+	b, e := ctx.reader(fmt.Sprintf("%s/.xs_id", u.HomeDir))
 	if e != nil {
 		log.Printf("INFO: Cannot read %s/.xs_id\n", u.HomeDir)
 		return false
@@ -176,7 +189,7 @@ func AuthUserByToken(reader func(string) ([]byte, error), userlookup func(string
 			break
 		}
 	}
-	_, userErr := userlookup(username)
+	_, userErr := ctx.userlookup(username)
 	if userErr != nil {
 		valid = false
 	}
