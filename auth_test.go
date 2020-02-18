@@ -21,10 +21,20 @@ disableduser:!:18310::::::`
 
 	dummyAuthTokenFile = "hostA:abcdefg\nhostB:wxyz\n"
 
+	dummyXsPasswdFile = `#username:salt:authCookie
+bobdobbs:$2a$12$9vqGkFqikspe/2dTARqu1O:$2a$12$9vqGkFqikspe/2dTARqu1OuDKCQ/RYWsnaFjmi.HtmECRkxcZ.kBK
+notbob:$2a$12$cZpiYaq5U998cOkXzRKdyu:$2a$12$cZpiYaq5U998cOkXzRKdyuJ2FoEQyVLa3QkYdPQk74VXMoAzhvuP6
+`
+
 	testGoodUsers = []userVerifs{
 		{"johndoe", "testpass", true},
 		{"joebloggs", "testpass2", true},
 		{"johndoe", "badpass", false},
+	}
+
+	testXsPasswdUsers = []userVerifs{
+		{"bobdobbs", "praisebob", true},
+		{"notbob", "imposter", false},
 	}
 
 	userlookup_arg_u string
@@ -32,8 +42,8 @@ disableduser:!:18310::::::`
 )
 
 func newMockAuthCtx(reader func(string) ([]byte, error), userlookup func(string) (*user.User, error)) (ret *AuthCtx) {
-		ret = &AuthCtx{reader, userlookup}
-		return
+	ret = &AuthCtx{reader, userlookup}
+	return
 }
 
 func _mock_user_Lookup(username string) (*user.User, error) {
@@ -51,6 +61,10 @@ func _mock_ioutil_ReadFile(f string) ([]byte, error) {
 	if f == "/etc/shadow" {
 		fmt.Println("  [mocking ReadFile(\"/etc/shadow\")]")
 		return []byte(dummyShadowA), nil
+	}
+	if f == "/etc/xs.passwd" {
+		fmt.Println("  [mocking ReadFile(\"/etc/xs.passwd\")]")
+		return []byte(dummyXsPasswdFile), nil
 	}
 	if strings.Contains(f, "/.xs_id") {
 		fmt.Println("  [mocking ReadFile(\".xs_id\")]")
@@ -144,5 +158,55 @@ func TestAuthUserByTokenSucceedsWithMatchedUserAndToken(t *testing.T) {
 	stat := AuthUserByToken(ctx, userlookup_arg_u, "hostA", "hostA:abcdefg")
 	if !stat {
 		t.Fatal("failed with valid user and token")
+	}
+}
+
+func TestAuthUserByPasswdFailsOnEmptyFile(t *testing.T) {
+	ctx := newMockAuthCtx(_mock_ioutil_ReadFileEmpty, _mock_user_Lookup)
+	userlookup_arg_u = "bobdobbs"
+	readfile_arg_f = "/etc/xs.passwd"
+	stat, _ := AuthUserByPasswd(ctx, userlookup_arg_u, "praisebob", readfile_arg_f)
+	if stat {
+		t.Fatal("failed to fail with missing xs.passwd file")
+	}
+}
+
+func TestAuthUserByPasswdFailsOnBadAuth(t *testing.T) {
+	ctx := newMockAuthCtx(_mock_ioutil_ReadFile, _mock_user_Lookup)
+	userlookup_arg_u = "bobdobbs"
+	readfile_arg_f = "/etc/xs.passwd"
+	stat, _ := AuthUserByPasswd(ctx, userlookup_arg_u, "wrongpass", readfile_arg_f)
+	if stat {
+		t.Fatal("failed to fail with valid user, incorrect passwd in xs.passwd file")
+	}
+}
+
+func TestAuthUserByPasswdFailsOnBadUser(t *testing.T) {
+	ctx := newMockAuthCtx(_mock_ioutil_ReadFile, _mock_user_Lookup)
+	userlookup_arg_u = "bobdobbs"
+	readfile_arg_f = "/etc/xs.passwd"
+	stat, _ := AuthUserByPasswd(ctx, userlookup_arg_u, "theotherbob", readfile_arg_f)
+	if stat {
+		t.Fatal("failed to fail on invalid user vs. xs.passwd file")
+	}
+}
+
+func TestAuthUserByPasswdPassesOnGoodAuth(t *testing.T) {
+	ctx := newMockAuthCtx(_mock_ioutil_ReadFile, _mock_user_Lookup)
+	userlookup_arg_u = "bobdobbs"
+	readfile_arg_f = "/etc/xs.passwd"
+	stat, _ := AuthUserByPasswd(ctx, userlookup_arg_u, "praisebob", readfile_arg_f)
+	if !stat {
+		t.Fatal("failed on valid user w/correct passwd in xs.passwd file")
+	}
+}
+
+func TestAuthUserByPasswdPassesOnOtherGoodAuth(t *testing.T) {
+	ctx := newMockAuthCtx(_mock_ioutil_ReadFile, _mock_user_Lookup)
+	userlookup_arg_u = "notbob"
+	readfile_arg_f = "/etc/xs.passwd"
+	stat, _ := AuthUserByPasswd(ctx, userlookup_arg_u, "imposter", readfile_arg_f)
+	if !stat {
+		t.Fatal("failed on valid user 2nd entry w/correct passwd in xs.passwd file")
 	}
 }

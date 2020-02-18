@@ -31,9 +31,9 @@ type AuthCtx struct {
 	userlookup func(string) (*user.User, error) // eg. os/user.Lookup()
 }
 
-func NewAuthCtx(/*reader func(string) ([]byte, error), userlookup func(string) (*user.User, error)*/) (ret *AuthCtx) {
-		ret = &AuthCtx{ioutil.ReadFile, user.Lookup}
-		return
+func NewAuthCtx( /*reader func(string) ([]byte, error), userlookup func(string) (*user.User, error)*/ ) (ret *AuthCtx) {
+	ret = &AuthCtx{ioutil.ReadFile, user.Lookup}
+	return
 }
 
 // --------- System passwd/shadow auth routine(s) --------------
