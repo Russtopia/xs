@@ -15,6 +15,8 @@ blitter.com/go/kyber
 blitter.com/go/mtwist
 # blitter.com/go/newhope v0.0.0-20200130200750-192fc08a8aae
 blitter.com/go/newhope
+# github.com/aead/chacha20 v0.0.0-20180709150244-8b13a72661da
+github.com/aead/chacha20/chacha
 # github.com/jameskeane/bcrypt v0.0.0-20120420032655-c3cd44c1e20f
 github.com/jameskeane/bcrypt
 # github.com/klauspost/cpuid v1.2.2

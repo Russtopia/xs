@@ -99,6 +99,7 @@ const (
 	CAlgTwofish128 // golang.org/x/crypto/twofish
 	CAlgBlowfish64 // golang.org/x/crypto/blowfish
 	CAlgCryptMT1   //cryptmt using mtwist64
+	CAlgChaCha20_12
 	CAlgNoneDisallowed
 )
 

@@ -21,6 +21,7 @@ import (
 	"log"
 
 	"blitter.com/go/cryptmt"
+	"github.com/aead/chacha20/chacha"
 	"golang.org/x/crypto/blowfish"
 	"golang.org/x/crypto/twofish"
 
@@ -104,6 +105,18 @@ func (hc Conn) getStream(keymat []byte) (rc cipher.Stream, mc hash.Hash, err err
 	case CAlgCryptMT1:
 		rc = cryptmt.New(nil, nil, keymat)
 		log.Printf("[cipher CRYPTMT1 (%d)]\n", copts)
+	case CAlgChaCha20_12:
+		keymat = expandKeyMat(keymat, chacha.KeySize)
+		key = keymat[0:chacha.KeySize]
+		ivlen = chacha.INonceSize
+		iv = keymat[chacha.KeySize : chacha.KeySize+ivlen]
+		rc, err = chacha.NewCipher(iv, key, 20)
+		if err != nil {
+			log.Printf("[ChaCha20 config error]\n")
+			fmt.Printf("[ChaCha20 config error]\n")
+		}
+		// TODO: SetCounter() to something derived from key or nonce or extra keymat?
+		log.Printf("[cipher CHACHA20_12 (%d)]\n", copts)
 	default:
 		log.Printf("[invalid cipher (%d)]\n", copts)
 		fmt.Printf("DOOFUS SET A VALID CIPHER ALG (%d)\n", copts)

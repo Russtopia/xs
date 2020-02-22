@@ -9,6 +9,7 @@ require (
 	blitter.com/go/kyber v0.0.0-20200130200857-6f2021cb88d9
 	blitter.com/go/mtwist v1.0.1 // indirect
 	blitter.com/go/newhope v0.0.0-20200130200750-192fc08a8aae
+	github.com/aead/chacha20 v0.0.0-20180709150244-8b13a72661da
 	github.com/jameskeane/bcrypt v0.0.0-20120420032655-c3cd44c1e20f
 	github.com/klauspost/cpuid v1.2.2 // indirect
 	github.com/klauspost/reedsolomon v1.9.3 // indirect
