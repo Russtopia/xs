@@ -420,7 +420,7 @@ func doShellMode(isInteractive bool, conn *xsnet.Conn, oldState *xs.State, rec *
 		// exit with inerr == nil
 		_, inerr := io.Copy(os.Stdout, conn)
 		if inerr != nil {
-			_ = xs.Restore(int(os.Stdin.Fd()), oldState) // #nosec
+			restoreTermState(oldState)
 			// Copy operations and user logging off will cause
 			// a "use of closed network connection" so handle that
 			// gracefully here
@@ -435,7 +435,7 @@ func doShellMode(isInteractive bool, conn *xsnet.Conn, oldState *xs.State, rec *
 
 		if isInteractive {
 			log.Println("[* Got EOF *]")
-			_ = xs.Restore(int(os.Stdin.Fd()), oldState) // #nosec
+			restoreTermState(oldState)
 			exitWithStatus(int(rec.Status()))
 		}
 	}
@@ -463,7 +463,7 @@ func doShellMode(isInteractive bool, conn *xsnet.Conn, oldState *xs.State, rec *
 			if outerr != nil {
 				log.Println(outerr)
 				fmt.Println(outerr)
-				_ = xs.Restore(int(os.Stdin.Fd()), oldState) // #nosec
+				restoreTermState(oldState)
 				log.Println("[Hanging up]")
 				exitWithStatus(0)
 			}
@@ -848,11 +848,16 @@ func main() {
 			}
 			// #gv:s/label=\"main\$1\"/label=\"deferRestore\"/
 			// TODO:.gv:main:1:deferRestore
-			defer func() { _ = xs.Restore(int(os.Stdin.Fd()), oldState) }() // nolint: errcheck,gosec
+			defer restoreTermState(oldState)
 		} else {
 			log.Println("NOT A TTY")
 		}
 	}
+
+	// Start login timeout here and disconnect if user/pass phase stalls
+	loginTimeout := time.AfterFunc(30*time.Second, func() {
+		fmt.Printf(" .. [login timeout]")
+	})
 
 	if len(authCookie) == 0 {
 		//No auth token, prompt for password
@@ -864,6 +869,8 @@ func main() {
 		}
 		authCookie = string(ab)
 	}
+
+	_ = loginTimeout.Stop()
 	// Security scrub
 	runtime.GC()
 
@@ -871,9 +878,9 @@ func main() {
 	rec := xs.NewSession(op, []byte(uname), []byte(remoteHost), []byte(os.Getenv("TERM")), []byte(cmdStr), []byte(authCookie), 0)
 	sendErr := sendSessionParams(&conn, rec)
 	if sendErr != nil {
-		_ = xs.Restore(int(os.Stdin.Fd()), oldState) // nolint: errcheck,gosec
+		restoreTermState(oldState)
 		rec.SetStatus(254)
-		fmt.Fprintln(os.Stderr, "Error: server rejected secure proposal params") // nolint: errcheck
+		fmt.Fprintln(os.Stderr, "Error: server rejected secure proposal params or login timed out") // nolint: errcheck
 		exitWithStatus(int(rec.Status()))
 		//log.Fatal(sendErr)
 	}
@@ -930,17 +937,21 @@ func main() {
 		}
 
 		if rec.Status() != 0 {
-			_ = xs.Restore(int(os.Stdin.Fd()), oldState)                         // nolint: errcheck,gosec
+			restoreTermState(oldState)
 			fmt.Fprintln(os.Stderr, "Session exited with status:", rec.Status()) // nolint: errcheck
 		}
 	}
 
 	if oldState != nil {
-		_ = xs.Restore(int(os.Stdin.Fd()), oldState) // nolint: gosec
+		restoreTermState(oldState)
 		oldState = nil
 	}
 
 	exitWithStatus(int(rec.Status()))
+}
+
+func restoreTermState(oldState *xs.State) {
+	_ = xs.Restore(int(os.Stdin.Fd()), oldState) // nolint: errcheck,gosec
 }
 
 // exitWithStatus wraps os.Exit() plus does any required pprof housekeeping

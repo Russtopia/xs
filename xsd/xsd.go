@@ -26,6 +26,7 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+	"time"
 	"unsafe"
 
 	"blitter.com/go/goutmp"
@@ -640,6 +641,13 @@ func main() {
 			go func(hc *xsnet.Conn) (e error) {
 				defer hc.Close() // nolint: errcheck
 
+				// Start login timeout here and disconnect if user/pass phase stalls
+				loginTimeout := time.AfterFunc(30*time.Second, func() {
+					logger.LogNotice(fmt.Sprintln("Login timed out")) // nolint: errcheck,gosec
+					hc.Write([]byte{0})                               // nolint: gosec,errcheck
+					hc.Close()
+				})
+
 				//We use io.ReadFull() here to guarantee we consume
 				//just the data we want for the xs.Session, and no more.
 				//Otherwise data will be sitting in the channel that isn't
@@ -719,6 +727,7 @@ func main() {
 					}
 				}
 
+				_ = loginTimeout.Stop()
 				// Security scrub
 				rec.ClearAuthCookie()
 
