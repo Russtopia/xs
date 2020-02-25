@@ -35,6 +35,7 @@ Currently supported session algorithms:
 * Twofish-128
 * Blowfish-64
 * CryptMTv1 (64bit) (https://eprint.iacr.org/2005/165.pdf)
+* ChaCha20 (https://github.com/aead/chacha20)
 
 [HMAC]
 * HMAC-SHA256
