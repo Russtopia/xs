@@ -184,6 +184,8 @@ xc uses a 'tarpipe' to send file data over the encrypted channel. Use the -d fla
 
 NOTE: Renaming while copying (eg., 'cp /foo/bar/fileA ./fileB') is NOT supported. Put another way, the destination (whether local or remote) must ALWAYS be a directory.
 
+If the 'pv' pipeview utility is available (http://www.ivarch.com/programs/pv.shtml) file transfer progress and bandwidth control will be available (suppress the former with the -q option, set the latter with -L &lt;bytes_per_second&gt;).
+
 ### Tunnels
 
 Simple tunnels (client -> server, no reverse tunnels for now) are supported.
