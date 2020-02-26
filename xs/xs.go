@@ -240,8 +240,34 @@ func GetSize() (cols, rows int, err error) {
 	return
 }
 
+func buildCmdRemoteToLocal(copyQuiet bool, copyLimitBPS uint, destPath, files string) (captureStderr bool, cmd string, args []string) {
+	// Detect if we have 'pv'
+	// pipeview http://www.ivarch.com/programs/pv.shtml
+	// and use it for nice client progress display.
+	_, pverr := os.Stat("/usr/bin/pv")
+	if pverr != nil {
+		_, pverr = os.Stat("/usr/local/bin/pv")
+	}
+
+	if copyQuiet || pverr != nil {
+		// copyQuiet and copyLimitBPS are not applicable in dumb copy mode
+		captureStderr = true
+		cmd = "/bin/tar"
+
+		args = []string{"-xz", "-C", destPath}
+} else {
+		// TODO: Query remote side for total file/dir size
+		bandwidthInBytesPerSec := " -L " + fmt.Sprintf("%d ", copyLimitBPS)
+		displayOpts := " -f -pr "
+		cmd = "/bin/bash"
+		args = []string{"-c", "pv " + displayOpts + bandwidthInBytesPerSec + "| tar -xz -C " + destPath}
+	}
+	log.Printf("[%v %v]\n", cmd, args)
+	return
+}
+
 func buildCmdLocalToRemote(copyQuiet bool, copyLimitBPS uint, files string) (captureStderr bool, cmd string, args []string) {
-	// TODO: detect if we have 'pv'
+	// Detect if we have 'pv'
 	// pipeview http://www.ivarch.com/programs/pv.shtml
 	// and use it for nice client progress display.
 	_, pverr := os.Stat("/usr/bin/pv")
@@ -403,17 +429,11 @@ func doCopyMode(conn *xsnet.Conn, remoteDest bool, files string, copyQuiet bool,
 		}
 	} else {
 		log.Println("remote filepath:", string(rec.Cmd()), "local files:", files)
-		var c *exec.Cmd
-
-		cmdName := "/bin/tar"
 		destPath := files
 
-		cmdArgs := []string{"-xz", "-C", destPath}
-		log.Printf("[%v %v]\n", cmdName, cmdArgs)
-		// NOTE the lack of quotes around --xform option's sed expression.
-		// When args are passed in exec() format, no quoting is required
-		// (as this isn't input from a shell) (right? -rlm 20180823)
-		//cmdArgs := []string{"-xvz", "-C", destPath, `--xform=s#.*/\(.*\)#\1#`}
+		_, cmdName, cmdArgs := buildCmdRemoteToLocal(copyQuiet, copyLimitBPS, destPath, strings.TrimSpace(files))
+
+		var c *exec.Cmd
 		c = exec.Command(cmdName, cmdArgs...) // #nosec
 		c.Stdin = conn
 		c.Stdout = os.Stdout
