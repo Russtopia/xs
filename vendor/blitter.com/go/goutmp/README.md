@@ -10,8 +10,8 @@ Golang bindings for basic login/utmp accounting
 
 type UtmpEntry struct{ ... }
 
-func Put_lastlog_entry(app string, usr string, host string)
+func Put_lastlog_entry(app, usr, ptsname, host string)
 func Unput_utmp(entry UtmpEntry)
-func Put_utmp(user string, host string) UtmpEntry
+func Put_utmp(user, ptsname, host string) UtmpEntry
 ```
 

@@ -1,6 +1,6 @@
 // Package CryptMT - implementation of cryptMTv1 stream cipher
-// (but with mtwist64 as base accum) 
-// https://eprint.iacr.org/2005/165.pdf 
+// (but with mtwist64 as base accum)
+// https://eprint.iacr.org/2005/165.pdf
 package cryptmt
 
 // TODO rlm: according to go docs, stream ciphers do not implement the
@@ -11,32 +11,50 @@ package cryptmt
 
 import (
 	"errors"
+	"io"
 
 	mtwist "blitter.com/go/mtwist"
 )
 
 type Cipher struct {
+	r     io.Reader
+	w     io.Writer
 	accum uint64
 	m     *mtwist.MT19937_64
 }
 
-func (c *Cipher) yield8() (r byte) {
+func (c *Cipher) yield() (r byte) {
 	c.accum = c.accum * (c.m.Int63() | 1)
 	r = byte(c.accum>>56) & 0xFF
 	return
 }
 
-// NewCipher creates and returns a Cipher. The key argument should be the
+// New creates and returns a Cipher. The key argument should be the
 // CryptMT key, 64 bytes.
-func NewCipher(key []byte) (c *Cipher) {
-	c = &Cipher{m: mtwist.New()}
+func New(r io.Reader, w io.Writer, key []byte) (c *Cipher) {
+	c = &Cipher{m: mtwist.New(), r: r, w: w}
 	c.m.SeedFullState(key)
 	c.accum = 1
 	// from paper, discard first 64 bytes of output
 	for idx := 0; idx < 64; idx++ {
-		_ = c.yield8()
+		_ = c.yield()
 	}
 	return c
+}
+
+func (c *Cipher) Read(p []byte) (n int, err error) {
+	n, err = c.r.Read(p)
+	if err == nil {
+		for idx := 0; idx < n; idx++ {
+			p[idx] = p[idx] ^ c.yield()
+		}
+	}
+	return n, err
+}
+
+func (c *Cipher) Write(p []byte) (n int, err error) {
+	n, err = c.w.Write(p)
+	return n, err
 }
 
 // XORKeyStream XORs each byte in the given slice with a byte from the
@@ -55,6 +73,6 @@ func (c *Cipher) XORKeyStream(dst, src []byte) {
 	}
 
 	for i, b := range src {
-		dst[i] = b ^ c.yield8()
+		dst[i] = b ^ c.yield()
 	}
 }

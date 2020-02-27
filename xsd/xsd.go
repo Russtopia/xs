@@ -641,6 +641,13 @@ func main() {
 			go func(hc *xsnet.Conn) (e error) {
 				defer hc.Close() // nolint: errcheck
 
+				// Start login timeout here and disconnect if user/pass phase stalls
+				loginTimeout := time.AfterFunc(30*time.Second, func() {
+					logger.LogNotice(fmt.Sprintln("Login timed out")) // nolint: errcheck,gosec
+					hc.Write([]byte{0})                               // nolint: gosec,errcheck
+					hc.Close()
+				})
+
 				//We use io.ReadFull() here to guarantee we consume
 				//just the data we want for the xs.Session, and no more.
 				//Otherwise data will be sitting in the channel that isn't
@@ -709,17 +716,18 @@ func main() {
 
 				var valid bool
 				var allowedCmds string // Currently unused
-				if xs.AuthUserByToken(string(rec.Who()), string(rec.ConnHost()), string(rec.AuthCookie(true))) {
+				if xs.AuthUserByToken(xs.NewAuthCtx(), string(rec.Who()), string(rec.ConnHost()), string(rec.AuthCookie(true))) {
 					valid = true
 				} else {
 					if useSystemPasswd {
 						//var passErr error
-						valid, _ /*passErr*/ = xs.VerifyPass(string(rec.Who()), string(rec.AuthCookie(true)))
+						valid, _ /*passErr*/ = xs.VerifyPass(xs.NewAuthCtx(), string(rec.Who()), string(rec.AuthCookie(true)))
 					} else {
-						valid, allowedCmds = xs.AuthUserByPasswd(string(rec.Who()), string(rec.AuthCookie(true)), "/etc/xs.passwd")
+						valid, allowedCmds = xs.AuthUserByPasswd(xs.NewAuthCtx(), string(rec.Who()), string(rec.AuthCookie(true)), "/etc/xs.passwd")
 					}
 				}
 
+				_ = loginTimeout.Stop()
 				// Security scrub
 				rec.ClearAuthCookie()
 

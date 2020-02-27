@@ -41,9 +41,9 @@ import (
 	"time"
 
 	hkex "blitter.com/go/herradurakex"
-	"blitter.com/go/xs/logger"
 	"blitter.com/go/kyber"
 	"blitter.com/go/newhope"
+	"blitter.com/go/xs/logger"
 )
 
 /*---------------------------------------------------------------------*/
@@ -145,8 +145,8 @@ func (c *CSCipherAlg) String() string {
 		return "C_BLOWFISH_64"
 	case CAlgCryptMT1:
 		return "C_CRYPTMT1"
-	case CAlgWanderer:
-		return "C_WANDERER"
+	case CAlgChaCha20_12:
+		return "C_CHACHA20_12"
 	default:
 		return "C_ERR_UNK"
 	}
@@ -282,6 +282,8 @@ func _new(kexAlg KEXAlg, conn *net.Conn) (hc *Conn, e error) {
 		hc.kex = KEX_HERRADURA512
 		log.Printf("[KEx alg %d ?? defaults to %d]\n", kexAlg, hc.kex)
 	}
+
+	//hc.logCipherText = true // !!! DEBUGGING ONLY !!! NEVER DEPLOY this uncommented !!!
 	return
 }
 
@@ -300,7 +302,7 @@ func _new(kexAlg KEXAlg, conn *net.Conn) (hc *Conn, e error) {
 //
 // Session (symmetric) crypto
 //
-// C_AES_256 C_TWOFISH_128 C_BLOWFISH_128 C_CRYPTMT1
+// C_AES_256 C_TWOFISH_128 C_BLOWFISH_128 C_CRYPTMT1 C_CHACHA20_12
 //
 // Session HMACs
 //
@@ -324,10 +326,10 @@ func (hc *Conn) applyConnExtensions(extensions ...string) {
 			log.Println("[extension arg = C_CRYPTMT1]")
 			hc.cipheropts &= (0xFFFFFF00)
 			hc.cipheropts |= CAlgCryptMT1
-		case "C_WANDERER":
-			log.Println("[extension arg = C_WANDERER]")
+		case "C_CHACHA20_12":
+			log.Println("[extension arg = C_CHACHA20_12]")
 			hc.cipheropts &= (0xFFFFFF00)
-			hc.cipheropts |= CAlgWanderer
+			hc.cipheropts |= CAlgChaCha20_12
 		case "H_SHA256":
 			log.Println("[extension arg = H_SHA256]")
 			hc.cipheropts &= (0xFFFF00FF)
