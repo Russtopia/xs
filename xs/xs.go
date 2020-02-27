@@ -727,6 +727,11 @@ func main() {
 	}
 	flag.Parse()
 
+	if vopt {
+		fmt.Printf("version %s (%s)\n", version, gitCommit)
+		exitWithStatus(0)
+	}
+
 	if cpuprofile != "" {
 		f, err := os.Create(cpuprofile)
 		if err != nil {
@@ -799,11 +804,6 @@ func main() {
 	//fmt.Println("server finally is:", server)
 	if flag.NFlag() == 0 && server == "" {
 		flag.Usage()
-		exitWithStatus(0)
-	}
-
-	if vopt {
-		fmt.Printf("version %s (%s)\n", version, gitCommit)
 		exitWithStatus(0)
 	}
 
