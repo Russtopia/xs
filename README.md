@@ -35,6 +35,7 @@ Currently supported session algorithms:
 * Twofish-128
 * Blowfish-64
 * CryptMTv1 (64bit) (https://eprint.iacr.org/2005/165.pdf)
+* ChaCha20 (https://github.com/aead/chacha20)
 
 [HMAC]
 * HMAC-SHA256
@@ -182,6 +183,8 @@ $ xc joebloggs@host-or-ip:/remoteDirOrFile /some/where/local/Dir
 xc uses a 'tarpipe' to send file data over the encrypted channel. Use the -d flag on client or server to see the generated tar commands if you're curious.
 
 NOTE: Renaming while copying (eg., 'cp /foo/bar/fileA ./fileB') is NOT supported. Put another way, the destination (whether local or remote) must ALWAYS be a directory.
+
+If the 'pv' pipeview utility is available (http://www.ivarch.com/programs/pv.shtml) file transfer progress and bandwidth control will be available (suppress the former with the -q option, set the latter with -L &lt;bytes_per_second&gt;).
 
 ### Tunnels
 

@@ -240,21 +240,47 @@ func GetSize() (cols, rows int, err error) {
 	return
 }
 
-// doCopyMode begins a secure xs local<->remote file copy operation.
-//
-// TODO: reduce gocyclo
-func doCopyMode(conn *xsnet.Conn, remoteDest bool, files string, rec *xs.Session) (exitStatus uint32, err error) {
-	if remoteDest {
-		log.Println("local files:", files, "remote filepath:", string(rec.Cmd()))
+func buildCmdRemoteToLocal(copyQuiet bool, copyLimitBPS uint, destPath, files string) (captureStderr bool, cmd string, args []string) {
+	// Detect if we have 'pv'
+	// pipeview http://www.ivarch.com/programs/pv.shtml
+	// and use it for nice client progress display.
+	_, pverr := os.Stat("/usr/bin/pv")
+	if pverr != nil {
+		_, pverr = os.Stat("/usr/local/bin/pv")
+	}
 
-		var c *exec.Cmd
+	if copyQuiet || pverr != nil {
+		// copyQuiet and copyLimitBPS are not applicable in dumb copy mode
+		captureStderr = true
+		cmd = "/bin/tar"
 
-		//os.Clearenv()
-		//os.Setenv("HOME", u.HomeDir)
-		//os.Setenv("TERM", "vt102") // TODO: server or client option?
+		args = []string{"-xz", "-C", destPath}
+} else {
+		// TODO: Query remote side for total file/dir size
+		bandwidthInBytesPerSec := " -L " + fmt.Sprintf("%d ", copyLimitBPS)
+		displayOpts := " -f -pr "
+		cmd = "/bin/bash"
+		args = []string{"-c", "pv " + displayOpts + bandwidthInBytesPerSec + "| tar -xz -C " + destPath}
+	}
+	log.Printf("[%v %v]\n", cmd, args)
+	return
+}
 
-		cmdName := "/bin/tar"
-		cmdArgs := []string{"-cz", "-f", "/dev/stdout"}
+func buildCmdLocalToRemote(copyQuiet bool, copyLimitBPS uint, files string) (captureStderr bool, cmd string, args []string) {
+	// Detect if we have 'pv'
+	// pipeview http://www.ivarch.com/programs/pv.shtml
+	// and use it for nice client progress display.
+	_, pverr := os.Stat("/usr/bin/pv")
+	if pverr != nil {
+		_, pverr = os.Stat("/usr/local/bin/pv")
+	}
+
+	if pverr != nil {
+		// copyQuiet and copyLimitBPS are not applicable in dumb copy mode
+
+		captureStderr = true
+		cmd = "/bin/tar"
+		args = []string{"-cz", "-f", "/dev/stdout"}
 		files = strings.TrimSpace(files)
 		// Awesome fact: tar actually can take multiple -C args, and
 		// changes to the dest dir *as it sees each one*. This enables
@@ -272,22 +298,70 @@ func doCopyMode(conn *xsnet.Conn, remoteDest bool, files string, rec *xs.Session
 			v, _ = filepath.Abs(v) // #nosec
 			dirTmp, fileTmp := path.Split(v)
 			if dirTmp == "" {
-				cmdArgs = append(cmdArgs, fileTmp)
+				args = append(args, fileTmp)
 			} else {
-				cmdArgs = append(cmdArgs, "-C", dirTmp, fileTmp)
+				args = append(args, "-C", dirTmp, fileTmp)
 			}
 		}
+	} else {
+		captureStderr = copyQuiet
+		bandwidthInBytesPerSec := " -L " + fmt.Sprintf("%d", copyLimitBPS)
+		displayOpts := " -f -pr "
+		cmd = "/bin/bash"
+		args = []string{"-c", "/bin/tar -cz -f /dev/stdout "}
+		files = strings.TrimSpace(files)
+		// Awesome fact: tar actually can take multiple -C args, and
+		// changes to the dest dir *as it sees each one*. This enables
+		// its use below, where clients can send scattered sets of source
+		// files and dirs to be extracted to a single dest dir server-side,
+		// whilst preserving the subtrees of dirs on the other side.
+		// Eg., tar -c -f /dev/stdout -C /dirA fileInA -C /some/where/dirB fileInB /foo/dirC
+		// packages fileInA, fileInB, and dirC at a single toplevel in the tar.
+		// The tar authors are/were real smarties :)
+		//
+		// This is the 'scatter/gather' logic to allow specification of
+		// files and dirs in different trees to be deposited in a single
+		// remote destDir.
+		for _, v := range strings.Split(files, " ") {
+			v, _ = filepath.Abs(v) // #nosec
+			dirTmp, fileTmp := path.Split(v)
+			if dirTmp == "" {
+				args[1] = args[1] + fileTmp + " "
+			} else {
+				args[1] = args[1] + " -C " + dirTmp + " " + fileTmp + " "
+			}
+		}
+		args[1] = args[1] + "| pv" + displayOpts + bandwidthInBytesPerSec + " -s $(du -cb " + files + " | tail -1 | cut -f 1) -c"
+	}
 
-		log.Printf("[%v %v]\n", cmdName, cmdArgs)
-		// NOTE the lack of quotes around --xform option's sed expression.
-		// When args are passed in exec() format, no quoting is required
-		// (as this isn't input from a shell) (right? -rlm 20180823)
+	log.Printf("[%v %v]\n", cmd, args)
+	return
+}
+
+// doCopyMode begins a secure xs local<->remote file copy operation.
+//
+// TODO: reduce gocyclo
+func doCopyMode(conn *xsnet.Conn, remoteDest bool, files string, copyQuiet bool, copyLimitBPS uint, rec *xs.Session) (exitStatus uint32, err error) {
+	if remoteDest {
+		log.Println("local files:", files, "remote filepath:", string(rec.Cmd()))
+
+		var c *exec.Cmd
+
+		//os.Clearenv()
+		//os.Setenv("HOME", u.HomeDir)
+		//os.Setenv("TERM", "vt102") // TODO: server or client option?
+
+		captureStderr, cmdName, cmdArgs := buildCmdLocalToRemote(copyQuiet, copyLimitBPS, strings.TrimSpace(files))
 		c = exec.Command(cmdName, cmdArgs...) // #nosec
 		c.Dir, _ = os.Getwd()                 // #nosec
 		log.Println("[wd:", c.Dir, "]")
 		c.Stdout = conn
 		stdErrBuffer := new(bytes.Buffer)
-		c.Stderr = stdErrBuffer
+		if captureStderr {
+			c.Stderr = stdErrBuffer
+		} else {
+			c.Stderr = os.Stderr
+		}
 
 		// Start the command (no pty)
 		err = c.Start() // returns immediately
@@ -320,7 +394,9 @@ func doCopyMode(conn *xsnet.Conn, remoteDest bool, files string, rec *xs.Session
 					// an ExitStatus() method with the same signature.
 					if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
 						exitStatus = uint32(status.ExitStatus())
-						fmt.Print(stdErrBuffer)
+						if captureStderr {
+							fmt.Print(stdErrBuffer)
+						}
 					}
 				}
 			}
@@ -353,17 +429,11 @@ func doCopyMode(conn *xsnet.Conn, remoteDest bool, files string, rec *xs.Session
 		}
 	} else {
 		log.Println("remote filepath:", string(rec.Cmd()), "local files:", files)
-		var c *exec.Cmd
-
-		cmdName := "/bin/tar"
 		destPath := files
 
-		cmdArgs := []string{"-xz", "-C", destPath}
-		log.Printf("[%v %v]\n", cmdName, cmdArgs)
-		// NOTE the lack of quotes around --xform option's sed expression.
-		// When args are passed in exec() format, no quoting is required
-		// (as this isn't input from a shell) (right? -rlm 20180823)
-		//cmdArgs := []string{"-xvz", "-C", destPath, `--xform=s#.*/\(.*\)#\1#`}
+		_, cmdName, cmdArgs := buildCmdRemoteToLocal(copyQuiet, copyLimitBPS, destPath, strings.TrimSpace(files))
+
+		var c *exec.Cmd
 		c = exec.Command(cmdName, cmdArgs...) // #nosec
 		c.Stdin = conn
 		c.Stdout = os.Stdout
@@ -612,6 +682,8 @@ func main() {
 
 	var copySrc []byte
 	var copyDst string
+	var copyQuiet bool
+	var copyLimitBPS uint
 
 	var authCookie string
 	var chaffEnabled bool
@@ -649,6 +721,8 @@ func main() {
 		shellMode = true
 		flag.Usage = usageShell
 	} else {
+		flag.BoolVar(&copyQuiet, "q", false, "do not output progress bar during copy")
+		flag.UintVar(&copyLimitBPS, "L", 8589934592, "copy max rate in bytes per sec")
 		flag.Usage = usageCp
 	}
 	flag.Parse()
@@ -932,7 +1006,7 @@ func main() {
 			launchTuns(&conn, remoteHost, tunSpecStr)
 			doShellMode(isInteractive, &conn, oldState, rec)
 		} else { // copyMode
-			s, _ := doCopyMode(&conn, pathIsDest, fileArgs, rec) // nolint: errcheck,gosec
+			s, _ := doCopyMode(&conn, pathIsDest, fileArgs, copyQuiet, copyLimitBPS, rec) // nolint: errcheck,gosec
 			rec.SetStatus(s)
 		}
 
