@@ -55,5 +55,7 @@ to the project. Any intent to deviate the project from its original purpose
 of existence will constitute grounds for remedial action which may include
 expulsion from the project.
 
-This document is based upon the Code of Merit version 1.0 (Dec 4 2018).
+This document is based upon the original Code of Merit version 1.0 (Dec 4 2018).
 (https://web.archive.org/web/20181204203029/http://code-of-merit.org/)
+
+Updated version (Mar 29 2020): https://codeofmerit.org/code/
