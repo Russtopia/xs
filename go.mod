@@ -6,6 +6,7 @@ require (
 	blitter.com/go/cryptmt v1.0.2
 	blitter.com/go/goutmp v1.0.2
 	blitter.com/go/herradurakex v1.0.0
+	blitter.com/go/hopscotch v0.0.0-20200320040654-43cb7c7c7e95 // indirect
 	blitter.com/go/kyber v0.0.0-20200130200857-6f2021cb88d9
 	blitter.com/go/mtwist v1.0.1 // indirect
 	blitter.com/go/newhope v0.0.0-20200130200750-192fc08a8aae

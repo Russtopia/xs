@@ -258,7 +258,7 @@ func buildCmdRemoteToLocal(copyQuiet bool, copyLimitBPS uint, destPath, files st
 } else {
 		// TODO: Query remote side for total file/dir size
 		bandwidthInBytesPerSec := " -L " + fmt.Sprintf("%d ", copyLimitBPS)
-		displayOpts := " -f -pr "
+		displayOpts := " -pre "
 		cmd = "/bin/bash"
 		args = []string{"-c", "pv " + displayOpts + bandwidthInBytesPerSec + "| tar -xz -C " + destPath}
 	}
@@ -306,7 +306,7 @@ func buildCmdLocalToRemote(copyQuiet bool, copyLimitBPS uint, files string) (cap
 	} else {
 		captureStderr = copyQuiet
 		bandwidthInBytesPerSec := " -L " + fmt.Sprintf("%d", copyLimitBPS)
-		displayOpts := " -f -pr "
+		displayOpts := " -pre "
 		cmd = "/bin/bash"
 		args = []string{"-c", "/bin/tar -cz -f /dev/stdout "}
 		files = strings.TrimSpace(files)
