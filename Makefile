@@ -1,3 +1,4 @@
+MAKE=gmake
 VERSION := 0.8.21
 .PHONY: lint vis clean common client server passwd subpkgs install uninstall reinstall
 

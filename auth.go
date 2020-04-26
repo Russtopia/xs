@@ -18,6 +18,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"os"
 	"os/user"
 	"runtime"
 	"strings"
@@ -44,7 +45,15 @@ func VerifyPass(ctx *AuthCtx, user, password string) (bool, error) {
 		ctx.reader = ioutil.ReadFile // dependency injection hides that this is required
 	}
 	passlib.UseDefaults(passlib.Defaults20180601)
-	pwFileData, e := ctx.reader("/etc/shadow")
+	var pwFileName string
+	if runtime.GOOS == "linux" {
+		pwFileName = "/etc/shadow"
+	} else if runtime.GOOS == "freebsd" {
+		pwFileName = "/etc/master.passwd"
+	} else {
+		pwFileName = "unsupported"
+	}
+	pwFileData, e := ctx.reader(pwFileName)
 	if e != nil {
 		return false, e
 	}
@@ -195,3 +204,23 @@ func AuthUserByToken(ctx *AuthCtx, username string, connhostname string, auth st
 	}
 	return
 }
+
+func GetTool(tool string) (ret string) {
+	ret = "/bin/"+tool
+	_, err := os.Stat(ret)
+	if err == nil {
+		return ret
+	}
+	ret = "/usr/bin/"+tool
+	_, err = os.Stat(ret)
+	if err == nil {
+		return ret
+	}
+	ret = "/usr/local/bin/"+tool
+	_, err = os.Stat(ret)
+	if err == nil {
+		return ret
+	}
+	return ""
+}
+

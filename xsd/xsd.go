@@ -85,7 +85,7 @@ func runClientToServerCopyAs(who, ttype string, conn *xsnet.Conn, fpath string, 
 	os.Setenv("HKEXSH", "1")     // nolint: gosec,errcheck
 
 	var c *exec.Cmd
-	cmdName := "/bin/tar"
+	cmdName := xs.GetTool("tar")
 
 	var destDir string
 	if path.IsAbs(fpath) {
@@ -100,6 +100,7 @@ func runClientToServerCopyAs(who, ttype string, conn *xsnet.Conn, fpath string, 
 	// When args are passed in exec() format, no quoting is required
 	// (as this isn't input from a shell) (right? -rlm 20180823)
 	//cmdArgs := []string{"-x", "-C", destDir, `--xform=s#.*/\(.*\)#\1#`}
+	fmt.Println(cmdName, cmdArgs)
 	c = exec.Command(cmdName, cmdArgs...) // nolint: gosec
 
 	c.Dir = destDir
@@ -189,7 +190,7 @@ func runServerToClientCopyAs(who, ttype string, conn *xsnet.Conn, srcPath string
 	_ = os.Setenv("HKEXSH", "1")     // nolint: gosec
 
 	var c *exec.Cmd
-	cmdName := "/bin/tar"
+	cmdName := xs.GetTool("tar")
 	if !path.IsAbs(srcPath) {
 		srcPath = fmt.Sprintf("%s%c%s", u.HomeDir, os.PathSeparator, srcPath)
 	}
@@ -289,12 +290,12 @@ func runShellAs(who, hname, ttype, cmd string, interactive bool, conn *xsnet.Con
 			// automagically, at the cost of another external tool
 			// dependency.
 			//
-			c = exec.Command("/bin/login", "-f", "-p", who) // nolint: gosec
+			c = exec.Command(xs.GetTool("login"), "-f", "-p", who) // nolint: gosec
 		} else {
-			c = exec.Command("/bin/bash", "-i", "-l") // nolint: gosec
+			c = exec.Command(xs.GetTool("bash"), "-i", "-l") // nolint: gosec
 		}
 	} else {
-		c = exec.Command("/bin/bash", "-c", cmd) // nolint: gosec
+		c = exec.Command(xs.GetTool("bash"), "-c", cmd) // nolint: gosec
 	}
 	//If os.Clearenv() isn't called by server above these will be seen in the
 	//client's session env.

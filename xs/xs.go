@@ -1,4 +1,5 @@
 // xs client
+
 //
 // Copyright (c) 2017-2019 Russell Magee
 // Licensed under the terms of the MIT license (see LICENSE.mit in this
@@ -252,14 +253,14 @@ func buildCmdRemoteToLocal(copyQuiet bool, copyLimitBPS uint, destPath, files st
 	if copyQuiet || pverr != nil {
 		// copyQuiet and copyLimitBPS are not applicable in dumb copy mode
 		captureStderr = true
-		cmd = "/bin/tar"
+		cmd = xs.GetTool("tar")
 
 		args = []string{"-xz", "-C", destPath}
 } else {
 		// TODO: Query remote side for total file/dir size
 		bandwidthInBytesPerSec := " -L " + fmt.Sprintf("%d ", copyLimitBPS)
 		displayOpts := " -pre "
-		cmd = "/bin/bash"
+		cmd = xs.GetTool("bash")
 		args = []string{"-c", "pv " + displayOpts + bandwidthInBytesPerSec + "| tar -xz -C " + destPath}
 	}
 	log.Printf("[%v %v]\n", cmd, args)
@@ -279,7 +280,7 @@ func buildCmdLocalToRemote(copyQuiet bool, copyLimitBPS uint, files string) (cap
 		// copyQuiet and copyLimitBPS are not applicable in dumb copy mode
 
 		captureStderr = true
-		cmd = "/bin/tar"
+		cmd = xs.GetTool("tar")
 		args = []string{"-cz", "-f", "/dev/stdout"}
 		files = strings.TrimSpace(files)
 		// Awesome fact: tar actually can take multiple -C args, and
@@ -307,8 +308,8 @@ func buildCmdLocalToRemote(copyQuiet bool, copyLimitBPS uint, files string) (cap
 		captureStderr = copyQuiet
 		bandwidthInBytesPerSec := " -L " + fmt.Sprintf("%d", copyLimitBPS)
 		displayOpts := " -pre "
-		cmd = "/bin/bash"
-		args = []string{"-c", "/bin/tar -cz -f /dev/stdout "}
+		cmd = xs.GetTool("bash")
+		args = []string{"-c", xs.GetTool("tar")+" -cz -f /dev/stdout "}
 		files = strings.TrimSpace(files)
 		// Awesome fact: tar actually can take multiple -C args, and
 		// changes to the dest dir *as it sees each one*. This enables
@@ -331,11 +332,20 @@ func buildCmdLocalToRemote(copyQuiet bool, copyLimitBPS uint, files string) (cap
 				args[1] = args[1] + " -C " + dirTmp + " " + fileTmp + " "
 			}
 		}
-		args[1] = args[1] + "| pv" + displayOpts + bandwidthInBytesPerSec + " -s $(du -cb " + files + " | tail -1 | cut -f 1) -c"
+		args[1] = args[1] + "| pv" + displayOpts + bandwidthInBytesPerSec + " -s " + getTreeSizeSubCmd(files) + " -c"
 	}
 
 	log.Printf("[%v %v]\n", cmd, args)
 	return
+}
+
+func getTreeSizeSubCmd(paths string) (c string) {
+	if runtime.GOOS == "linux" {
+		c = " $(du -cb " + paths + " | tail -1 | cut -f 1) "
+	} else {
+		c = " $(expr $(du -c " + paths + ` | tail -1 | cut -f 1) \* 1024) `
+	}
+	return c
 }
 
 // doCopyMode begins a secure xs local<->remote file copy operation.
@@ -916,7 +926,7 @@ func main() {
 
 	if shellMode {
 		if isatty.IsTerminal(os.Stdin.Fd()) {
-			oldState, err = xs.MakeRaw(int(os.Stdin.Fd()))
+			oldState, err = xs.MakeRaw(os.Stdin.Fd())
 			if err != nil {
 				panic(err)
 			}
@@ -936,7 +946,7 @@ func main() {
 	if len(authCookie) == 0 {
 		//No auth token, prompt for password
 		fmt.Printf("Gimme cookie:")
-		ab, e := xs.ReadPassword(int(os.Stdin.Fd()))
+		ab, e := xs.ReadPassword(os.Stdin.Fd())
 		fmt.Printf("\r\n")
 		if e != nil {
 			panic(e)
@@ -1025,7 +1035,7 @@ func main() {
 }
 
 func restoreTermState(oldState *xs.State) {
-	_ = xs.Restore(int(os.Stdin.Fd()), oldState) // nolint: errcheck,gosec
+	_ = xs.Restore(os.Stdin.Fd(), oldState) // nolint: errcheck,gosec
 }
 
 // exitWithStatus wraps os.Exit() plus does any required pprof housekeeping
