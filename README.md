@@ -55,8 +55,7 @@ Packets are subject to padding (random size, randomly applied as prefix or postf
 Chaffing and tunnels, if specified, are set up during initial client->server connection. Packets from the client local port(s) are sent through the main secured connection to the server's remote port(s), and vice versa, tagged with a chaff or tunnel specifier so that they can be discarded as chaff or de-multiplexed and delivered to the proper tunnel endpoints, respectively.
 
 ### Accounts and Passwords
-Within the xspasswd/ directory is a password-setting utility. XS uses its own password file distinct from the system /etc/passwd to authenticate clients, using standard bcrypt+salt storage. This is currently done to allow alternate login credentials via xs vs. console/ssh login, due to the experimental nature of the program. At some point in the future an option to use the system's /etc/passwd and /etc/shadow may be implemented, making the use of the auxilliary xspasswd utility optional or obsolete.
-
+Within the ```xspasswd/``` directory is a password-setting utility, ```xspasswd```, used if one wishes ```xs``` access to use separate credentials from those of the default (likely ssh) login method. In this mode, ```xsd``` uses its own password file distinct from the system /etc/passwd to authenticate clients, using standard bcrypt+salt storage. Activate this mode by invoking ```xsd``` with ```-s false```.
 
 HERRADURA KEX
 
