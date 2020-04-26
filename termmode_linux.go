@@ -30,8 +30,8 @@ type State struct {
 // MakeRaw put the terminal connected to the given file descriptor into raw
 // mode and returns the previous state of the terminal so that it can be
 // restored.
-func MakeRaw(fd int) (*State, error) {
-	termios, err := unix.IoctlGetTermios(fd, ioctlReadTermios)
+func MakeRaw(fd uintptr) (*State, error) {
+	termios, err := unix.IoctlGetTermios(int(fd), ioctlReadTermios)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func MakeRaw(fd int) (*State, error) {
 	termios.Cflag |= unix.CS8
 	termios.Cc[unix.VMIN] = 1
 	termios.Cc[unix.VTIME] = 0
-	if err := unix.IoctlSetTermios(fd, ioctlWriteTermios, termios); err != nil {
+	if err := unix.IoctlSetTermios(int(fd), ioctlWriteTermios, termios); err != nil {
 		return nil, err
 	}
 
@@ -56,8 +56,8 @@ func MakeRaw(fd int) (*State, error) {
 
 // GetState returns the current state of a terminal which may be useful to
 // restore the terminal after a signal.
-func GetState(fd int) (*State, error) {
-	termios, err := unix.IoctlGetTermios(fd, ioctlReadTermios)
+func GetState(fd uintptr) (*State, error) {
+	termios, err := unix.IoctlGetTermios(int(fd), ioctlReadTermios)
 	if err != nil {
 		return nil, err
 	}
@@ -67,9 +67,9 @@ func GetState(fd int) (*State, error) {
 
 // Restore restores the terminal connected to the given file descriptor to a
 // previous state.
-func Restore(fd int, state *State) error {
+func Restore(fd uintptr, state *State) error {
 	if state != nil {
-		return unix.IoctlSetTermios(fd, ioctlWriteTermios, &state.termios)
+		return unix.IoctlSetTermios(int(fd), ioctlWriteTermios, &state.termios)
 	} else {
 		return errors.New("nil State")
 	}
@@ -78,8 +78,8 @@ func Restore(fd int, state *State) error {
 // ReadPassword reads a line of input from a terminal without local echo.  This
 // is commonly used for inputting passwords and other sensitive data. The slice
 // returned does not include the \n.
-func ReadPassword(fd int) ([]byte, error) {
-	termios, err := unix.IoctlGetTermios(fd, ioctlReadTermios)
+func ReadPassword(fd uintptr) ([]byte, error) {
+	termios, err := unix.IoctlGetTermios(int(fd), ioctlReadTermios)
 	if err != nil {
 		return nil, err
 	}
@@ -88,12 +88,12 @@ func ReadPassword(fd int) ([]byte, error) {
 	newState.Lflag &^= unix.ECHO
 	newState.Lflag |= unix.ICANON | unix.ISIG
 	newState.Iflag |= unix.ICRNL
-	if err := unix.IoctlSetTermios(fd, ioctlWriteTermios, &newState); err != nil {
+	if err := unix.IoctlSetTermios(int(fd), ioctlWriteTermios, &newState); err != nil {
 		return nil, err
 	}
 
 	defer func() {
-		_ = unix.IoctlSetTermios(fd, ioctlWriteTermios, termios) // nolint: gosec
+		_ = unix.IoctlSetTermios(int(fd), ioctlWriteTermios, termios) // nolint: gosec
 	}()
 
 	return readPasswordLine(passwordReader(fd))

@@ -1,5 +1,5 @@
 // +build windows
-//
+
 // Note the terminal manipulation functions herein are mostly stubs. They
 // don't really do anything and the xs demo client depends on a wrapper
 // script using the 'stty' tool to actually set the proper mode for
