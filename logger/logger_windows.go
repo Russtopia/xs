@@ -1,5 +1,5 @@
 // +build windows
-//
+
 // Wrapper around UNIX syslog, so that it also may be wrapped
 // with something else for Windows.
 package logger

@@ -1,5 +1,5 @@
 // +build freebsd
-//
+
 // Package logger is a wrapper around UNIX syslog, so that it also may
 // be wrapped with something else for Windows (Sadly, the stdlib log/syslog
 // is frozen, and there is no Windows implementation.)
