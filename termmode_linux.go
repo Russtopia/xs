@@ -1,4 +1,5 @@
-// +build linux,bsd
+// +build linux
+
 package xs
 
 import (
