@@ -1,5 +1,5 @@
 MAKE=gmake
-VERSION := 0.8.21
+VERSION := 0.8.22
 .PHONY: lint vis clean common client server passwd subpkgs install uninstall reinstall
 
 ## Tag version of binaries with build info wrt.
