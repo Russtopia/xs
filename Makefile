@@ -1,4 +1,3 @@
-MAKE=gmake
 VERSION := 0.8.22
 .PHONY: lint vis clean common client server passwd subpkgs install uninstall reinstall
 
@@ -35,6 +34,7 @@ INSTPREFIX = /usr/local
 all: common client server passwd
 
 clean:
+	@echo "Make: $(MAKE)"
 	go clean .
 	for d in $(SUBDIRS); do\
 	  $(MAKE) -C $$d clean;\
@@ -81,15 +81,15 @@ vis:
 	stat=$$?; if [ $$stat -ne "0" ]; then \
 	  /bin/echo "go-callvis not found. Run go get https://github.com/TrueFurby/go-callvis to install."; \
 	else \
-	  make -C xs vis;\
-	  make -C xsd vis;\
-	  make -C xspasswd vis; \
+	  $(MAKE) -C xs vis;\
+	  $(MAKE) -C xsd vis;\
+	  $(MAKE) -C xspasswd vis; \
 	fi
 
 lint:
-	make -C xspasswd lint
-	make -C xsd lint
-	make -C xs lint
+	$(MAKE) -C xspasswd lint
+	$(MAKE) -C xsd lint
+	$(MAKE) -C xs lint
 
 reinstall: uninstall install
 
