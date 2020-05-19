@@ -1,6 +1,5 @@
 [![GoDoc](https://godoc.org/blitter.com/go/xs?status.svg)](https://godoc.org/blitter.com/go/xs)
 
-
 # XS
 --
 
