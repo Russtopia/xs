@@ -722,7 +722,10 @@ func main() {
 
 	// Find out what program we are (shell or copier)
 	myPath := strings.Split(os.Args[0], string(os.PathSeparator))
-	if myPath[len(myPath)-1] != "xc" && myPath[len(myPath)-1] != "xc.exe" {
+	if myPath[len(myPath)-1] != "xc" &&
+	myPath[len(myPath)-1] != "_xc" &&
+	myPath[len(myPath)-1] != "xc.exe" &&
+	myPath[len(myPath)-1] != "_xc.exe" {
 		// xs accepts a command (-x) but not
 		// a srcpath (-r) or dstpath (-t)
 		flag.StringVar(&cmdStr, "x", "", "run <`command`> (if not specified, run interactive shell)")
