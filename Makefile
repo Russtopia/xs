@@ -72,8 +72,9 @@ client: common
 
 
 server: common
-ifdef WIN_MSYS
+ifeq ($(MSYSTEM),MSYS)
 	echo "Build of xsd server for Windows not yet supported"
+else
 	$(MAKE) BUILDOPTS=$(BUILDOPTS) -C xsd
 endif
 

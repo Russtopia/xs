@@ -11,8 +11,7 @@ require (
 	blitter.com/go/newhope v0.0.0-20200130200750-192fc08a8aae
 	github.com/aead/chacha20 v0.0.0-20180709150244-8b13a72661da
 	github.com/jameskeane/bcrypt v0.0.0-20120420032655-c3cd44c1e20f
-	github.com/klauspost/cpuid v1.2.3 // indirect
-	github.com/klauspost/reedsolomon v1.9.4 // indirect
+	github.com/klauspost/reedsolomon v1.9.9 // indirect
 	github.com/kr/pty v1.1.8
 	github.com/mattn/go-isatty v0.0.12
 	github.com/pkg/errors v0.9.1 // indirect
