@@ -104,6 +104,7 @@ ifdef WIN_MSYS
 else
 	cp xs/xs $(INSTPREFIX)/bin
 	cd $(INSTPREFIX)/bin && ln -s xs xc && cd -
+	cp xsd/xsd $(INSTPREFIX)/sbin
 endif
 
 uninstall:
