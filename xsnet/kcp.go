@@ -40,7 +40,7 @@ func getKCPalgnum(extensions []string) (k KCPAlg) {
 		switch s {
 		case "KCP_NONE":
 			k = KCP_NONE
-			break //out of for
+			break //golint:ignore SA4011 out of for
 		case "KCP_AES":
 			k = KCP_AES
 			break //out of for

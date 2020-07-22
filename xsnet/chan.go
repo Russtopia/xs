@@ -59,7 +59,7 @@ func expandKeyMat(keymat []byte, blocksize int) []byte {
 /* Support functionality to set up encryption after a channel has
 been negotiated via xsnet.go
 */
-func (hc Conn) getStream(keymat []byte) (rc cipher.Stream, mc hash.Hash, err error) {
+func (hc *Conn) getStream(keymat []byte) (rc cipher.Stream, mc hash.Hash, err error) {
 	var key []byte
 	var block cipher.Block
 	var iv []byte

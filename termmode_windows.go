@@ -27,7 +27,7 @@ type State struct {
 // MakeRaw put the terminal connected to the given file descriptor into raw
 // mode and returns the previous state of the terminal so that it can be
 // restored.
-func MakeRaw(fd int) (*State, error) {
+func MakeRaw(fd uintptr) (*State, error) {
 	// This doesn't really work. The exec.Command() runs a sub-shell
 	// so the stty mods don't affect the client process.
 	cmd := exec.Command("stty", "-echo raw")
@@ -43,7 +43,7 @@ func GetState(fd int) (*State, error) {
 
 // Restore restores the terminal connected to the given file descriptor to a
 // previous state.
-func Restore(fd int, state *State) error {
+func Restore(fd uintptr, state *State) error {
 	cmd := exec.Command("stty", "echo cooked")
 	cmd.Run()
 	return nil
@@ -52,7 +52,7 @@ func Restore(fd int, state *State) error {
 // ReadPassword reads a line of input from a terminal without local echo.  This
 // is commonly used for inputting passwords and other sensitive data. The slice
 // returned does not include the \n.
-func ReadPassword(fd int) ([]byte, error) {
+func ReadPassword(fd uintptr) ([]byte, error) {
 	return readPasswordLine(passwordReader(fd))
 }
 

@@ -256,7 +256,7 @@ func buildCmdRemoteToLocal(copyQuiet bool, copyLimitBPS uint, destPath, files st
 		cmd = xs.GetTool("tar")
 
 		args = []string{"-xz", "-C", destPath}
-} else {
+	} else {
 		// TODO: Query remote side for total file/dir size
 		bandwidthInBytesPerSec := " -L " + fmt.Sprintf("%d ", copyLimitBPS)
 		displayOpts := " -pre "
@@ -309,7 +309,7 @@ func buildCmdLocalToRemote(copyQuiet bool, copyLimitBPS uint, files string) (cap
 		bandwidthInBytesPerSec := " -L " + fmt.Sprintf("%d", copyLimitBPS)
 		displayOpts := " -pre "
 		cmd = xs.GetTool("bash")
-		args = []string{"-c", xs.GetTool("tar")+" -cz -f /dev/stdout "}
+		args = []string{"-c", xs.GetTool("tar") + " -cz -f /dev/stdout "}
 		files = strings.TrimSpace(files)
 		// Awesome fact: tar actually can take multiple -C args, and
 		// changes to the dest dir *as it sees each one*. This enables
@@ -939,8 +939,13 @@ func main() {
 	}
 
 	// Start login timeout here and disconnect if user/pass phase stalls
+	//iloginImpatience := time.AfterFunc(20*time.Second, func() {
+	//i	fmt.Printf(" .. [you still there? Waiting for a password.]")
+	//i})
 	loginTimeout := time.AfterFunc(30*time.Second, func() {
-		fmt.Printf(" .. [login timeout]")
+		restoreTermState(oldState)
+		fmt.Printf(" .. [login timeout]\n")
+		exitWithStatus(xsnet.CSOLoginTimeout)
 	})
 
 	if len(authCookie) == 0 {
@@ -953,7 +958,8 @@ func main() {
 		}
 		authCookie = string(ab)
 	}
-
+	
+	//i_ = loginImpatience.Stop()
 	_ = loginTimeout.Stop()
 	// Security scrub
 	runtime.GC()

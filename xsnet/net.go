@@ -191,11 +191,11 @@ func (hc *Conn) Unlock() {
 	hc.m.Unlock()
 }
 
-func (hc Conn) KEX() KEXAlg {
+func (hc *Conn) KEX() KEXAlg {
 	return hc.kex
 }
 
-func (hc Conn) GetStatus() CSOType {
+func (hc *Conn) GetStatus() CSOType {
 	return *hc.closeStat
 }
 
@@ -209,7 +209,7 @@ func (hc *Conn) SetStatus(stat CSOType) {
 //
 // (Used for protocol-level negotiations after KEx such as
 // cipher/HMAC algorithm options etc.)
-func (hc Conn) ConnOpts() uint32 {
+func (hc *Conn) ConnOpts() uint32 {
 	return hc.cipheropts
 }
 
