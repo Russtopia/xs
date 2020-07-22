@@ -722,7 +722,10 @@ func main() {
 
 	// Find out what program we are (shell or copier)
 	myPath := strings.Split(os.Args[0], string(os.PathSeparator))
-	if myPath[len(myPath)-1] != "xc" && myPath[len(myPath)-1] != "xc.exe" {
+	if myPath[len(myPath)-1] != "xc" &&
+		myPath[len(myPath)-1] != "_xc" &&
+		myPath[len(myPath)-1] != "xc.exe" &&
+		myPath[len(myPath)-1] != "_xc.exe" {
 		// xs accepts a command (-x) but not
 		// a srcpath (-r) or dstpath (-t)
 		flag.StringVar(&cmdStr, "x", "", "run <`command`> (if not specified, run interactive shell)")
@@ -766,7 +769,7 @@ func main() {
 	var uname string
 	if remoteUser == "" {
 		u, _ := user.Current() // nolint: gosec
-		uname = u.Username
+		uname = localUserName(u)
 	} else {
 		uname = remoteUser
 	}
@@ -1038,6 +1041,19 @@ func main() {
 	}
 
 	exitWithStatus(int(rec.Status()))
+}
+
+// currentUser returns the current username minus any OS-specific prefixes
+// such as MS Windows workgroup prefixes (eg. workgroup\user).
+func localUserName(u *user.User) string {
+	if u == nil {
+		log.Fatal("null User?!")
+	}
+
+	// WinAPI: username may have CIFS prefix %USERDOMAIN%\
+	userspec := strings.Split(u.Username, `\`)
+	username := userspec[len(userspec)-1]
+	return username
 }
 
 func restoreTermState(oldState *xs.State) {

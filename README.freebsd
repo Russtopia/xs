@@ -1,6 +1,0 @@
-## The Makefile(s) to build require GNU make (gmake).
-## Please install and invoke build via:
-## $ gmake <targets>
-## eg.,
-## $ gmake clean all
-

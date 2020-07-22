@@ -1,6 +1,5 @@
 [![GoDoc](https://godoc.org/blitter.com/go/xs?status.svg)](https://godoc.org/blitter.com/go/xs)
 
-
 # XS
 --
 
@@ -198,3 +197,9 @@ Example, tunnelling ssh through xs
 * [client side, term A] ```$ xs -T=6002:7002 user@server```
 * [client side, term B] ```$ ssh user@localhost -p 6002```
 
+
+### Building for FreeBSD
+
+The Makefile(s) to build require GNU make (gmake).
+Please install and invoke build via:
+```$ gmake clean all```

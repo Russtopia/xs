@@ -28,10 +28,12 @@ cleanup() {
   stty sane
 }
 
+me="$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
+
 if [ ${1}x == "-hx" ]; then
-  ./hkexsh -h
+  _${me} -h
 else
   stty -echo raw icrnl
-  ./hkexsh $@
+  _${me} $@
 fi
 

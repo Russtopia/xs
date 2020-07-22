@@ -26,12 +26,23 @@ BUILDOPTS :=$(BUILDOPTS)"$(GOBUILDOPTS) -ldflags \"-X main.version=$(VERSION)$(M
 #endif
 
 SUBPKGS = logger spinsult xsnet
-TOOLS = xspasswd xs xsd
+TOOLS = xs xsd
 SUBDIRS = $(LIBS) $(TOOLS)
+
+ifeq ($(GOOS),)
+	GOOS=$(shell go env GOOS)
+endif
+
+ifeq ($(GOOS),windows)
+ifeq ($(MSYSTEM),MSYS)
+WIN_MSYS=1
+endif
+endif
+
 
 INSTPREFIX = /usr/local
 
-all: common client server passwd
+all: common client server
 
 clean:
 	@echo "Make: $(MAKE)"
@@ -60,21 +71,12 @@ client: common
 	$(MAKE) BUILDOPTS=$(BUILDOPTS) -C xs
 
 
-ifeq ($(MSYSTEM),)
-ifneq ($(GOOS),windows)
 server: common
+ifeq ($(MSYSTEM),MSYS)
+	echo "Build of xsd server for Windows not yet supported"
+else
 	$(MAKE) BUILDOPTS=$(BUILDOPTS) -C xsd
-else
-	echo "Cross-build of xsd server for Windows not yet supported"
 endif
-else
-server: common
-	echo "xsd server not (yet) supported on Windows"
-endif
-
-
-passwd: common
-	$(MAKE) BUILDOPTS=$(BUILDOPTS) -C xspasswd
 
 vis:
 	@which go-callvis >/dev/null 2>&1; \
@@ -83,38 +85,30 @@ vis:
 	else \
 	  $(MAKE) -C xs vis;\
 	  $(MAKE) -C xsd vis;\
-	  $(MAKE) -C xspasswd vis; \
 	fi
 
 lint:
-	$(MAKE) -C xspasswd lint
 	$(MAKE) -C xsd lint
 	$(MAKE) -C xs lint
 
 reinstall: uninstall install
 
 install:
-	cp xs/xs $(INSTPREFIX)/bin
-ifeq ($(MSYSTEM),)
-ifneq ($(GOOS),windows)
-	cp xsd/xsd xspasswd/xspasswd $(INSTPREFIX)/sbin
-else
-	mv $(INSTPREFIX)/bin/xs $(INSTPREFIX)/bin/_xs
+	echo "WIN_MSYS:" $(WIN_MSYS)
+ifdef WIN_MSYS
 	cp xs/mintty_wrapper.sh $(INSTPREFIX)/bin/xs
-	echo "Cross-build of xsd server for Windows not yet supported"
-endif
+	cp xs/mintty_wrapper.sh $(INSTPREFIX)/bin/xc
+	cp xs/xs $(INSTPREFIX)/bin/_xs
+	cp xs/xs $(INSTPREFIX)/bin/_xc
+	echo "Install of xsd server for Windows not yet supported"
 else
-	echo "Cross-build of xsd server for Windows not yet supported"
-endif
+	cp xs/xs $(INSTPREFIX)/bin
 	cd $(INSTPREFIX)/bin && ln -s xs xc && cd -
-
+endif
 
 uninstall:
-	rm -f $(INSTPREFIX)/bin/xs $(INSTPREFIX)/bin/xc $(INSTPREFIX)/bin/_xs
-ifeq ($(MSYSTEM),)
-ifneq ($(GOOS),windows)
-	rm -f $(INSTPREFIX)/sbin/xsd $(INSTPREFIX)/sbin/xspasswd
-else
-endif
-else
+	rm -f $(INSTPREFIX)/bin/xs $(INSTPREFIX)/bin/xc \
+	$(INSTPREFIX)/bin/_xs $(INSTPREFIX)/bin/_xc
+ifndef $(WIN_MSYS)
+	rm -f $(INSTPREFIX)/sbin/xsd
 endif

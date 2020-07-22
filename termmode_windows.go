@@ -37,7 +37,7 @@ func MakeRaw(fd uintptr) (*State, error) {
 
 // GetState returns the current state of a terminal which may be useful to
 // restore the terminal after a signal.
-func GetState(fd int) (*State, error) {
+func GetState(fd uintptr) (*State, error) {
 	return &State{}, nil
 }
 
