@@ -62,12 +62,12 @@ const (
 	CSOTermSize           // set term size (rows:cols)
 	CSOExitStatus         // Remote cmd exit status
 	CSOChaff              // Dummy packet, do not pass beyond decryption
-	
+
 	// Client side errors
-	CSOLoginTimeout = 16
+	CSOLoginTimeout
 
 	// Tunnel setup/control/status
-	CSOTunSetup = 32     // client -> server tunnel setup request (dstport)
+	CSOTunSetup     // client -> server tunnel setup request (dstport)
 	CSOTunSetupAck  // server -> client tunnel setup ack
 	CSOTunRefused   // server -> client: tunnel rport connection refused
 	CSOTunData      // packet contains tunnel data [rport:data]

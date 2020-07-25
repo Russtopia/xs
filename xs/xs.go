@@ -678,31 +678,35 @@ func sendSessionParams(conn io.Writer /* *xsnet.Conn*/, rec *xs.Session) (e erro
 
 // TODO: reduce gocyclo
 func main() {
-	var vopt bool
-	var gopt bool //login via password, asking server to generate authToken
-	var dbg bool
-	var shellMode bool   // if true act as shell, else file copier
-	var cipherAlg string //cipher alg
-	var hmacAlg string   //hmac alg
-	var kexAlg string    //KEX/KEM alg
-	var server string
-	var port uint
-	var cmdStr string
-	var tunSpecStr string // lport1:rport1[,lport2:rport2,...]
+	var (
+		isInteractive bool
+		vopt          bool
+		gopt          bool //login via password, asking server to generate authToken
+		dbg           bool
+		shellMode     bool   // if true act as shell, else file copier
+		cipherAlg     string //cipher alg
+		hmacAlg       string //hmac alg
+		kexAlg        string //KEX/KEM alg
+		server        string
+		port          uint
+		cmdStr        string
+		tunSpecStr    string // lport1:rport1[,lport2:rport2,...]
 
-	var copySrc []byte
-	var copyDst string
-	var copyQuiet bool
-	var copyLimitBPS uint
+		copySrc      []byte
+		copyDst      string
+		copyQuiet    bool
+		copyLimitBPS uint
 
-	var authCookie string
-	var chaffEnabled bool
-	var chaffFreqMin uint
-	var chaffFreqMax uint
-	var chaffBytesMax uint
+		authCookie    string
+		chaffEnabled  bool
+		chaffFreqMin  uint
+		chaffFreqMax  uint
+		chaffBytesMax uint
 
-	var op []byte
-	isInteractive := false
+		op []byte
+	)
+
+	//=== Common (xs and xc) option parsing
 
 	flag.BoolVar(&vopt, "v", false, "show version")
 	flag.BoolVar(&dbg, "d", false, "debug logging")
@@ -719,6 +723,8 @@ func main() {
 
 	flag.StringVar(&cpuprofile, "cpuprofile", "", "write cpu profile to <`file`>")
 	flag.StringVar(&memprofile, "memprofile", "", "write memory profile to <`file`>")
+
+	//=== xc vs. xs option parsing
 
 	// Find out what program we are (shell or copier)
 	myPath := strings.Split(os.Args[0], string(os.PathSeparator))
@@ -745,6 +751,8 @@ func main() {
 		exitWithStatus(0)
 	}
 
+	//=== Profiling instrumentation
+
 	if cpuprofile != "" {
 		f, err := os.Create(cpuprofile)
 		if err != nil {
@@ -760,6 +768,8 @@ func main() {
 
 		go func() { http.ListenAndServe("localhost:6060", nil) }()
 	}
+
+	//=== User, host, port and path args for file operations, if applicable
 
 	remoteUser, remoteHost, tmpPath, pathIsDest, otherArgs :=
 		parseNonSwitchArgs(flag.Args())
@@ -780,6 +790,8 @@ func main() {
 	if tmpPath == "" {
 		tmpPath = "."
 	}
+
+	//=== Copy mode arg and copy src/dest setup
 
 	var fileArgs string
 	if !shellMode /*&& tmpPath != ""*/ {
@@ -812,7 +824,7 @@ func main() {
 		}
 	}
 
-	// Do some more option consistency checks
+	//=== Do some final option consistency checks
 
 	//fmt.Println("server finally is:", server)
 	if flag.NFlag() == 0 && server == "" {
@@ -824,7 +836,6 @@ func main() {
 		log.Fatal("incompatible options -- either cmd (-x) or copy ops but not both")
 	}
 
-	//-------------------------------------------------------------------
 	// Here we have parsed all options and can now carry out
 	// either the shell session or copy operation.
 	_ = shellMode
@@ -836,6 +847,8 @@ func main() {
 	} else {
 		log.SetOutput(ioutil.Discard)
 	}
+
+	//=== Auth token fetch for login
 
 	if !gopt {
 		// See if we can log in via an auth token
@@ -858,7 +871,7 @@ func main() {
 		}
 	}
 
-	// Enforce some sane min/max vals on chaff flags
+	//=== Enforce some sane min/max vals on chaff flags
 	if chaffFreqMin < 2 {
 		chaffFreqMin = 2
 	}
@@ -868,6 +881,8 @@ func main() {
 	if chaffBytesMax == 0 || chaffBytesMax > 4096 {
 		chaffBytesMax = 64
 	}
+
+	//=== Shell vs. Copy mode chaff and cmd setup
 
 	if shellMode {
 		// We must make the decision about interactivity before Dial()
@@ -909,6 +924,8 @@ func main() {
 		}
 	}
 
+	//=== TCP / KCP Dial setup
+
 	proto := "tcp"
 	if kcpMode != "unused" {
 		proto = "kcp"
@@ -919,13 +936,15 @@ func main() {
 		exitWithStatus(3)
 	}
 
+	//=== Shell terminal mode (Shell vs. Copy) setup
+
 	// Set stdin in raw mode if it's an interactive session
 	// TODO: send flag to server side indicating this
 	//  affects shell command used
 	var oldState *xs.State
 	defer conn.Close() // nolint: errcheck
 
-	// From this point on, conn is a secure encrypted channel
+	//=== From this point on, conn is a secure encrypted channel
 
 	if shellMode {
 		if isatty.IsTerminal(os.Stdin.Fd()) {
@@ -940,6 +959,8 @@ func main() {
 			log.Println("NOT A TTY")
 		}
 	}
+
+	//=== Login phase
 
 	// Start login timeout here and disconnect if user/pass phase stalls
 	//iloginImpatience := time.AfterFunc(20*time.Second, func() {
@@ -961,11 +982,13 @@ func main() {
 		}
 		authCookie = string(ab)
 	}
-	
+
 	//i_ = loginImpatience.Stop()
 	_ = loginTimeout.Stop()
 	// Security scrub
 	runtime.GC()
+
+	//=== Session param and TERM setup
 
 	// Set up session params and send over to server
 	rec := xs.NewSession(op, []byte(uname), []byte(remoteHost), []byte(os.Getenv("TERM")), []byte(cmdStr), []byte(authCookie), 0)
@@ -982,17 +1005,21 @@ func main() {
 	authCookie = "" // nolint: ineffassign
 	runtime.GC()
 
-	// Read auth reply from server
+	//=== Login Auth
+
+	//=== Read auth reply from server
 	authReply := make([]byte, 1) // bool: 0 = fail, 1 = pass
 	_, err = conn.Read(authReply)
 	if err != nil {
+		//=== Exit if auth reply not received
 		fmt.Fprintln(os.Stderr, "Error reading auth reply") // nolint: errcheck
 		rec.SetStatus(255)
 	} else if authReply[0] == 0 {
+		//=== .. or if auth failed
 		fmt.Fprintln(os.Stderr, rejectUserMsg()) // nolint: errcheck
 		rec.SetStatus(255)
 	} else {
-		// Set up chaffing to server
+		//=== Set up chaffing to server
 		conn.SetupChaff(chaffFreqMin, chaffFreqMax, chaffBytesMax) // enable client->server chaffing
 		if chaffEnabled {
 			// #gv:s/label=\"main\$2\"/label=\"deferCloseChaff\"/
@@ -1002,7 +1029,7 @@ func main() {
 			defer conn.ShutdownChaff()
 		}
 
-		// Keepalive for any tunnels that may exist
+		//=== (goroutine) Start keepAliveWorker for tunnels
 		// #gv:s/label=\"main\$1\"/label=\"tunKeepAlive\"/
 		// TODO:.gv:main:1:tunKeepAlive
 		//[1]: better to always send tunnel keepAlives even if client didn't specify
@@ -1021,10 +1048,13 @@ func main() {
 		go keepAliveWorker()
 		//[1]}
 
+		//=== Session entry (shellMode or copyMode)
 		if shellMode {
+			//=== (shell) launch tunnels
 			launchTuns(&conn, remoteHost, tunSpecStr)
 			doShellMode(isInteractive, &conn, oldState, rec)
-		} else { // copyMode
+		} else {
+			//=== (.. or file copy)
 			s, _ := doCopyMode(&conn, pathIsDest, fileArgs, copyQuiet, copyLimitBPS, rec) // nolint: errcheck,gosec
 			rec.SetStatus(s)
 		}
@@ -1040,6 +1070,7 @@ func main() {
 		oldState = nil
 	}
 
+	//=== Exit
 	exitWithStatus(int(rec.Status()))
 }
 
