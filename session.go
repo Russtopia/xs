@@ -96,7 +96,7 @@ func (h Session) AuthCookie(reallyShow bool) []byte {
 	return []byte("**REDACTED**")
 }
 
-// SetAuthCookie stores the authcookie (essential the password) used to
+// SetAuthCookie stores the authcookie (essentially the password) used to
 // authenticate the Session.
 func (h *Session) SetAuthCookie(a []byte) {
 	h.authCookie = a
