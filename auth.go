@@ -2,7 +2,7 @@ package xs
 
 // Package xs - a secure terminal client/server written from scratch in Go
 //
-// Copyright (c) 2017-2019 Russell Magee
+// Copyright (c) 2017-2020 Russell Magee
 // Licensed under the terms of the MIT license (see LICENSE.mit in this
 // distribution)
 //
@@ -38,7 +38,8 @@ func NewAuthCtx( /*reader func(string) ([]byte, error), userlookup func(string) 
 }
 
 // --------- System passwd/shadow auth routine(s) --------------
-// Verify a password against system standard shadow file
+
+// VerifyPass verifies a password against system standard shadow file
 // Note auxilliary fields for expiry policy are *not* inspected.
 func VerifyPass(ctx *AuthCtx, user, password string) (bool, error) {
 	if ctx.reader == nil {

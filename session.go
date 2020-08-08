@@ -2,7 +2,7 @@ package xs
 
 // Package xs - a secure terminal client/server written from scratch in Go
 //
-// Copyright (c) 2017-2019 Russell Magee
+// Copyright (c) 2017-2020 Russell Magee
 // Licensed under the terms of the MIT license (see LICENSE.mit in this
 // distribution)
 //
@@ -96,7 +96,7 @@ func (h Session) AuthCookie(reallyShow bool) []byte {
 	return []byte("**REDACTED**")
 }
 
-// SetAuthCookie stores the authcookie (essential the password) used to
+// SetAuthCookie stores the authcookie (essentially the password) used to
 // authenticate the Session.
 func (h *Session) SetAuthCookie(a []byte) {
 	h.authCookie = a

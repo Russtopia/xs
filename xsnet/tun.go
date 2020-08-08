@@ -1,6 +1,6 @@
 // hkextun.go - Tunnel setup using an established xsnet.Conn
 
-// Copyright (c) 2017-2019 Russell Magee
+// Copyright (c) 2017-2020 Russell Magee
 // Licensed under the terms of the MIT license (see LICENSE.mit in this
 // distribution)
 //
