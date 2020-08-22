@@ -38,7 +38,9 @@ go test -v .
 stage "Test(Authtoken)"
 ############
 echo "Clearing test user $USER ~/.xs_id file ..."
-mv ~/.xs_id ~/.xs_id.bak
+if [ -f ~/.xs_id ]; then
+  mv ~/.xs_id ~/.xs_id.bak
+fi
 echo "Setting dummy authtoken in ~/.xs_id ..."
 echo "localhost:asdfasdfasdf" >~/.xs_id
 echo "Performing remote command on @localhost via authtoken login ..."
@@ -50,7 +52,9 @@ else
   echo "client cmd performed OK."
   unset tokentest
 fi
-mv ~/.xs_id.bak ~/.xs_id
+if [ -f ~/.xs_id.bak ]; then
+  mv ~/.xs_id.bak ~/.xs_id
+fi
 
 ############
 stage "Test(S->C)"
