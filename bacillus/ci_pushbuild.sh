@@ -1,4 +1,6 @@
 #!/bin/bash
+#
+## bacillus (https://gogs.blitter.com/Russtopia/bacillus) build/test CI script
 
 export GOPATH="${HOME}/go"
 export PATH=/usr/local/bin:/usr/bin:/usr/lib/ccache/bin:/bin:$GOPATH/bin
@@ -22,15 +24,21 @@ echo "Building most recent push on branch $branch"
 git checkout "$branch"
 ls
 
+############
 stage "Build"
+############
 make all
 
+############
 stage "UnitTests"
+############
 go test -v .
 
+############
 stage "Test(Authtoken)"
+############
 echo "Clearing test user $USER ~/.xs_id file ..."
-rm -f ~/.xs_id
+mv ~/.xs_id ~/.xs_id.bak
 echo "Setting dummy authtoken in ~/.xs_id ..."
 echo "localhost:asdfasdfasdf" >~/.xs_id
 echo "Performing remote command on @localhost via authtoken login ..."
@@ -42,8 +50,11 @@ else
   echo "client cmd performed OK."
   unset tokentest
 fi
+mv ~/.xs_id.bak ~/.xs_id
 
+############
 stage "Test(S->C)"
+############
 echo "Testing secure copy from server -> client ..."
 tmpdir=$$
 mkdir -p /tmp/$tmpdir
@@ -63,17 +74,25 @@ else
   exit $stat
 fi
 
+############
 stage "Test(C->S)"
+############
 echo "TODO ..."
 
+############
 stage "Lint"
+############
 make lint
 
+############
 stage "Artifacts"
+############
 echo -n "Creating tarfile ..."
 tar -cz --exclude=.git --exclude=cptest -f ${BACILLUS_ARTFDIR}/xs.tgz .
 
+############
 stage "Cleanup"
+############
 rm -f ~/.xs_id
 
 echo
