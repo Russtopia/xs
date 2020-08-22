@@ -4,8 +4,10 @@
 --
 
 XS (**X**perimental **S**hell) is a golang implementation of a simple remote shell client and
-server, similar in role to ssh, offering encrypted interactive and non-interactive sessions,
-file copying and tunnels with traffic obfuscation ('chaffing').
+server, similar in role to ssh, offering encrypted interactive and non-interactive sessions (remote commands),
+remote file copying and tunnels with optional traffic obfuscation ('chaffing').
+
+It is stable to the point that I use it for day-to-day remote access in place of, and in preference to, ssh.
 
 ***
 **NOTE: Due to the experimental nature of the KEX/KEM algorithms used, and the novelty of the overall codebase, this package SHOULD BE CONSIDERED EXTREMELY EXPERIMENTAL and USED WITH CAUTION. It DEFINITELY SHOULD NOT be used for any sensitive applications. USE AT YOUR OWN RISK. NEITHER WARRANTY NOR CLAIM OF FITNESS FOR PURPOSE IS EXPRESSED OR IMPLIED.**
