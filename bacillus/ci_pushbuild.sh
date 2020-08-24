@@ -52,9 +52,6 @@ else
   echo "client cmd performed OK."
   unset tokentest
 fi
-if [ -f ~/.xs_id.bak ]; then
-  mv ~/.xs_id.bak ~/.xs_id
-fi
 
 ############
 stage "Test(S->C)"
@@ -82,6 +79,10 @@ fi
 stage "Test(C->S)"
 ############
 echo "TODO ..."
+
+if [ -f ~/.xs_id.bak ]; then
+  mv ~/.xs_id.bak ~/.xs_id
+fi
 
 ############
 stage "Lint"
