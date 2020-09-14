@@ -65,8 +65,8 @@ echo -n "Integrity check on copied files (sha1sum) ..."
 sha1sum $(find cptest -type f | sort) >sc.sha1sum
 diff sc.sha1sum ${BACILLUS_WORKDIR}/build/xs/cptest.sha1sum
 stat=$?
-
 cd -
+
 rm -rf /tmp/$tmpdir
 if [ $stat -eq "0" ]; then
   echo "OK."
@@ -99,7 +99,7 @@ tar -cz --exclude=.git --exclude=cptest -f ${BACILLUS_ARTFDIR}/xs.tgz .
 ############
 stage "Cleanup"
 ############
-rm -f ~/.xs_id
+# nop
 
 echo
 echo "--Done--"
