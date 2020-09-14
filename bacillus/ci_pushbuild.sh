@@ -53,11 +53,6 @@ else
   unset tokentest
 fi
 
-if [ -f ~/.xs_id.bak ]; then
-  echo "Restoring test user $USER ~/.xs_id file ..."
-  mv ~/.xs_id.bak ~/.xs_id
-fi
-
 ############
 stage "Test(S->C)"
 ############
@@ -86,6 +81,7 @@ stage "Test(C->S)"
 echo "TODO ..."
 
 if [ -f ~/.xs_id.bak ]; then
+  echo "Restoring test user $USER ~/.xs_id file ..."
   mv ~/.xs_id.bak ~/.xs_id
 fi
 
