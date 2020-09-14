@@ -37,8 +37,8 @@ go test -v .
 ############
 stage "Test(Authtoken)"
 ############
-echo "Clearing test user $USER ~/.xs_id file ..."
 if [ -f ~/.xs_id ]; then
+  echo "Clearing test user $USER ~/.xs_id file ..."
   mv ~/.xs_id ~/.xs_id.bak
 fi
 echo "Setting dummy authtoken in ~/.xs_id ..."
@@ -51,6 +51,11 @@ if [ "${tokentest}" != "FOO" ]; then
 else
   echo "client cmd performed OK."
   unset tokentest
+fi
+
+if [ -f ~/.xs_id.bak ]; then
+  echo "Restoring test user $USER ~/.xs_id file ..."
+  mv ~/.xs_id.bak ~/.xs_id
 fi
 
 ############
