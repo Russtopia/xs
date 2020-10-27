@@ -105,13 +105,22 @@ $ make clean all
 $ sudo make [install | uninstall | reinstall]
 ```
 
-### To manage service (assuming openrc init)
+### To manage service (openrc init)
 
 An example init script (xsd.initrc) is provided. Consult your Linux distribution documentation for proper service/daemon installation. For openrc,
 
 ```
 $ sudo cp xsd.initrc /etc/init.d/xsd
 $ sudo rc-config add xsd default
+```
+
+### To manage service (sysV init)
+
+An example init script (xsd.sysvrc) is provided. Consult your Linux distribution documentation for proper service/daemon installation. For sysV init,
+
+```
+$ sudo cp xsd.sysvrc /etc/init.d/xsd
+$ sudo sysv-rc-conf --level 2345 xsd on
 ```
 
 The make system assumes installation in /usr/local/sbin (xsd, xspasswd) and /usr/local/bin (xs/xc symlink).
