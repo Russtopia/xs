@@ -13,6 +13,7 @@ require (
 	github.com/jameskeane/bcrypt v0.0.0-20120420032655-c3cd44c1e20f
 	github.com/klauspost/reedsolomon v1.9.9 // indirect
 	github.com/kr/pty v1.1.8
+	github.com/kuking/go-frodokem v1.0.1
 	github.com/mattn/go-isatty v0.0.12
 	github.com/mmcloughlin/avo v0.0.0-20200523190732-4439b6b2c061 // indirect
 	github.com/pkg/errors v0.9.1 // indirect

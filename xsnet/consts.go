@@ -29,6 +29,10 @@ const (
 	KEX_NEWHOPE_SIMPLE // 'NewHopeLP-Simple' - https://eprint.iacr.org/2016/1157
 	KEX_resvd14
 	KEX_resvd15
+	KEX_FRODOKEM_1344AES
+	KEX_FRODOKEM_1344SHAKE
+	KEX_FRODOKEM_976AES
+	KEX_FRODOKEM_976SHAKE
 	KEX_invalid = 255
 )
 

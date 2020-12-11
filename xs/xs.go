@@ -64,22 +64,22 @@ const bob = string("\r\n\r\n" +
 	"@@@@@@@^^~~~~~~~~~~~~~~~~~~~~^@@@@@@@@@\r\n" +
 	"@@@@@@^     ~^  @  @@ @ @ @ I  ~^@@@@@@\r\n" +
 	"@@@@@            ~ ~~ ~I          @@@@@\r\n" +
-	"@@@@'                  '  _,w@<    @@@@\r\n" +
+	"@@@@'                  '  _,w@<    @@@@    .\r\n" +
 	"@@@@     @@@@@@@@w___,w@@@@@@@@  @  @@@\r\n" +
-	"@@@@     @@@@@@@@@@@@@@@@@@@@@@  I  @@@\r\n" +
+	"@@@@     @@@@@@@@@@@@@@@@@@@@@@  I  @@@   Bob\r\n" +
 	"@@@@     @@@@@@@@@@@@@@@@@@@@*@[ i  @@@\r\n" +
-	"@@@@     @@@@@@@@@@@@@@@@@@@@[][ | ]@@@\r\n" +
+	"@@@@     @@@@@@@@@@@@@@@@@@@@[][ | ]@@@           bOb\r\n" +
 	"@@@@     ~_,,_ ~@@@@@@@~ ____~ @    @@@\r\n" +
-	"@@@@    _~ ,  ,  `@@@~  _  _`@ ]L  J@@@\r\n" +
+	"@@@@    _~ ,  ,  `@@@~  _  _`@ ]L  J@@@    o\r\n" +
 	"@@@@  , @@w@ww+   @@@ww``,,@w@ ][  @@@@\r\n" +
-	"@@@@,  @@@@www@@@ @@@@@@@ww@@@@@[  @@@@\r\n" +
+	"@@@@,  @@@@www@@@ @@@@@@@ww@@@@@[  @@@@      BOB\r\n" +
 	"@@@@@_|| @@@@@@P' @@P@@@@@@@@@@@[|c@@@@\r\n" +
-	"@@@@@@w| '@@P~  P]@@@-~, ~Y@@^'],@@@@@@\r\n" +
+	"@@@@@@w| '@@P~  P]@@@-~, ~Y@@^'],@@@@@@           . o\r\n" +
 	"@@@@@@@[   _        _J@@Tk     ]]@@@@@@\r\n" +
 	"@@@@@@@@,@ @@, c,,,,,,,y ,w@@[ ,@@@@@@@\r\n" +
-	"@@@@@@@@@ i @w   ====--_@@@@@  @@@@@@@@\r\n" +
+	"@@@@@@@@@ i @w   ====--_@@@@@  @@@@@@@@       o .\r\n" +
 	"@@@@@@@@@@`,P~ _ ~^^^^Y@@@@@  @@@@@@@@@\r\n" +
-	"@@@@^^=^@@^   ^' ,ww,w@@@@@ _@@@@@@@@@@\r\n" +
+	"@@@@^^=^@@^   ^' ,ww,w@@@@@ _@@@@@@@@@@    B   o   B\r\n" +
 	"@@@_xJ~ ~   ,    @@@@@@@P~_@@@@@@@@@@@@\r\n" +
 	"@@   @,   ,@@@,_____   _,J@@@@@@@@@@@@@\r\n" +
 	"@@L  `' ,@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\r\n" +
@@ -712,7 +712,7 @@ func main() {
 	flag.BoolVar(&dbg, "d", false, "debug logging")
 	flag.StringVar(&cipherAlg, "c", "C_AES_256", "session `cipher` [C_AES_256 | C_TWOFISH_128 | C_BLOWFISH_64 | C_CRYPTMT1 | C_CHACHA20_12]")
 	flag.StringVar(&hmacAlg, "m", "H_SHA256", "session `HMAC` [H_SHA256 | H_SHA512]")
-	flag.StringVar(&kexAlg, "k", "KEX_HERRADURA512", "KEx `alg` [KEX_HERRADURA{256/512/1024/2048} | KEX_KYBER{512/768/1024} | KEX_NEWHOPE | KEX_NEWHOPE_SIMPLE]")
+	flag.StringVar(&kexAlg, "k", "KEX_HERRADURA512", "KEx `alg` [KEX_HERRADURA{256/512/1024/2048} | KEX_KYBER{512/768/1024} | KEX_NEWHOPE | KEX_NEWHOPE_SIMPLE | KEX_FRODOKEM_{1344|976}{AES|SHAKE}]")
 	flag.StringVar(&kcpMode, "K", "unused", "KCP `alg`, one of [KCP_NONE | KCP_AES | KCP_BLOWFISH | KCP_CAST5 | KCP_SM4 | KCP_SALSA20 | KCP_SIMPLEXOR | KCP_TEA | KCP_3DES | KCP_TWOFISH | KCP_XTEA] to use KCP (github.com/xtaci/kcp-go) reliable UDP instead of TCP")
 	flag.UintVar(&port, "p", 2000, "``port")
 	//flag.StringVar(&authCookie, "a", "", "auth cookie")

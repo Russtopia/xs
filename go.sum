@@ -33,6 +33,8 @@ github.com/klauspost/reedsolomon v1.9.9 h1:qCL7LZlv17xMixl55nq2/Oa1Y86nfO8EqDfv2
 github.com/klauspost/reedsolomon v1.9.9/go.mod h1:O7yFFHiQwDR6b2t63KPUpccPtNdp5ADgh1gg4fd12wo=
 github.com/kr/pty v1.1.8 h1:AkaSdXYQOWeaO3neb8EM634ahkXXe3jYbVh/F9lq+GI=
 github.com/kr/pty v1.1.8/go.mod h1:O1sed60cT9XZ5uDucP5qwvh+TE3NnUj51EiZO/lmSfw=
+github.com/kuking/go-frodokem v1.0.1 h1:13bks3u4CPpvUtOLttT+A37j9myV4kLnS7Z3qDiTm4o=
+github.com/kuking/go-frodokem v1.0.1/go.mod h1:TzD0W9QnVOcwigeSySEuNZfJaGxWRtFRb7hXe/w/waI=
 github.com/mattn/go-isatty v0.0.12 h1:wuysRhFDzyxgEmMf5xjvJ2M9dZoWAXNNr5LSBS7uHXY=
 github.com/mattn/go-isatty v0.0.12/go.mod h1:cbi8OIDigv2wuxKPP5vlRcQ1OAZbq2CE4Kysco4FUpU=
 github.com/mmcloughlin/avo v0.0.0-20200523190732-4439b6b2c061 h1:UCU8+cLbbvyxi0sQ9fSeoEhZgvrrD9HKMtX6Gmc1vk8=
@@ -50,6 +52,7 @@ github.com/tjfoc/gmsm v1.3.0 h1:i7c6Za/IlgBvnGxYpfD7L3TGuaS+v6oGcgq+J9/ecEA=
 github.com/tjfoc/gmsm v1.3.0/go.mod h1:HaUcFuY0auTiaHB9MHFGCPx5IaLhTUd2atbCFBQXn9w=
 github.com/tjfoc/gmsm v1.3.1 h1:+k3IAlF81c31/TllJmIfuCYnjl8ziMdTWGWJcP9J1uo=
 github.com/tjfoc/gmsm v1.3.1/go.mod h1:HaUcFuY0auTiaHB9MHFGCPx5IaLhTUd2atbCFBQXn9w=
+github.com/ulikunitz/xz v0.5.7/go.mod h1:nbz6k7qbPmH4IRqmfOplQw/tblSgqTqBwxkY0oWt/14=
 github.com/xtaci/kcp-go v1.0.1 h1:SEZn2Iick6ualQpV8yY9cXdDTgbfBHPIwJl7UvxfxLQ=
 github.com/xtaci/kcp-go v5.4.20+incompatible h1:TN1uey3Raw0sTz0Fg8GkfM0uH3YwzhnZWQ1bABv5xAg=
 github.com/xtaci/kcp-go v5.4.20+incompatible/go.mod h1:bN6vIwHQbfHaHtFpEssmWsN45a+AZwO7eyRCmEIbtvE=

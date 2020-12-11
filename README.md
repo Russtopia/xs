@@ -27,7 +27,7 @@ Currently supported exchanges are:
 [Omar Elejandro Herrera Reyna's HerraduraKEx project](http://github.com/Caume/HerraduraKEx);
 * The KYBER IND-CCA-2 secure key encapsulation mechanism, [pq-crystals Kyber](https://pq-crystals.org/kyber/)  :: [Yawning/kyber golang implementation](https://git.schwanenlied.me/yawning/kyber)
 * The NEWHOPE algorithm [newhopecrypto.org](https://www.newhopecrypto.org/) :: [Yawning/go-newhope golang implementation](https://git.schwanenlied.me/yawning/newhope)
-
+* The FrodoKEM algorithm [frodokem.org](https://frodokem.org/) :: Go version by [Eduardo E. S. Riccardi](https://github.com/kuking/go-frodokem)
 
 Currently supported session algorithms:
 
