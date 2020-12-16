@@ -427,13 +427,13 @@ func FrodoKEMDialSetup(c io.ReadWriter, hc *Conn) (err error) {
 	}
 	pubA, secA := kem.Keygen() // pA
 	//log.Printf("[pubKeyAlice: %v]\n", pubA)
-	
+
 	// Alice, step 2: Send the public key (na,ea) to Bob
 	fmt.Fprintf(c, "0x%x\n", pubA)
-	
+
 	// (... and cipher, connection opts)
 	fmt.Fprintf(c, "0x%x:0x%x\n", hc.cipheropts, hc.opts)
-	
+
 	// [Bob does the same and sends use a public key (nb, eb)
 	pubB_bigint := big.NewInt(0)
 	_, err = fmt.Fscanf(c, "0x%x\n", pubB_bigint)
@@ -446,27 +446,27 @@ func FrodoKEMDialSetup(c io.ReadWriter, hc *Conn) (err error) {
 	if err != nil {
 		return err
 	}
-	
+
 	// Alice, step 3: Create ctAtoB, shareA
 	ctAtoB, shareA, err := kem.Encapsulate(pubB)
 	if err != nil {
 		return err
 	}
-	
+
 	// Alice, step 4: Send ctAtoB to Bob
 	fmt.Fprintf(c, "0x%x\n", ctAtoB)
-	
+
 	// Alice, step 5: Receive ctBtoA from Bob
 	ctBtoA_bigint := big.NewInt(0)
 	_, err = fmt.Fscanf(c, "0x%x\n", ctBtoA_bigint)
 	ctBtoA := ctBtoA_bigint.Bytes()
 	log.Printf("[Got ctBob[]:%v]\n", ctBtoA)
-	
+
 	// Alice, step 6: compute Bob's share
 	shareB, err := kem.Dencapsulate(secA, ctBtoA)
 	sessionKey := append(shareA, shareB...)
 	//log.Printf("[Derived sharedSecret:0x%x]\n", sessionKey)
-	
+
 	hc.r, hc.rm, err = hc.getStream(sessionKey)
 	hc.w, hc.wm, err = hc.getStream(sessionKey)
 	return
@@ -681,13 +681,13 @@ func FrodoKEMAcceptSetup(c *net.Conn, hc *Conn) (err error) {
 	}
 	pubB, secB := kem.Keygen()
 	//log.Printf("[pubKeyBob: %v]\n", pubB)
-	
+
 	// Bob, step 2: Send the public key (nb,eb) to Alice
 	fmt.Fprintf(*c, "0x%x\n", pubB)
-	
+
 	// (... and cipher, connection opts)
 	fmt.Fprintf(*c, "0x%x:0x%x\n", hc.cipheropts, hc.opts)
-	
+
 	// [Alice does the same and sends use a public key (na, ea)
 	pubA_bigint := big.NewInt(0)
 	_, err = fmt.Fscanf(*c, "0x%x\n", pubA_bigint)
@@ -700,27 +700,27 @@ func FrodoKEMAcceptSetup(c *net.Conn, hc *Conn) (err error) {
 	if err != nil {
 		return err
 	}
-	
+
 	// Bob, step 3: Create ctBtoA, shareB
 	ctBtoA, shareB, err := kem.Encapsulate(pubA)
 	if err != nil {
 		return err
 	}
-	
+
 	// Bob, step 4: Send ctBtoA to Alice
 	fmt.Fprintf(*c, "0x%x\n", ctBtoA)
-	
+
 	// Bob, step 5: Receive ctAtoB from Alice
 	ctAtoB_bigint := big.NewInt(0)
 	_, err = fmt.Fscanf(*c, "0x%x\n", ctAtoB_bigint)
 	ctAtoB := ctAtoB_bigint.Bytes()
 	log.Printf("[Got ctAlice[]:%v]\n", ctAtoB)
-	
+
 	// Alice, step 6: compute Bob's share
 	shareA, err := kem.Dencapsulate(secB, ctAtoB)
 	sessionKey := append(shareA, shareB...)
 	//log.Printf("[Derived sharedSecret:0x%x]\n", sessionKey)
-	
+
 	hc.r, hc.rm, err = hc.getStream(sessionKey)
 	hc.w, hc.wm, err = hc.getStream(sessionKey)
 	return
@@ -1500,6 +1500,19 @@ func (hc *Conn) WritePacket(b []byte, ctrlStatOp byte) (n int, err error) {
 	if hc.logPlainText {
 		log.Printf("  :>ptext:\r\n%s\r\n", hex.Dump(b[0:payloadLen]))
 	}
+
+	// NOTE the code currently uses Authenticate-then-Encrypt, which in block modes
+	// is insecure; however
+	// 1) we are using exclusively XOR-stream modes with random padding,
+	// 2) are padding randomly either before or after the real payload, and
+	// 3) the padding side indicator value itself is part of the ciphertext
+	// ... thus are not subject to oracle attacks of the type used on SSL
+	// (see https://link.springer.com/content/pdf/10.1007%2F3-540-44647-8_19.pdf)
+	//
+	// Nevertheless, to address any future concerns this code may switch to
+	// Encrypt-then-Auth and offer the current scheme as a legacy mode
+	// (or just issue a breaking release since this is very pre-1.0.)
+	// -rlm 2020-12-15
 
 	// Calculate hmac on payload
 	hc.wm.Write(b[0:payloadLen])
