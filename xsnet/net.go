@@ -1288,6 +1288,16 @@ func (hc Conn) Read(b []byte) (n int, err error) {
 			log.Printf("  <:ctext:\r\n%s\r\n", hex.Dump(payloadBytes[:n]))
 		}
 
+		hc.rm.Write(payloadBytes) // Calc hmac on received data
+		hTmp := hc.rm.Sum(nil)[0:HMAC_CHK_SZ]
+		//log.Printf("<%04x) HMAC:(i)%s (c)%02x\r\n", decryptN, hex.EncodeToString([]byte(hmacIn[0:])), hTmp)
+
+		// Log alert if hmac didn't match, corrupted channel
+		if !bytes.Equal(hTmp, []byte(hmacIn[0:])) /*|| hmacIn[0] > 0xf8*/ {
+			logger.LogDebug(fmt.Sprintln("** ALERT - detected HMAC mismatch, possible channel tampering **"))
+			_, _ = (*hc.c).Write([]byte{CSOHmacInvalid})
+		}
+
 		db := bytes.NewBuffer(payloadBytes[:n]) //copying payloadBytes to db
 		// The StreamReader acts like a pipe, decrypting
 		// whatever is available and forwarding the result
@@ -1303,7 +1313,6 @@ func (hc Conn) Read(b []byte) (n int, err error) {
 			log.Println("xsnet.Read():", err)
 			//panic(err)
 		} else {
-			hc.rm.Write(payloadBytes) // Calc hmac on received data
 			// Padding: Read padSide, padLen, (padding | d) or (d | padding)
 			padSide := payloadBytes[0]
 			padLen := payloadBytes[1]
@@ -1417,19 +1426,6 @@ func (hc Conn) Read(b []byte) (n int, err error) {
 			} else {
 				logger.LogDebug(fmt.Sprintf("[Unknown CSOType:%d]", ctrlStatOp))
 			}
-
-			hTmp := hc.rm.Sum(nil)[0:HMAC_CHK_SZ]
-			//log.Printf("<%04x) HMAC:(i)%s (c)%02x\r\n", decryptN, hex.EncodeToString([]byte(hmacIn[0:])), hTmp)
-
-			if *hc.closeStat == CSETruncCSO {
-				logger.LogDebug(fmt.Sprintln("[cannot verify HMAC]"))
-			} else {
-				// Log alert if hmac didn't match, corrupted channel
-				if !bytes.Equal(hTmp, []byte(hmacIn[0:])) /*|| hmacIn[0] > 0xf8*/ {
-					logger.LogDebug(fmt.Sprintln("** ALERT - detected HMAC mismatch, possible channel tampering **"))
-					_, _ = (*hc.c).Write([]byte{CSOHmacInvalid})
-				}
-			}
 		}
 	}
 
@@ -1501,24 +1497,18 @@ func (hc *Conn) WritePacket(b []byte, ctrlStatOp byte) (n int, err error) {
 		log.Printf("  :>ptext:\r\n%s\r\n", hex.Dump(b[0:payloadLen]))
 	}
 
-	// NOTE the code currently uses Authenticate-then-Encrypt, which in block modes
-	// is insecure; however
-	// 1) we are using exclusively XOR-stream modes with random padding,
+	// NOTE releases prior to v0.9 used Authenticate-then-Encrypt,
+	// which in block modes is insecure; however
+	// 1) we use exclusively XOR-stream modes with random padding,
 	// 2) are padding randomly either before or after the real payload, and
 	// 3) the padding side indicator value itself is part of the ciphertext
 	// ... thus are not subject to oracle attacks of the type used on SSL
-	// (see https://link.springer.com/content/pdf/10.1007%2F3-540-44647-8_19.pdf)
+	// (described in (Krawczyk 2001/2014,
+	// https://link.springer.com/content/pdf/10.1007%2F3-540-44647-8_19.pdf)
 	//
-	// Nevertheless, to address any future concerns this code may switch to
-	// Encrypt-then-Auth and offer the current scheme as a legacy mode
-	// (or just issue a breaking release since this is very pre-1.0.)
+	// Nevertheless, to address any future concerns v0.9 onwards switches to
+	// Encrypt-then-Auth and breaks interop with earlier versions.
 	// -rlm 2020-12-15
-
-	// Calculate hmac on payload
-	hc.wm.Write(b[0:payloadLen])
-	hmacOut = hc.wm.Sum(nil)[0:HMAC_CHK_SZ]
-
-	//log.Printf("  (%08x> HMAC(o):%s\r\n", payloadLen, hex.EncodeToString(hmacOut))
 
 	var wb bytes.Buffer
 	// The StreamWriter acts like a pipe, forwarding whatever is
@@ -1531,6 +1521,11 @@ func (hc *Conn) WritePacket(b []byte, ctrlStatOp byte) (n int, err error) {
 	if hc.logCipherText {
 		log.Printf("  ->ctext:\r\n%s\r\n", hex.Dump(wb.Bytes()))
 	}
+
+	// Calculate hmac on cipher payload
+	hc.wm.Write(wb.Bytes())
+	hmacOut = hc.wm.Sum(nil)[0:HMAC_CHK_SZ] //finalize
+	//log.Printf("  (%08x> HMAC(o):%s\r\n", payloadLen, hex.EncodeToString(hmacOut))
 
 	err = binary.Write(*hc.c, binary.BigEndian, &ctrlStatOp)
 	if err == nil {
