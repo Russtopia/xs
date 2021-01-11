@@ -98,7 +98,7 @@ const (
 type CSOType uint32
 
 //TODO: this should be small (max unfragmented packet size?)
-const MAX_PAYLOAD_LEN = 4*1024*1024*1024 - 1
+const MAX_PAYLOAD_LEN = 2*1024*1024*1024 - 1
 
 // Session symmetric crypto algs
 const (

@@ -33,7 +33,7 @@ import (
 	xs "blitter.com/go/xs"
 	"blitter.com/go/xs/logger"
 	"blitter.com/go/xs/xsnet"
-	"github.com/kr/pty"
+	"github.com/creack/pty"
 )
 
 var (
@@ -82,7 +82,7 @@ func runClientToServerCopyAs(who, ttype string, conn *xsnet.Conn, fpath string, 
 	os.Clearenv()
 	os.Setenv("HOME", u.HomeDir) // nolint: gosec,errcheck
 	os.Setenv("TERM", ttype)     // nolint: gosec,errcheck
-	os.Setenv("HKEXSH", "1")     // nolint: gosec,errcheck
+	os.Setenv("XS_SESSION", "1")     // nolint: gosec,errcheck
 
 	var c *exec.Cmd
 	cmdName := xs.GetTool("tar")
@@ -187,7 +187,7 @@ func runServerToClientCopyAs(who, ttype string, conn *xsnet.Conn, srcPath string
 	os.Clearenv()
 	_ = os.Setenv("HOME", u.HomeDir) // nolint: gosec
 	_ = os.Setenv("TERM", ttype)     // nolint: gosec
-	_ = os.Setenv("HKEXSH", "1")     // nolint: gosec
+	_ = os.Setenv("XS_SESSION", "1")     // nolint: gosec
 
 	var c *exec.Cmd
 	cmdName := xs.GetTool("tar")
@@ -278,7 +278,7 @@ func runShellAs(who, hname, ttype, cmd string, interactive bool, conn *xsnet.Con
 	os.Clearenv()
 	_ = os.Setenv("HOME", u.HomeDir) // nolint: gosec
 	_ = os.Setenv("TERM", ttype)     // nolint: gosec
-	_ = os.Setenv("HKEXSH", "1")     // nolint: gosec
+	_ = os.Setenv("XS_SESSION", "1")     // nolint: gosec
 
 	var c *exec.Cmd
 	if interactive {

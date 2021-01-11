@@ -49,7 +49,7 @@ import (
 
 /*---------------------------------------------------------------------*/
 const PAD_SZ = 32     // max size of padding applied to each packet
-const HMAC_CHK_SZ = 4 // leading bytes of HMAC to xmit for verification
+const HMAC_CHK_SZ = 8 // leading bytes of HMAC to xmit for verification
 
 type (
 	WinSize struct {
@@ -426,21 +426,25 @@ func FrodoKEMDialSetup(c io.ReadWriter, hc *Conn) (err error) {
 		kem = frodo.Frodo976SHAKE()
 	}
 	pubA, secA := kem.Keygen() // pA
-	//log.Printf("[pubKeyAlice: %v]\n", pubA)
 
 	// Alice, step 2: Send the public key (na,ea) to Bob
-	fmt.Fprintf(c, "0x%x\n", pubA)
+	n, err := fmt.Fprintf(c, "0x%x\n", pubA)
+	if err != nil {
+		panic(err)
+	}
+	if n < len(pubA) {
+		panic(errors.New("incomplete Fprintf() of pubA"))
+	}
 
-	// (... and cipher, connection opts)
+	// (... and send cipher, connection opts)
 	fmt.Fprintf(c, "0x%x:0x%x\n", hc.cipheropts, hc.opts)
 
 	// [Bob does the same and sends use a public key (nb, eb)
 	pubB_bigint := big.NewInt(0)
 	_, err = fmt.Fscanf(c, "0x%x\n", pubB_bigint)
 	pubB := pubB_bigint.Bytes()
-	//log.Printf("[Got pubKeyBob[]:%v]\n", pubB)
 
-	// (... and cipher, connection opts)
+	// (... and sends us cipher, connection opts)
 	_, err = fmt.Fscanf(c, "0x%x:0x%x\n",
 		&hc.cipheropts, &hc.opts)
 	if err != nil {
@@ -460,12 +464,10 @@ func FrodoKEMDialSetup(c io.ReadWriter, hc *Conn) (err error) {
 	ctBtoA_bigint := big.NewInt(0)
 	_, err = fmt.Fscanf(c, "0x%x\n", ctBtoA_bigint)
 	ctBtoA := ctBtoA_bigint.Bytes()
-	log.Printf("[Got ctBob[]:%v]\n", ctBtoA)
 
 	// Alice, step 6: compute Bob's share
 	shareB, err := kem.Dencapsulate(secA, ctBtoA)
 	sessionKey := append(shareA, shareB...)
-	//log.Printf("[Derived sharedSecret:0x%x]\n", sessionKey)
 
 	hc.r, hc.rm, err = hc.getStream(sessionKey)
 	hc.w, hc.wm, err = hc.getStream(sessionKey)
@@ -521,7 +523,7 @@ func NewHopeDialSetup(c io.ReadWriter, hc *Conn) (err error) {
 	if err != nil {
 		panic(err)
 	}
-	//log.Printf("[Derived sharedSecret:0x%x]\n", aliceSharedSecret)
+	
 	hc.r, hc.rm, err = hc.getStream(aliceSharedSecret)
 	hc.w, hc.wm, err = hc.getStream(aliceSharedSecret)
 	return
@@ -565,7 +567,7 @@ func NewHopeSimpleDialSetup(c io.ReadWriter, hc *Conn) (err error) {
 	if err != nil {
 		panic(err)
 	}
-	//log.Printf("[Derived sharedSecret:0x%x]\n", aliceSharedSecret)
+	
 	hc.r, hc.rm, err = hc.getStream(aliceSharedSecret)
 	hc.w, hc.wm, err = hc.getStream(aliceSharedSecret)
 	return
@@ -616,7 +618,6 @@ func KyberDialSetup(c io.ReadWriter /*net.Conn*/, hc *Conn) (err error) {
 	// Alice, step 3: Decrypt the KEM cipher text.
 	aliceSharedSecret := alicePrivateKey.KEMDecrypt(pubKeyB)
 
-	//log.Printf("[Derived sharedSecret:0x%x]\n", aliceSharedSecret)
 	hc.r, hc.rm, err = hc.getStream(aliceSharedSecret)
 	hc.w, hc.wm, err = hc.getStream(aliceSharedSecret)
 	return
@@ -680,27 +681,32 @@ func FrodoKEMAcceptSetup(c *net.Conn, hc *Conn) (err error) {
 		kem = frodo.Frodo976SHAKE()
 	}
 	pubB, secB := kem.Keygen()
-	//log.Printf("[pubKeyBob: %v]\n", pubB)
 
-	// Bob, step 2: Send the public key (nb,eb) to Alice
-	fmt.Fprintf(*c, "0x%x\n", pubB)
-
-	// (... and cipher, connection opts)
-	fmt.Fprintf(*c, "0x%x:0x%x\n", hc.cipheropts, hc.opts)
-
-	// [Alice does the same and sends use a public key (na, ea)
+	
+	// [Alice sends use a public key (na, ea)
 	pubA_bigint := big.NewInt(0)
 	_, err = fmt.Fscanf(*c, "0x%x\n", pubA_bigint)
 	pubA := pubA_bigint.Bytes()
-	//log.Printf("[Got pubKeyAlice[]:%v]\n", pubA)
 
-	// (... and cipher, connection opts)
+	// (... and sends us cipher, connection opts)
 	_, err = fmt.Fscanf(*c, "0x%x:0x%x\n",
 		&hc.cipheropts, &hc.opts)
 	if err != nil {
 		return err
 	}
 
+	// Bob, step 2: Send the public key (nb,eb) to Alice
+	n, err := fmt.Fprintf(*c, "0x%x\n", pubB)
+	if err != nil {
+		panic(err)
+	}
+	if n < len(pubB) {
+		panic(errors.New("incomplete Fprintf() of pubB"))
+	}
+
+	// (... and send cipher, connection opts)
+	fmt.Fprintf(*c, "0x%x:0x%x\n", hc.cipheropts, hc.opts)
+	
 	// Bob, step 3: Create ctBtoA, shareB
 	ctBtoA, shareB, err := kem.Encapsulate(pubA)
 	if err != nil {
@@ -714,12 +720,10 @@ func FrodoKEMAcceptSetup(c *net.Conn, hc *Conn) (err error) {
 	ctAtoB_bigint := big.NewInt(0)
 	_, err = fmt.Fscanf(*c, "0x%x\n", ctAtoB_bigint)
 	ctAtoB := ctAtoB_bigint.Bytes()
-	log.Printf("[Got ctAlice[]:%v]\n", ctAtoB)
 
 	// Alice, step 6: compute Bob's share
 	shareA, err := kem.Dencapsulate(secB, ctAtoB)
 	sessionKey := append(shareA, shareB...)
-	//log.Printf("[Derived sharedSecret:0x%x]\n", sessionKey)
 
 	hc.r, hc.rm, err = hc.getStream(sessionKey)
 	hc.w, hc.wm, err = hc.getStream(sessionKey)
@@ -759,7 +763,6 @@ func NewHopeAcceptSetup(c *net.Conn, hc *Conn) (err error) {
 	fmt.Fprintf(*c, "0x%x\n0x%x:0x%x\n", pubKeyBob.Send,
 		hc.cipheropts, hc.opts)
 
-	//log.Printf("[Derived sharedSecret:0x%x]\n", bobSharedSecret)
 	hc.r, hc.rm, err = hc.getStream(bobSharedSecret)
 	hc.w, hc.wm, err = hc.getStream(bobSharedSecret)
 	return
@@ -798,7 +801,6 @@ func NewHopeSimpleAcceptSetup(c *net.Conn, hc *Conn) (err error) {
 	fmt.Fprintf(*c, "0x%x\n0x%x:0x%x\n", pubKeyBob.Send,
 		hc.cipheropts, hc.opts)
 
-	//log.Printf("[Derived sharedSecret:0x%x]\n", bobSharedSecret)
 	hc.r, hc.rm, err = hc.getStream(bobSharedSecret)
 	hc.w, hc.wm, err = hc.getStream(bobSharedSecret)
 	return
@@ -847,7 +849,6 @@ func KyberAcceptSetup(c *net.Conn, hc *Conn) (err error) {
 	fmt.Fprintf(*c, "0x%x\n0x%x:0x%x\n", cipherText,
 		hc.cipheropts, hc.opts)
 
-	//log.Printf("[Derived sharedSecret:0x%x]\n", bobSharedSecret)
 	hc.r, hc.rm, err = hc.getStream(bobSharedSecret)
 	hc.w, hc.wm, err = hc.getStream(bobSharedSecret)
 	return
@@ -1287,6 +1288,7 @@ func (hc Conn) Read(b []byte) (n int, err error) {
 		if hc.logCipherText {
 			log.Printf("  <:ctext:\r\n%s\r\n", hex.Dump(payloadBytes[:n]))
 		}
+		//fmt.Printf("  <:ctext:\r\n%s\r\n", hex.Dump(payloadBytes[:n]))
 
 		hc.rm.Write(payloadBytes) // Calc hmac on received data
 		hTmp := hc.rm.Sum(nil)[0:HMAC_CHK_SZ]
@@ -1306,8 +1308,9 @@ func (hc Conn) Read(b []byte) (n int, err error) {
 		// The caller isn't necessarily reading the full payload so we need
 		// to decrypt to an intermediate buffer, draining it on demand of caller
 		decryptN, err := rs.Read(payloadBytes)
+
 		if hc.logPlainText {
-			log.Printf("  <-ptext:\r\n%s\r\n", hex.Dump(payloadBytes[:n]))
+			log.Printf("  <:ptext:\r\n%s\r\n", hex.Dump(payloadBytes[:n]))
 		}
 		if err != nil {
 			log.Println("xsnet.Read():", err)
@@ -1323,9 +1326,6 @@ func (hc Conn) Read(b []byte) (n int, err error) {
 			} else {
 				payloadBytes = payloadBytes[0 : len(payloadBytes)-int(padLen)]
 			}
-
-			//fmt.Printf("padSide:%d padLen:%d payloadBytes:%s\n",
-			//	padSide, padLen, hex.Dump(payloadBytes))
 
 			// Throw away pkt if it's chaff (ie., caller to Read() won't see this data)
 			if ctrlStatOp == CSOChaff {
@@ -1435,6 +1435,7 @@ func (hc Conn) Read(b []byte) (n int, err error) {
 	}
 
 	log.Printf("Read() got %d bytes\n", retN)
+
 	copy(b, hc.dBuf.Next(retN))
 	return retN, nil
 }
@@ -1443,9 +1444,7 @@ func (hc Conn) Read(b []byte) (n int, err error) {
 //
 // See go doc io.Writer
 func (hc Conn) Write(b []byte) (n int, err error) {
-	//fmt.Printf("WRITE(%d)\n", len(b))
 	n, err = hc.WritePacket(b, CSONone)
-	//fmt.Printf("WROTE(%d)\n", n)
 	return n, err
 }
 
@@ -1460,27 +1459,23 @@ func (hc *Conn) WritePacket(b []byte, ctrlStatOp byte) (n int, err error) {
 	}
 
 	//Padding prior to encryption
-	padSz := (rand.Intn(PAD_SZ) / 2) + (PAD_SZ / 2)
+	padSz := rand.Intn(PAD_SZ-1) + 1 /*(rand.Intn(PAD_SZ) / 2) + (PAD_SZ / 2)*/
 	padLen := padSz - ((len(b) + padSz) % padSz)
 	if padLen == padSz {
 		// No padding required
 		padLen = 0
 	}
+
 	padBytes := make([]byte, padLen)
 	rand.Read(padBytes)
 	// For a little more confusion let's support padding either before
 	// or after the payload.
 	padSide := rand.Intn(2)
-	//fmt.Printf("--\n")
-	//fmt.Printf("PRE_PADDING:%s\r\n", hex.Dump(b))
-	//fmt.Printf("padSide:%d padLen:%d\r\n", padSide, padLen)
 	if padSide == 0 {
 		b = append([]byte{byte(padSide)}, append([]byte{byte(padLen)}, append(padBytes, b...)...)...)
 	} else {
 		b = append([]byte{byte(padSide)}, append([]byte{byte(padLen)}, append(b, padBytes...)...)...)
 	}
-	//fmt.Printf("POST_PADDING:%s\r\n", hex.Dump(b))
-	//fmt.Printf("--\r\n")
 
 	// N.B. Originally this Lock() surrounded only the
 	// calls to binary.Write(hc.c ..) however there appears
@@ -1492,9 +1487,8 @@ func (hc *Conn) WritePacket(b []byte, ctrlStatOp byte) (n int, err error) {
 	// could be tightened.
 	hc.Lock()
 	payloadLen = uint32(len(b))
-	//!fmt.Printf("  --== payloadLen:%d\n", payloadLen)
 	if hc.logPlainText {
-		log.Printf("  :>ptext:\r\n%s\r\n", hex.Dump(b[0:payloadLen]))
+		log.Printf("  >:ptext:\r\n%s\r\n", hex.Dump(b[0:payloadLen]))
 	}
 
 	// NOTE releases prior to v0.9 used Authenticate-then-Encrypt,
@@ -1514,13 +1508,18 @@ func (hc *Conn) WritePacket(b []byte, ctrlStatOp byte) (n int, err error) {
 	// The StreamWriter acts like a pipe, forwarding whatever is
 	// written to it through the cipher, encrypting as it goes
 	ws := &cipher.StreamWriter{S: hc.w, W: &wb}
-	_, err = ws.Write(b[0:payloadLen])
+	wN, err := ws.Write(b[0:payloadLen])
 	if err != nil {
 		panic(err)
 	}
-	if hc.logCipherText {
-		log.Printf("  ->ctext:\r\n%s\r\n", hex.Dump(wb.Bytes()))
+	if wN < int(payloadLen) {
+		panic("truncated Write to cipher *****")
 	}
+
+	if hc.logCipherText {
+		log.Printf("  >:ctext:\r\n%s\r\n", hex.Dump(wb.Bytes()))
+	}
+	//fmt.Printf("  >:ctext:\r\n%s\r\n", hex.Dump(wb.Bytes()))
 
 	// Calculate hmac on cipher payload
 	hc.wm.Write(wb.Bytes())
@@ -1552,7 +1551,11 @@ func (hc *Conn) WritePacket(b []byte, ctrlStatOp byte) (n int, err error) {
 
 	// We must 'lie' to caller indicating the length of THEIR
 	// data written (ie., not including the padding and padding headers)
-	return n - 2 - int(padLen), err
+	retN := n - 2 - int(padLen)
+	if retN <= 0 {
+		retN = 0
+	}
+	return retN, err
 }
 
 func (hc *Conn) EnableChaff() {

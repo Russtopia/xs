@@ -42,7 +42,7 @@ endif
 
 INSTPREFIX = /usr/local
 
-all: common client server
+all: common client server #seccheck
 
 clean:
 	@echo "Make: $(MAKE)"
@@ -77,6 +77,10 @@ ifeq ($(MSYSTEM),MSYS)
 else
 	$(MAKE) BUILDOPTS=$(BUILDOPTS) -C xsd
 endif
+
+#seccheck:
+#	grep -r "logPlainText.*true" .
+#	if [ $$? -eq 0 ]; then echo "WARNING plaintext debug is enabled"; exit 1; fi
 
 vis:
 	@which go-callvis >/dev/null 2>&1; \

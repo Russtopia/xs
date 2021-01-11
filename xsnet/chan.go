@@ -110,7 +110,7 @@ func (hc *Conn) getStream(keymat []byte) (rc cipher.Stream, mc hash.Hash, err er
 		key = keymat[0:chacha.KeySize]
 		ivlen = chacha.INonceSize
 		iv = keymat[chacha.KeySize : chacha.KeySize+ivlen]
-		rc, err = chacha.NewCipher(iv, key, 20)
+		rc, err = chacha.NewCipher(iv, key, chacha.INonceSize)
 		if err != nil {
 			log.Printf("[ChaCha20 config error]\n")
 			fmt.Printf("[ChaCha20 config error]\n")
