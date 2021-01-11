@@ -1,4 +1,4 @@
-VERSION := 0.9.0pre
+VERSION := 0.9.0
 .PHONY: lint vis clean common client server passwd subpkgs install uninstall reinstall
 
 ## Tag version of binaries with build info wrt.
@@ -42,7 +42,7 @@ endif
 
 INSTPREFIX = /usr/local
 
-all: common client server #seccheck
+all: common client server
 
 clean:
 	@echo "Make: $(MAKE)"
@@ -77,10 +77,6 @@ ifeq ($(MSYSTEM),MSYS)
 else
 	$(MAKE) BUILDOPTS=$(BUILDOPTS) -C xsd
 endif
-
-#seccheck:
-#	grep -r "logPlainText.*true" .
-#	if [ $$? -eq 0 ]; then echo "WARNING plaintext debug is enabled"; exit 1; fi
 
 vis:
 	@which go-callvis >/dev/null 2>&1; \
