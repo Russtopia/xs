@@ -39,6 +39,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	crand "crypto/rand"
 
 	hkex "blitter.com/go/herradurakex"
 	"blitter.com/go/kyber"
@@ -474,24 +475,11 @@ func FrodoKEMDialSetup(c io.ReadWriter, hc *Conn) (err error) {
 	return
 }
 
-// randReader wraps rand.Read() in a struct that implements io.Reader
-// for use by the Kyber and NEWHOPE/NEWHOPE_SIMPLE KEM methods.
-type randReader struct {
-}
-
-func (r randReader) Read(b []byte) (n int, e error) {
-	n, e = rand.Read(b)
-	return
-}
-
 func NewHopeDialSetup(c io.ReadWriter, hc *Conn) (err error) {
 	// Send xsnet.Conn parameters to remote side
 
 	// Alice, step 1: Generate a key pair.
-	r := new(randReader)
-	rand.Seed(time.Now().UnixNano())
-
-	privKeyAlice, pubKeyAlice, err := newhope.GenerateKeyPairAlice(r)
+	privKeyAlice, pubKeyAlice, err := newhope.GenerateKeyPairAlice(crand.Reader)
 	if err != nil {
 		panic(err)
 	}
@@ -533,9 +521,7 @@ func NewHopeSimpleDialSetup(c io.ReadWriter, hc *Conn) (err error) {
 	// Send xsnet.Conn parameters to remote side
 
 	// Alice, step 1: Generate a key pair.
-	r := new(randReader)
-	rand.Seed(time.Now().UnixNano())
-	privKeyAlice, pubKeyAlice, err := newhope.GenerateKeyPairSimpleAlice(r)
+	privKeyAlice, pubKeyAlice, err := newhope.GenerateKeyPairSimpleAlice(crand.Reader)
 	if err != nil {
 		panic(err)
 	}
@@ -577,19 +563,17 @@ func KyberDialSetup(c io.ReadWriter /*net.Conn*/, hc *Conn) (err error) {
 	// Send xsnet.Conn parameters to remote side
 
 	// Alice, step 1: Generate a key pair.
-	r := new(randReader)
-	rand.Seed(time.Now().UnixNano())
 	var alicePublicKey *kyber.PublicKey
 	var alicePrivateKey *kyber.PrivateKey
 	switch hc.kex {
 	case KEX_KYBER512:
-		alicePublicKey, alicePrivateKey, err = kyber.Kyber512.GenerateKeyPair(r)
+		alicePublicKey, alicePrivateKey, err = kyber.Kyber512.GenerateKeyPair(crand.Reader)
 	case KEX_KYBER768:
-		alicePublicKey, alicePrivateKey, err = kyber.Kyber768.GenerateKeyPair(r)
+		alicePublicKey, alicePrivateKey, err = kyber.Kyber768.GenerateKeyPair(crand.Reader)
 	case KEX_KYBER1024:
-		alicePublicKey, alicePrivateKey, err = kyber.Kyber1024.GenerateKeyPair(r)
+		alicePublicKey, alicePrivateKey, err = kyber.Kyber1024.GenerateKeyPair(crand.Reader)
 	default:
-		alicePublicKey, alicePrivateKey, err = kyber.Kyber768.GenerateKeyPair(r)
+		alicePublicKey, alicePrivateKey, err = kyber.Kyber768.GenerateKeyPair(crand.Reader)
 	}
 
 	if err != nil {
@@ -731,8 +715,6 @@ func FrodoKEMAcceptSetup(c *net.Conn, hc *Conn) (err error) {
 }
 
 func NewHopeAcceptSetup(c *net.Conn, hc *Conn) (err error) {
-	r := new(randReader)
-	rand.Seed(time.Now().UnixNano())
 	// Bob, step 1: Deserialize Alice's public key from the binary encoding.
 	alicePublicKey := big.NewInt(0)
 	_, err = fmt.Fscanln(*c, alicePublicKey)
@@ -754,7 +736,7 @@ func NewHopeAcceptSetup(c *net.Conn, hc *Conn) (err error) {
 	}
 
 	// Bob, step 2: Generate the KEM cipher text and shared secret.
-	pubKeyBob, bobSharedSecret, err := newhope.KeyExchangeBob(r, &pubKeyAlice)
+	pubKeyBob, bobSharedSecret, err := newhope.KeyExchangeBob(crand.Reader, &pubKeyAlice)
 	if err != nil {
 		panic(err)
 	}
@@ -769,8 +751,6 @@ func NewHopeAcceptSetup(c *net.Conn, hc *Conn) (err error) {
 }
 
 func NewHopeSimpleAcceptSetup(c *net.Conn, hc *Conn) (err error) {
-	r := new(randReader)
-	rand.Seed(time.Now().UnixNano())
 	// Bob, step 1: Deserialize Alice's public key from the binary encoding.
 	alicePublicKey := big.NewInt(0)
 	_, err = fmt.Fscanln(*c, alicePublicKey)
@@ -792,7 +772,7 @@ func NewHopeSimpleAcceptSetup(c *net.Conn, hc *Conn) (err error) {
 	}
 
 	// Bob, step 2: Generate the KEM cipher text and shared secret.
-	pubKeyBob, bobSharedSecret, err := newhope.KeyExchangeSimpleBob(r, &pubKeyAlice)
+	pubKeyBob, bobSharedSecret, err := newhope.KeyExchangeSimpleBob(crand.Reader, &pubKeyAlice)
 	if err != nil {
 		panic(err)
 	}
@@ -838,9 +818,7 @@ func KyberAcceptSetup(c *net.Conn, hc *Conn) (err error) {
 	}
 
 	// Bob, step 2: Generate the KEM cipher text and shared secret.
-	r := new(randReader)
-	rand.Seed(time.Now().UnixNano())
-	cipherText, bobSharedSecret, err := peerPublicKey.KEMEncrypt(r)
+	cipherText, bobSharedSecret, err := peerPublicKey.KEMEncrypt(crand.Reader)
 	if err != nil {
 		panic(err)
 	}
