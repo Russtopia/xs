@@ -54,9 +54,10 @@ else
 fi
 
 ############
-stage "Test(S->C)"
+stage "Test(xc S->C)"
 ############
 echo "Testing secure copy from server -> client ..."
+./xc_testfiles.sh
 tmpdir=$$
 mkdir -p /tmp/$tmpdir
 cd /tmp/$tmpdir
@@ -76,7 +77,7 @@ else
 fi
 
 ############
-stage "Test(C->S)"
+stage "Test(xc C->S)"
 ############
 echo "TODO ..."
 
@@ -99,7 +100,7 @@ tar -cz --exclude=.git --exclude=cptest -f ${BACILLUS_ARTFDIR}/xs.tgz .
 ############
 stage "Cleanup"
 ############
-# nop
+rm -rf cptest
 
 echo
 echo "--Done--"
