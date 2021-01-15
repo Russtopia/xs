@@ -58,6 +58,8 @@ stage "Test(xc S->C)"
 ############
 echo "Testing secure copy from server -> client ..."
 ./xc_testfiles.sh
+sha1sum $(find cptest -type f | sort) >sc.sha1sum
+
 tmpdir=$$
 mkdir -p /tmp/$tmpdir
 cd /tmp/$tmpdir
