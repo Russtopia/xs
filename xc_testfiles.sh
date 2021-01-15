@@ -11,3 +11,4 @@ dd bs=1024 count=16 if=/dev/urandom of=${dir}/file6B
 dd bs=1048576 count=32 if=/dev/urandom of=${dir}/subdir/file32MB
 dd bs=1048576 count=64 if=/dev/urandom of=${dir}/subdir/file64MB
 
+sha1sum $(find ${dir} -type f | sort) >${dir}.sha1sum

@@ -58,6 +58,7 @@ stage "Test(xc S->C)"
 ############
 echo "Testing secure copy from server -> client ..."
 ./xc_testfiles.sh
+
 tmpdir=$$
 mkdir -p /tmp/$tmpdir
 cd /tmp/$tmpdir
