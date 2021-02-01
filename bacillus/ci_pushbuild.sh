@@ -42,7 +42,7 @@ if [ -f ~/.xs_id ]; then
   mv ~/.xs_id ~/.xs_id.bak
 fi
 echo "Setting dummy authtoken in ~/.xs_id ..."
-echo "localhost:asdfasdfasdf" >~/.xs_id
+echo "localhost:${USER}:asdfasdfasdf" >~/.xs_id
 echo "Performing remote command on @localhost via authtoken login ..."
 tokentest=$(timeout 10 xs -x "echo -n FOO" @localhost)
 if [ "${tokentest}" != "FOO" ]; then
