@@ -182,19 +182,27 @@ func AuthUserByToken(ctx *AuthCtx, username string, connhostname string, auth st
 
 	r.Comma = ':'
 	r.Comment = '#'
-	r.FieldsPerRecord = 2 // connhost:authtoken
+	r.FieldsPerRecord = 3 // connhost:username:authtoken
 	for {
 		record, err := r.Read()
 		if err == io.EOF {
 			return false
 		}
+		if len(record) < 3 ||
+			len(record[0]) < 1 ||
+			len(record[1]) < 1 ||
+			len(record[2]) < 1 {
+			return false
+		}
 		record[0] = strings.TrimSpace(record[0])
 		record[1] = strings.TrimSpace(record[1])
+		record[2] = strings.TrimSpace(record[2])
 		//fmt.Println("auth:", auth, "record:",
-		//	strings.Join([]string{record[0], record[1]}, ":"))
+		//	strings.Join([]string{record[0], record[1], record[2]}, ":"))
 
 		if (connhostname == record[0]) &&
-			(auth == strings.Join([]string{record[0], record[1]}, ":")) {
+			username == record[1] &&
+			(auth == strings.Join([]string{record[0], record[1], record[2]}, ":")) {
 			valid = true
 			break
 		}
@@ -207,21 +215,20 @@ func AuthUserByToken(ctx *AuthCtx, username string, connhostname string, auth st
 }
 
 func GetTool(tool string) (ret string) {
-	ret = "/bin/"+tool
+	ret = "/bin/" + tool
 	_, err := os.Stat(ret)
 	if err == nil {
 		return ret
 	}
-	ret = "/usr/bin/"+tool
+	ret = "/usr/bin/" + tool
 	_, err = os.Stat(ret)
 	if err == nil {
 		return ret
 	}
-	ret = "/usr/local/bin/"+tool
+	ret = "/usr/local/bin/" + tool
 	_, err = os.Stat(ret)
 	if err == nil {
 		return ret
 	}
 	return ""
 }
-

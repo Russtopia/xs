@@ -82,7 +82,7 @@ func runClientToServerCopyAs(who, ttype string, conn *xsnet.Conn, fpath string, 
 	os.Clearenv()
 	os.Setenv("HOME", u.HomeDir) // nolint: gosec,errcheck
 	os.Setenv("TERM", ttype)     // nolint: gosec,errcheck
-	os.Setenv("XS_SESSION", "1")     // nolint: gosec,errcheck
+	os.Setenv("XS_SESSION", "1") // nolint: gosec,errcheck
 
 	var c *exec.Cmd
 	cmdName := xs.GetTool("tar")
@@ -187,7 +187,7 @@ func runServerToClientCopyAs(who, ttype string, conn *xsnet.Conn, srcPath string
 	os.Clearenv()
 	_ = os.Setenv("HOME", u.HomeDir) // nolint: gosec
 	_ = os.Setenv("TERM", ttype)     // nolint: gosec
-	_ = os.Setenv("XS_SESSION", "1")     // nolint: gosec
+	_ = os.Setenv("XS_SESSION", "1") // nolint: gosec
 
 	var c *exec.Cmd
 	cmdName := xs.GetTool("tar")
@@ -278,13 +278,17 @@ func runShellAs(who, hname, ttype, cmd string, interactive bool, conn *xsnet.Con
 	os.Clearenv()
 	_ = os.Setenv("HOME", u.HomeDir) // nolint: gosec
 	_ = os.Setenv("TERM", ttype)     // nolint: gosec
-	_ = os.Setenv("XS_SESSION", "1")     // nolint: gosec
+	_ = os.Setenv("XS_SESSION", "1") // nolint: gosec
 
 	var c *exec.Cmd
+
 	if interactive {
 		if useSysLogin {
-			// Use the server's login binary (post-auth
-			// which is still done via our own bcrypt file)
+			// Use the server's login binary (post-auth, which
+			// is still done via our own bcrypt file)
+			//
+			// Note login will drop privs to the intended user for us
+			//
 			// Things UNIX login does, like print the 'motd',
 			// and use the shell specified by /etc/passwd, will be done
 			// automagically, at the cost of another external tool
@@ -292,23 +296,23 @@ func runShellAs(who, hname, ttype, cmd string, interactive bool, conn *xsnet.Con
 			//
 			c = exec.Command(xs.GetTool("login"), "-f", "-p", who) // nolint: gosec
 		} else {
+			// Using our separate login via local passwd file
+			//
+			// Note we must drop privs ourselves for the user shell
+			//
 			c = exec.Command(xs.GetTool("bash"), "-i", "-l") // nolint: gosec
+			c.SysProcAttr = &syscall.SysProcAttr{}
+			c.SysProcAttr.Credential = &syscall.Credential{Uid: uid, Gid: gid}
 		}
 	} else {
 		c = exec.Command(xs.GetTool("bash"), "-c", cmd) // nolint: gosec
+		c.SysProcAttr = &syscall.SysProcAttr{}
+		c.SysProcAttr.Credential = &syscall.Credential{Uid: uid, Gid: gid}
 	}
 	//If os.Clearenv() isn't called by server above these will be seen in the
 	//client's session env.
 	//c.Env = []string{"HOME=" + u.HomeDir, "SUDO_GID=", "SUDO_UID=", "SUDO_USER=", "SUDO_COMMAND=", "MAIL=", "LOGNAME="+who}
 	c.Dir = u.HomeDir
-	c.SysProcAttr = &syscall.SysProcAttr{}
-	if useSysLogin {
-		// If using server's login binary, drop to user creds
-		// is taken care of by it.
-		c.SysProcAttr.Credential = &syscall.Credential{}
-	} else {
-		c.SysProcAttr.Credential = &syscall.Credential{Uid: uid, Gid: gid}
-	}
 
 	// Start the command with a pty.
 	ptmx, err := pty.Start(c) // returns immediately with ptmx file
@@ -418,15 +422,15 @@ func runShellAs(who, hname, ttype, cmd string, interactive bool, conn *xsnet.Con
 // GenAuthToken generates a pseudorandom auth token for a specific
 // user from a specific host to allow non-interactive logins.
 func GenAuthToken(who string, connhost string) string {
-	//tokenA, e := os.Hostname()
+	//hname, e := os.Hostname()
 	//if e != nil {
-	//	tokenA = "badhost"
+	//	hname = "#badhost#"
 	//}
-	tokenA := connhost
+	hname := connhost
 
-	tokenB := make([]byte, 64)
-	_, _ = rand.Read(tokenB) // nolint: gosec
-	return fmt.Sprintf("%s:%s", tokenA, hex.EncodeToString(tokenB))
+	token := make([]byte, 64)
+	_, _ = rand.Read(token) // nolint: gosec
+	return fmt.Sprintf("%s:%s:%s", hname, who, hex.EncodeToString(token))
 }
 
 var (

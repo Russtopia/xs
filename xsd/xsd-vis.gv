@@ -20,259 +20,392 @@ labeljust="c";
 fontsize="18";
 bgcolor="#e6ecfa";
         
-        "blitter.com/go/xs/xsd.main$2" [ style="dotted,filled" fillcolor="lightblue" label="main$2" ]
-        "blitter.com/go/xs/xsd.GenAuthToken" [ fillcolor="lightblue" label="GenAuthToken" penwidth="1.5" ]
-        "blitter.com/go/xs/xsd.runShellAs" [ fillcolor="lightblue" label="runShellAs" penwidth="0.5" ]
-        "blitter.com/go/xs/xsd.runShellAs$1" [ fillcolor="lightblue" label="deferPtmxClose" style="dotted,filled" ]
-        "blitter.com/go/xs/xsd.ptsName" [ label="ptsName" penwidth="0.5" fillcolor="lightblue" ]
-        "blitter.com/go/xs/xsd.ioctl" [ fillcolor="lightblue" label="ioctl" penwidth="0.5" ]
-        "blitter.com/go/xs/xsd.runShellAs$2" [ fillcolor="lightblue" label="termResizeWatcher" style="dotted,filled" ]
-        "blitter.com/go/xs/xsd.runShellAs$3" [ style="dotted,filled" fillcolor="lightblue" label="stdinToPtyWorker" ]
-        "blitter.com/go/xs/xsd.runShellAs$4" [ style="dotted,filled" fillcolor="lightblue" label="deferChaffShutdown" ]
-        "blitter.com/go/xs/xsd.runShellAs$5" [ fillcolor="lightblue" label="ptyToStdoutWorker" style="dotted,filled" ]
-        "blitter.com/go/xs/xsd.runShellAs$6" [ fillcolor="lightblue" label="runShellAs$6" style="dotted,filled" ]
-        "blitter.com/go/xs/xsd.runClientToServerCopyAs" [ fillcolor="lightblue" label="runClientToServerCopyAs" penwidth="0.5" ]
-        "blitter.com/go/xs/xsd.runServerToClientCopyAs" [ fillcolor="lightblue" label="runServerToClientCopyAs" penwidth="0.5" ]
-        "blitter.com/go/xs/xsd.main" [ fillcolor="lightblue" label="main" penwidth="0.5" ]
-        "blitter.com/go/xs/xsd.main$1" [ fillcolor="lightblue" label="main$1" style="dotted,filled" ]
+        "blitter.com/go/xs/xsd.main$2$1" [ fillcolor="lightblue" label="main$2$1" style="dotted,filled" tooltip="blitter.com/go/xs/xsd.main$2$1 | defined in xsd.go:650\nat xsd.go:653: calling [(*blitter.com/go/xs/xsnet.Conn).Close]\nat xsd.go:652: calling [(blitter.com/go/xs/xsnet.Conn).Write]\nat xsd.go:651: calling [blitter.com/go/xs/logger.LogNotice]" ]
+        "blitter.com/go/xs/xsd.runShellAs$6" [ fillcolor="lightblue" label="runShellAs$6" style="dotted,filled" tooltip="blitter.com/go/xs/xsd.runShellAs$6 | defined in xsd.go:381\nat xsd.go:385: calling [(context.deadlineExceededError).Error]\nat xsd.go:385: calling [(compress/flate.CorruptInputError).Error]\nat xsd.go:385: calling [(compress/flate.InternalError).Error]\nat xsd.go:385: calling [(*github.com/pkg/errors.fundamental).Error]" ]
+        "blitter.com/go/xs/xsd.runShellAs$2" [ fillcolor="lightblue" label="termResizeWatcher" style="dotted,filled" tooltip="blitter.com/go/xs/xsd.runShellAs$2 | defined in xsd.go:336\nat xsd.go:336: calling [blitter.com/go/goutmp.Unput_utmp]" ]
+        "blitter.com/go/xs/xsd.runServerToClientCopyAs" [ fillcolor="lightblue" label="runServerToClientCopyAs" penwidth="0.5" tooltip="blitter.com/go/xs/xsd.runServerToClientCopyAs | defined in xsd.go:169\nat xsd.go:220: calling [(*blitter.com/go/xs/xsnet.Conn).EnableChaff]\nat xsd.go:223: calling [(*blitter.com/go/xs/xsnet.Conn).DisableChaff]\nat xsd.go:224: calling [(*blitter.com/go/xs/xsnet.Conn).ShutdownChaff]\nat xsd.go:193: calling [blitter.com/go/xs.GetTool]" ]
+        "blitter.com/go/xs/xsd.runClientToServerCopyAs" [ fillcolor="lightblue" label="runClientToServerCopyAs" penwidth="0.5" tooltip="blitter.com/go/xs/xsd.runClientToServerCopyAs | defined in xsd.go:68\nat xsd.go:122: calling [(*blitter.com/go/xs/xsnet.Conn).ShutdownChaff]\nat xsd.go:119: calling [(*blitter.com/go/xs/xsnet.Conn).EnableChaff]\nat xsd.go:88: calling [blitter.com/go/xs.GetTool]\nat xsd.go:121: calling [(*blitter.com/go/xs/xsnet.Conn).DisableChaff]" ]
+        "blitter.com/go/xs/xsd.runShellAs$4" [ label="deferChaffShutdown" style="dotted,filled" tooltip="blitter.com/go/xs/xsd.runShellAs$4 | defined in xsd.go:355\nat xsd.go:358: calling [(*github.com/pkg/errors.fundamental).Error]\nat xsd.go:358: calling [(context.deadlineExceededError).Error]\nat xsd.go:358: calling [(compress/flate.CorruptInputError).Error]\nat xsd.go:358: calling [(compress/flate.InternalError).Error]" fillcolor="lightblue" ]
+        "blitter.com/go/xs/xsd.main$1" [ fillcolor="lightblue" label="main$1" style="dotted,filled" tooltip="blitter.com/go/xs/xsd.main$1 | defined in xsd.go:586\nat xsd.go:591: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:595: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:599: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:601: calling [blitter.com/go/xs/logger.LogNotice]" ]
+        "blitter.com/go/xs/xsd.main$2" [ fillcolor="lightblue" label="main$2" style="dotted,filled" tooltip="blitter.com/go/xs/xsd.main$2 | defined in xsd.go:646\nat xsd.go:828: calling [blitter.com/go/xs/xsd.runServerToClientCopyAs]\nat xsd.go:701: calling [(*blitter.com/go/xs.Session).SetTermType]\nat xsd.go:720: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:724: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:729: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:731: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:743: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:754: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:755: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:757: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:762: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:764: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:771: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:772: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:777: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:779: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:786: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:788: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:793: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:795: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:803: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:804: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:809: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:811: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:827: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:828: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:830: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:833: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:729: calling [blitter.com/go/xs.VerifyPass]\nat xsd.go:737: calling [(*blitter.com/go/xs.Session).ClearAuthCookie]\nat xsd.go:743: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:754: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:771: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:779: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:786: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:795: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:803: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:811: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:827: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:833: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:717: calling [(*blitter.com/go/xs.Session).SetAuthCookie]\nat xsd.go:757: calling [(blitter.com/go/xs.Session).TermType]\nat xsd.go:772: calling [(blitter.com/go/xs.Session).TermType]\nat xsd.go:788: calling [(blitter.com/go/xs.Session).TermType]\nat xsd.go:804: calling [(blitter.com/go/xs.Session).TermType]\nat xsd.go:828: calling [(blitter.com/go/xs.Session).TermType]\nat xsd.go:765: calling [(*blitter.com/go/xs/xsnet.Conn).SetStatus]\nat xsd.go:780: calling [(*blitter.com/go/xs/xsnet.Conn).SetStatus]\nat xsd.go:796: calling [(*blitter.com/go/xs/xsnet.Conn).SetStatus]\nat xsd.go:815: calling [(*blitter.com/go/xs/xsnet.Conn).SetStatus]\nat xsd.go:841: calling [(*blitter.com/go/xs/xsnet.Conn).SetStatus]\nat xsd.go:693: calling [(*blitter.com/go/xs.Session).SetConnHost]\nat xsd.go:804: calling [blitter.com/go/xs/xsd.runClientToServerCopyAs]\nat xsd.go:752: calling [(*blitter.com/go/xs/xsnet.Conn).RemoteAddr]\nat xsd.go:769: calling [(*blitter.com/go/xs/xsnet.Conn).RemoteAddr]\nat xsd.go:784: calling [(*blitter.com/go/xs/xsnet.Conn).RemoteAddr]\nat xsd.go:801: calling [(*blitter.com/go/xs/xsnet.Conn).RemoteAddr]\nat xsd.go:825: calling [(*blitter.com/go/xs/xsnet.Conn).RemoteAddr]\nat xsd.go:762: calling [blitter.com/go/xs/logger.LogErr]\nat xsd.go:777: calling [blitter.com/go/xs/logger.LogErr]\nat xsd.go:809: calling [blitter.com/go/xs/logger.LogErr]\nat xsd.go:846: calling [blitter.com/go/xs/logger.LogErr]\nat xsd.go:830: calling [blitter.com/go/xs/logger.LogErr]\nat xsd.go:709: calling [(*blitter.com/go/xs.Session).SetCmd]\nat xsd.go:720: calling [(blitter.com/go/xs.Session).ConnHost]\nat xsd.go:724: calling [(blitter.com/go/xs.Session).ConnHost]\nat xsd.go:755: calling [(blitter.com/go/xs.Session).ConnHost]\nat xsd.go:821: calling [(*blitter.com/go/xs/xsnet.Conn).WritePacket]\nat xsd.go:685: calling [(*blitter.com/go/xs.Session).SetWho]\nat xsd.go:753: calling [blitter.com/go/goutmp.GetHost]\nat xsd.go:770: calling [blitter.com/go/goutmp.GetHost]\nat xsd.go:785: calling [blitter.com/go/goutmp.GetHost]\nat xsd.go:802: calling [blitter.com/go/goutmp.GetHost]\nat xsd.go:826: calling [blitter.com/go/goutmp.GetHost]\nat xsd.go:755: calling [blitter.com/go/xs/xsd.GenAuthToken]\nat xsd.go:757: calling [blitter.com/go/xs/xsd.runShellAs]\nat xsd.go:772: calling [blitter.com/go/xs/xsd.runShellAs]\nat xsd.go:788: calling [blitter.com/go/xs/xsd.runShellAs]\nat xsd.go:647: calling [(*blitter.com/go/xs/xsnet.Conn).Close]\nat xsd.go:677: calling [(*blitter.com/go/xs.Session).SetOp]\nat xsd.go:760: calling [(*blitter.com/go/xs.Session).SetOp]\nat xsd.go:775: calling [(*blitter.com/go/xs.Session).SetOp]\nat xsd.go:791: calling [(*blitter.com/go/xs.Session).SetOp]\nat xsd.go:807: calling [(*blitter.com/go/xs.Session).SetOp]\nat xsd.go:840: calling [(*blitter.com/go/xs.Session).SetOp]\nat xsd.go:724: calling [(blitter.com/go/xs.Session).AuthCookie]\nat xsd.go:729: calling [(blitter.com/go/xs.Session).AuthCookie]\nat xsd.go:731: calling [(blitter.com/go/xs.Session).AuthCookie]\nat xsd.go:724: calling [blitter.com/go/xs.NewAuthCtx]\nat xsd.go:729: calling [blitter.com/go/xs.NewAuthCtx]\nat xsd.go:731: calling [blitter.com/go/xs.NewAuthCtx]\nat xsd.go:731: calling [blitter.com/go/xs.AuthUserByPasswd]\nat xsd.go:741: calling [(blitter.com/go/xs/xsnet.Conn).Write]\nat xsd.go:744: calling [(blitter.com/go/xs/xsnet.Conn).Write]\nat xsd.go:720: calling [(blitter.com/go/xs.Session).Op]\nat xsd.go:750: calling [(blitter.com/go/xs.Session).Op]\nat xsd.go:767: calling [(blitter.com/go/xs.Session).Op]\nat xsd.go:782: calling [(blitter.com/go/xs.Session).Op]\nat xsd.go:798: calling [(blitter.com/go/xs.Session).Op]\nat xsd.go:822: calling [(blitter.com/go/xs.Session).Op]\nat xsd.go:720: calling [(blitter.com/go/xs.Session).Cmd]\nat xsd.go:772: calling [(blitter.com/go/xs.Session).Cmd]\nat xsd.go:788: calling [(blitter.com/go/xs.Session).Cmd]\nat xsd.go:804: calling [(blitter.com/go/xs.Session).Cmd]\nat xsd.go:828: calling [(blitter.com/go/xs.Session).Cmd]\nat xsd.go:724: calling [blitter.com/go/xs.AuthUserByToken]" ]
+        "blitter.com/go/xs/xsd.GenAuthToken" [ fillcolor="lightblue" label="GenAuthToken" penwidth="1.5" tooltip="blitter.com/go/xs/xsd.GenAuthToken | defined in xsd.go:424" ]
+        "blitter.com/go/xs/xsd.runShellAs" [ penwidth="0.5" tooltip="blitter.com/go/xs/xsd.runShellAs | defined in xsd.go:259\nat xsd.go:381: calling [blitter.com/go/xs/xsd.runShellAs$6]\nat xsd.go:336: calling [blitter.com/go/xs/xsd.runShellAs$2]\nat xsd.go:318: calling [github.com/creack/pty.Start]\nat xsd.go:337: calling [blitter.com/go/goutmp.Put_lastlog_entry]\nat xsd.go:409: calling [blitter.com/go/xs/logger.LogDebug]\nat xsd.go:308: calling [blitter.com/go/xs.GetTool]\nat xsd.go:297: calling [blitter.com/go/xs.GetTool]\nat xsd.go:303: calling [blitter.com/go/xs.GetTool]\nat xsd.go:331: calling [blitter.com/go/xs/xsd.ptsName]\nat xsd.go:335: calling [blitter.com/go/goutmp.Put_utmp]\nat xsd.go:368: calling [blitter.com/go/xs/xsd.runShellAs$5]\nat xsd.go:365: calling [(*blitter.com/go/xs/xsnet.Conn).EnableChaff]\nat xsd.go:407: calling [(*blitter.com/go/xs/xsnet.Conn).SetStatus]\nat xsd.go:345: calling [blitter.com/go/xs/xsd.runShellAs$3]\nat xsd.go:325: calling [blitter.com/go/xs/xsd.runShellAs$1]\nat xsd.go:355: calling [blitter.com/go/xs/xsd.runShellAs$4]" fillcolor="lightblue" label="runShellAs" ]
+        "blitter.com/go/xs/xsd.runShellAs$1" [ label="deferPtmxClose" style="dotted,filled" tooltip="blitter.com/go/xs/xsd.runShellAs$1 | defined in xsd.go:325" fillcolor="lightblue" ]
+        "blitter.com/go/xs/xsd.ptsName" [ tooltip="blitter.com/go/xs/xsd.ptsName | defined in xsd.go:57\nat xsd.go:59: calling [blitter.com/go/xs/xsd.ioctl]" fillcolor="lightblue" label="ptsName" penwidth="0.5" ]
+        "blitter.com/go/xs/xsd.ioctl" [ fillcolor="lightblue" label="ioctl" penwidth="0.5" tooltip="blitter.com/go/xs/xsd.ioctl | defined in xsd.go:50" ]
+        "blitter.com/go/xs/xsd.runShellAs$3" [ label="stdinToPtyWorker" style="dotted,filled" tooltip="blitter.com/go/xs/xsd.runShellAs$3 | defined in xsd.go:345\nat xsd.go:348: calling [github.com/creack/pty.Setsize]" fillcolor="lightblue" ]
+        "blitter.com/go/xs/xsd.runShellAs$5" [ fillcolor="lightblue" label="ptyToStdoutWorker" style="dotted,filled" tooltip="blitter.com/go/xs/xsd.runShellAs$5 | defined in xsd.go:368\nat xsd.go:369: calling [(*blitter.com/go/xs/xsnet.Conn).DisableChaff]\nat xsd.go:370: calling [(*blitter.com/go/xs/xsnet.Conn).ShutdownChaff]" ]
+        "blitter.com/go/xs/xsd.main" [ fillcolor="lightblue" label="main" penwidth="0.5" tooltip="blitter.com/go/xs/xsd.main | defined in xsd.go:508\nat xsd.go:627: calling [(*blitter.com/go/xs/xsnet.Conn).CAlg]\nat xsd.go:628: calling [(*blitter.com/go/xs/xsnet.Conn).CAlg]\nat xsd.go:641: calling [(*blitter.com/go/xs/xsnet.Conn).SetupChaff]\nat xsd.go:610: calling [blitter.com/go/xs/xsnet.Listen]\nat xsd.go:623: calling [(*blitter.com/go/xs/xsnet.Conn).KEX]\nat xsd.go:624: calling [(*blitter.com/go/xs/xsnet.Conn).KEX]\nat xsd.go:614: calling [(blitter.com/go/xs/xsnet.HKExListener).Close]\nat xsd.go:620: calling [(*blitter.com/go/xs/xsnet.HKExListener).Accept]\nat xsd.go:627: calling [(blitter.com/go/xs/xsd.allowedCipherAlgs).allowed]\nat xsd.go:623: calling [(blitter.com/go/xs/xsd.allowedKEXAlgs).allowed]\nat xsd.go:631: calling [(blitter.com/go/xs/xsd.allowedHMACAlgs).allowed]\nat xsd.go:626: calling [(*blitter.com/go/xs/xsnet.Conn).Close]\nat xsd.go:630: calling [(*blitter.com/go/xs/xsnet.Conn).Close]\nat xsd.go:634: calling [(*blitter.com/go/xs/xsnet.Conn).Close]\nat xsd.go:571: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:576: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:581: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:586: calling [blitter.com/go/xs/xsd.main$1]\nat xsd.go:625: calling [(*blitter.com/go/xs/xsnet.Conn).SetStatus]\nat xsd.go:629: calling [(*blitter.com/go/xs/xsnet.Conn).SetStatus]\nat xsd.go:633: calling [(*blitter.com/go/xs/xsnet.Conn).SetStatus]\nat xsd.go:559: calling [blitter.com/go/xs/logger.New]\nat xsd.go:631: calling [(*blitter.com/go/xs/xsnet.Conn).HAlg]\nat xsd.go:632: calling [(*blitter.com/go/xs/xsnet.Conn).HAlg]\nat xsd.go:560: calling [blitter.com/go/xs/xsnet.Init]\nat xsd.go:646: calling [blitter.com/go/xs/xsd.main$2]" ]
         
         subgraph "cluster_blitter.com/go/goutmp" {
-        URL="/?f=blitter.com/go/goutmp";
+        fontname="Tahoma bold";
+rank="sink";
+label="goutmp";
+penwidth="0.8";
+style="filled";
+URL="/?f=blitter.com/go/goutmp";
 tooltip="package: blitter.com/go/goutmp";
 fontsize="16";
-style="filled";
 fillcolor="lightyellow";
-fontname="bold";
-rank="sink";
-label="[goutmp]";
-penwidth="0.8";
         
-        "blitter.com/go/goutmp.GetHost" [ fillcolor="moccasin" label="GetHost" penwidth="1.5" ]
-        "blitter.com/go/goutmp.Put_utmp" [ fillcolor="moccasin" label="Put_utmp" penwidth="1.5" ]
-        "blitter.com/go/goutmp.Unput_utmp" [ label="Unput_utmp" penwidth="1.5" fillcolor="moccasin" ]
-        "blitter.com/go/goutmp.Put_lastlog_entry" [ fillcolor="moccasin" label="Put_lastlog_entry" penwidth="1.5" ]
+        "blitter.com/go/goutmp.Unput_utmp" [ fillcolor="moccasin" label="Unput_utmp" penwidth="1.5" tooltip="blitter.com/go/goutmp.Unput_utmp | defined in goutmp_linux.go:115" ]
+        "blitter.com/go/goutmp.GetHost" [ fillcolor="moccasin" label="GetHost" penwidth="1.5" tooltip="blitter.com/go/goutmp.GetHost | defined in goutmp_linux.go:91" ]
+        "blitter.com/go/goutmp.Put_utmp" [ fillcolor="moccasin" label="Put_utmp" penwidth="1.5" tooltip="blitter.com/go/goutmp.Put_utmp | defined in goutmp_linux.go:106" ]
+        "blitter.com/go/goutmp.Put_lastlog_entry" [ fillcolor="moccasin" label="Put_lastlog_entry" penwidth="1.5" tooltip="blitter.com/go/goutmp.Put_lastlog_entry | defined in goutmp_linux.go:120" ]
         
     }
 
         subgraph "cluster_blitter.com/go/xs" {
         fontsize="16";
-fontname="bold";
+style="filled";
+fillcolor="lightyellow";
 rank="sink";
 penwidth="0.8";
-fillcolor="lightyellow";
-label="[xs]";
+fontname="Tahoma bold";
+label="xs";
 URL="/?f=blitter.com/go/xs";
 tooltip="package: blitter.com/go/xs";
-style="filled";
         
-        "blitter.com/go/xs.AuthUserByToken" [ fillcolor="moccasin" label="AuthUserByToken" penwidth="1.5" ]
-        "blitter.com/go/xs.AuthUserByPasswd" [ label="AuthUserByPasswd" penwidth="1.5" fillcolor="moccasin" ]
+        "blitter.com/go/xs.GetTool" [ tooltip="blitter.com/go/xs.GetTool | defined in auth.go:211" fillcolor="moccasin" label="GetTool" penwidth="1.5" ]
+        "blitter.com/go/xs.NewAuthCtx" [ penwidth="1.5" tooltip="blitter.com/go/xs.NewAuthCtx | defined in auth.go:35" fillcolor="moccasin" label="NewAuthCtx" ]
+        "blitter.com/go/xs.AuthUserByToken" [ tooltip="blitter.com/go/xs.AuthUserByToken | defined in auth.go:161" fillcolor="moccasin" label="AuthUserByToken" penwidth="1.5" ]
+        "blitter.com/go/xs.VerifyPass" [ fillcolor="moccasin" label="VerifyPass" penwidth="1.5" tooltip="blitter.com/go/xs.VerifyPass | defined in auth.go:44" ]
+        "blitter.com/go/xs.AuthUserByPasswd" [ fillcolor="moccasin" label="AuthUserByPasswd" penwidth="1.5" tooltip="blitter.com/go/xs.AuthUserByPasswd | defined in auth.go:96" ]
         
         subgraph "cluster_*blitter.com/go/xs.Session" {
-        tooltip="type: *blitter.com/go/xs.Session";
+        style="rounded,filled";
+fillcolor="wheat2";
+label="(*Session)";
+tooltip="type: *blitter.com/go/xs.Session";
 penwidth="0.5";
 fontsize="15";
 fontcolor="#222222";
 labelloc="b";
-style="rounded,filled";
-fillcolor="wheat2";
-label="(*Session)";
         
-        "(*blitter.com/go/xs.Session).SetOp" [ fillcolor="moccasin" label="SetOp" penwidth="1.5" ]
-        "(*blitter.com/go/xs.Session).SetWho" [ penwidth="1.5" fillcolor="moccasin" label="SetWho" ]
-        "(*blitter.com/go/xs.Session).SetConnHost" [ penwidth="1.5" fillcolor="moccasin" label="SetConnHost" ]
-        "(*blitter.com/go/xs.Session).SetTermType" [ fillcolor="moccasin" label="SetTermType" penwidth="1.5" ]
-        "(*blitter.com/go/xs.Session).SetCmd" [ fillcolor="moccasin" label="SetCmd" penwidth="1.5" ]
-        "(*blitter.com/go/xs.Session).SetAuthCookie" [ fillcolor="moccasin" label="SetAuthCookie" penwidth="1.5" ]
-        "(*blitter.com/go/xs.Session).ClearAuthCookie" [ fillcolor="moccasin" label="ClearAuthCookie" penwidth="1.5" ]
+        "(*blitter.com/go/xs.Session).SetOp" [ fillcolor="moccasin" label="SetOp" penwidth="1.5" tooltip="(*blitter.com/go/xs.Session).SetOp | defined in session.go:41" ]
+        "(*blitter.com/go/xs.Session).SetWho" [ fillcolor="moccasin" label="SetWho" penwidth="1.5" tooltip="(*blitter.com/go/xs.Session).SetWho | defined in session.go:51" ]
+        "(*blitter.com/go/xs.Session).SetConnHost" [ penwidth="1.5" tooltip="(*blitter.com/go/xs.Session).SetConnHost | defined in session.go:61" fillcolor="moccasin" label="SetConnHost" ]
+        "(*blitter.com/go/xs.Session).SetTermType" [ tooltip="(*blitter.com/go/xs.Session).SetTermType | defined in session.go:73" fillcolor="moccasin" label="SetTermType" penwidth="1.5" ]
+        "(*blitter.com/go/xs.Session).SetCmd" [ fillcolor="moccasin" label="SetCmd" penwidth="1.5" tooltip="(*blitter.com/go/xs.Session).SetCmd | defined in session.go:85" ]
+        "(*blitter.com/go/xs.Session).SetAuthCookie" [ label="SetAuthCookie" penwidth="1.5" tooltip="(*blitter.com/go/xs.Session).SetAuthCookie | defined in session.go:101" fillcolor="moccasin" ]
+        "(*blitter.com/go/xs.Session).ClearAuthCookie" [ fillcolor="moccasin" label="ClearAuthCookie" penwidth="1.5" tooltip="(*blitter.com/go/xs.Session).ClearAuthCookie | defined in session.go:109" ]
         
     }
 
         subgraph "cluster_blitter.com/go/xs.Session" {
-        fillcolor="wheat2";
+        fontcolor="#222222";
+labelloc="b";
+style="rounded,filled";
+fillcolor="wheat2";
 label="(Session)";
 tooltip="type: blitter.com/go/xs.Session";
 penwidth="0.5";
 fontsize="15";
-fontcolor="#222222";
-labelloc="b";
-style="rounded,filled";
         
-        "(blitter.com/go/xs.Session).Op" [ fillcolor="moccasin" label="Op" penwidth="1.5" ]
-        "(blitter.com/go/xs.Session).Who" [ fillcolor="moccasin" label="Who" penwidth="1.5" ]
-        "(blitter.com/go/xs.Session).ConnHost" [ penwidth="1.5" fillcolor="moccasin" label="ConnHost" ]
-        "(blitter.com/go/xs.Session).Cmd" [ penwidth="1.5" fillcolor="moccasin" label="Cmd" ]
-        "(blitter.com/go/xs.Session).AuthCookie" [ label="AuthCookie" penwidth="1.5" fillcolor="moccasin" ]
-        "(blitter.com/go/xs.Session).TermType" [ fillcolor="moccasin" label="TermType" penwidth="1.5" ]
+        "(blitter.com/go/xs.Session).Op" [ fillcolor="moccasin" label="Op" penwidth="1.5" tooltip="(blitter.com/go/xs.Session).Op | defined in session.go:36" ]
+        "(blitter.com/go/xs.Session).Who" [ tooltip="(blitter.com/go/xs.Session).Who | defined in session.go:46" fillcolor="moccasin" label="Who" penwidth="1.5" ]
+        "(blitter.com/go/xs.Session).ConnHost" [ fillcolor="moccasin" label="ConnHost" penwidth="1.5" tooltip="(blitter.com/go/xs.Session).ConnHost | defined in session.go:56" ]
+        "(blitter.com/go/xs.Session).Cmd" [ label="Cmd" penwidth="1.5" tooltip="(blitter.com/go/xs.Session).Cmd | defined in session.go:79" fillcolor="moccasin" ]
+        "(blitter.com/go/xs.Session).AuthCookie" [ fillcolor="moccasin" label="AuthCookie" penwidth="1.5" tooltip="(blitter.com/go/xs.Session).AuthCookie | defined in session.go:92" ]
+        "(blitter.com/go/xs.Session).TermType" [ fillcolor="moccasin" label="TermType" penwidth="1.5" tooltip="(blitter.com/go/xs.Session).TermType | defined in session.go:67" ]
         
     }
 
     }
 
         subgraph "cluster_blitter.com/go/xs/logger" {
-        penwidth="0.8";
-fontsize="16";
+        fontsize="16";
 style="filled";
-fontname="bold";
-URL="/?f=blitter.com/go/xs/logger";
-fillcolor="lightyellow";
-rank="sink";
-label="[logger]";
+label="logger";
 tooltip="package: blitter.com/go/xs/logger";
+penwidth="0.8";
+fillcolor="lightyellow";
+fontname="Tahoma bold";
+rank="sink";
+URL="/?f=blitter.com/go/xs/logger";
         
-        "blitter.com/go/xs/logger.LogNotice" [ fillcolor="moccasin" label="LogNotice" penwidth="1.5" ]
-        "blitter.com/go/xs/logger.LogDebug" [ fillcolor="moccasin" label="LogDebug" penwidth="1.5" ]
-        "blitter.com/go/xs/logger.LogErr" [ fillcolor="moccasin" label="LogErr" penwidth="1.5" ]
-        "blitter.com/go/xs/logger.New" [ label="New" penwidth="1.5" fillcolor="moccasin" ]
+        "blitter.com/go/xs/logger.LogNotice" [ fillcolor="moccasin" label="LogNotice" penwidth="1.5" tooltip="blitter.com/go/xs/logger.LogNotice | defined in logger_linux.go:135" ]
+        "blitter.com/go/xs/logger.LogDebug" [ penwidth="1.5" tooltip="blitter.com/go/xs/logger.LogDebug | defined in logger_linux.go:103" fillcolor="moccasin" label="LogDebug" ]
+        "blitter.com/go/xs/logger.LogErr" [ fillcolor="moccasin" label="LogErr" penwidth="1.5" tooltip="blitter.com/go/xs/logger.LogErr | defined in logger_linux.go:119" ]
+        "blitter.com/go/xs/logger.New" [ fillcolor="moccasin" label="New" penwidth="1.5" tooltip="blitter.com/go/xs/logger.New | defined in logger_linux.go:71" ]
+        
+    }
+
+        subgraph "cluster_blitter.com/go/xs/xsd.allowedCipherAlgs" {
+        style="rounded,filled";
+fillcolor="lightsteelblue";
+label="(allowedCipherAlgs)";
+tooltip="type: blitter.com/go/xs/xsd.allowedCipherAlgs";
+penwidth="0.5";
+fontsize="15";
+fontcolor="#222222";
+labelloc="b";
+        
+        "(blitter.com/go/xs/xsd.allowedCipherAlgs).allowed" [ fillcolor="lightblue" label="allowed" penwidth="0.5" tooltip="(blitter.com/go/xs/xsd.allowedCipherAlgs).allowed | defined in xsd.go:464\nat xsd.go:466: calling [(*blitter.com/go/xs/xsnet.CSCipherAlg).String]" ]
+        
+    }
+
+        subgraph "cluster_blitter.com/go/xs/xsd.allowedHMACAlgs" {
+        fillcolor="lightsteelblue";
+label="(allowedHMACAlgs)";
+tooltip="type: blitter.com/go/xs/xsd.allowedHMACAlgs";
+penwidth="0.5";
+fontsize="15";
+fontcolor="#222222";
+labelloc="b";
+style="rounded,filled";
+        
+        "(blitter.com/go/xs/xsd.allowedHMACAlgs).allowed" [ tooltip="(blitter.com/go/xs/xsd.allowedHMACAlgs).allowed | defined in xsd.go:482\nat xsd.go:484: calling [(*blitter.com/go/xs/xsnet.CSHmacAlg).String]" fillcolor="lightblue" label="allowed" penwidth="0.5" ]
+        
+    }
+
+        subgraph "cluster_blitter.com/go/xs/xsd.allowedKEXAlgs" {
+        fontsize="15";
+fontcolor="#222222";
+labelloc="b";
+style="rounded,filled";
+fillcolor="lightsteelblue";
+label="(allowedKEXAlgs)";
+tooltip="type: blitter.com/go/xs/xsd.allowedKEXAlgs";
+penwidth="0.5";
+        
+        "(blitter.com/go/xs/xsd.allowedKEXAlgs).allowed" [ fillcolor="lightblue" label="allowed" penwidth="0.5" tooltip="(blitter.com/go/xs/xsd.allowedKEXAlgs).allowed | defined in xsd.go:446\nat xsd.go:448: calling [(*blitter.com/go/xs/xsnet.KEXAlg).String]" ]
         
     }
 
         subgraph "cluster_blitter.com/go/xs/xsnet" {
-        penwidth="0.8";
-label="[xsnet]";
+        label="xsnet";
+penwidth="0.8";
+fontsize="16";
+style="filled";
 fillcolor="lightyellow";
-fontname="bold";
+fontname="Tahoma bold";
 rank="sink";
 URL="/?f=blitter.com/go/xs/xsnet";
 tooltip="package: blitter.com/go/xs/xsnet";
-fontsize="16";
-style="filled";
         
-        "blitter.com/go/xs/xsnet.Init" [ fillcolor="moccasin" label="Init" penwidth="1.5" ]
-        "blitter.com/go/xs/xsnet.Listen" [ fillcolor="moccasin" label="Listen" penwidth="1.5" ]
+        "blitter.com/go/xs/xsnet.Init" [ fillcolor="moccasin" label="Init" penwidth="1.5" tooltip="blitter.com/go/xs/xsnet.Init | defined in net.go:192" ]
+        "blitter.com/go/xs/xsnet.Listen" [ fillcolor="moccasin" label="Listen" penwidth="1.5" tooltip="blitter.com/go/xs/xsnet.Listen | defined in net.go:1040" ]
         
+        subgraph "cluster_*blitter.com/go/xs/xsnet.CSCipherAlg" {
+        fillcolor="wheat2";
+label="(*CSCipherAlg)";
+tooltip="type: *blitter.com/go/xs/xsnet.CSCipherAlg";
+penwidth="0.5";
+fontsize="15";
+fontcolor="#222222";
+labelloc="b";
+style="rounded,filled";
+        
+        "(*blitter.com/go/xs/xsnet.CSCipherAlg).String" [ fillcolor="moccasin" label="String" penwidth="1.5" tooltip="(*blitter.com/go/xs/xsnet.CSCipherAlg).String | defined in net.go:148" ]
+        
+    }
+
+        subgraph "cluster_*blitter.com/go/xs/xsnet.CSHmacAlg" {
+        fontcolor="#222222";
+labelloc="b";
+style="rounded,filled";
+fillcolor="wheat2";
+label="(*CSHmacAlg)";
+tooltip="type: *blitter.com/go/xs/xsnet.CSHmacAlg";
+penwidth="0.5";
+fontsize="15";
+        
+        "(*blitter.com/go/xs/xsnet.CSHmacAlg).String" [ penwidth="1.5" tooltip="(*blitter.com/go/xs/xsnet.CSHmacAlg).String | defined in net.go:169" fillcolor="moccasin" label="String" ]
+        
+    }
+
         subgraph "cluster_*blitter.com/go/xs/xsnet.Conn" {
-        label="(*Conn)";
+        fillcolor="wheat2";
+label="(*Conn)";
 tooltip="type: *blitter.com/go/xs/xsnet.Conn";
 penwidth="0.5";
 fontsize="15";
 fontcolor="#222222";
 labelloc="b";
 style="rounded,filled";
-fillcolor="wheat2";
         
-        "(*blitter.com/go/xs/xsnet.Conn).Close" [ fillcolor="moccasin" label="Close" penwidth="1.5" ]
-        "(*blitter.com/go/xs/xsnet.Conn).RemoteAddr" [ fillcolor="moccasin" label="RemoteAddr" penwidth="1.5" ]
-        "(*blitter.com/go/xs/xsnet.Conn).EnableChaff" [ fillcolor="moccasin" label="EnableChaff" penwidth="1.5" ]
-        "(*blitter.com/go/xs/xsnet.Conn).DisableChaff" [ label="DisableChaff" penwidth="1.5" fillcolor="moccasin" ]
-        "(*blitter.com/go/xs/xsnet.Conn).ShutdownChaff" [ fillcolor="moccasin" label="ShutdownChaff" penwidth="1.5" ]
-        "(*blitter.com/go/xs/xsnet.Conn).SetStatus" [ fillcolor="moccasin" label="SetStatus" penwidth="1.5" ]
-        "(*blitter.com/go/xs/xsnet.Conn).WritePacket" [ fillcolor="moccasin" label="WritePacket" penwidth="1.5" ]
-        "(*blitter.com/go/xs/xsnet.Conn).SetupChaff" [ penwidth="1.5" fillcolor="moccasin" label="SetupChaff" ]
+        "(*blitter.com/go/xs/xsnet.Conn).Close" [ fillcolor="moccasin" label="Close" penwidth="1.5" tooltip="(*blitter.com/go/xs/xsnet.Conn).Close | defined in net.go:970" ]
+        "(*blitter.com/go/xs/xsnet.Conn).EnableChaff" [ tooltip="(*blitter.com/go/xs/xsnet.Conn).EnableChaff | defined in net.go:1539" fillcolor="moccasin" label="EnableChaff" penwidth="1.5" ]
+        "(*blitter.com/go/xs/xsnet.Conn).DisableChaff" [ fillcolor="moccasin" label="DisableChaff" penwidth="1.5" tooltip="(*blitter.com/go/xs/xsnet.Conn).DisableChaff | defined in net.go:1546" ]
+        "(*blitter.com/go/xs/xsnet.Conn).ShutdownChaff" [ penwidth="1.5" tooltip="(*blitter.com/go/xs/xsnet.Conn).ShutdownChaff | defined in net.go:1551" fillcolor="moccasin" label="ShutdownChaff" ]
+        "(*blitter.com/go/xs/xsnet.Conn).RemoteAddr" [ fillcolor="moccasin" label="RemoteAddr" penwidth="1.5" tooltip="(*blitter.com/go/xs/xsnet.Conn).RemoteAddr | defined in net.go:988" ]
+        "(*blitter.com/go/xs/xsnet.Conn).SetStatus" [ fillcolor="moccasin" label="SetStatus" penwidth="1.5" tooltip="(*blitter.com/go/xs/xsnet.Conn).SetStatus | defined in net.go:212" ]
+        "(*blitter.com/go/xs/xsnet.Conn).WritePacket" [ fillcolor="moccasin" label="WritePacket" penwidth="1.5" tooltip="(*blitter.com/go/xs/xsnet.Conn).WritePacket | defined in net.go:1430" ]
+        "(*blitter.com/go/xs/xsnet.Conn).KEX" [ fillcolor="moccasin" label="KEX" penwidth="1.5" tooltip="(*blitter.com/go/xs/xsnet.Conn).KEX | defined in net.go:204" ]
+        "(*blitter.com/go/xs/xsnet.Conn).CAlg" [ tooltip="(*blitter.com/go/xs/xsnet.Conn).CAlg | defined in net.go:144" fillcolor="moccasin" label="CAlg" penwidth="1.5" ]
+        "(*blitter.com/go/xs/xsnet.Conn).HAlg" [ fillcolor="moccasin" label="HAlg" penwidth="1.5" tooltip="(*blitter.com/go/xs/xsnet.Conn).HAlg | defined in net.go:165" ]
+        "(*blitter.com/go/xs/xsnet.Conn).SetupChaff" [ label="SetupChaff" penwidth="1.5" tooltip="(*blitter.com/go/xs/xsnet.Conn).SetupChaff | defined in net.go:1556" fillcolor="moccasin" ]
         
     }
 
         subgraph "cluster_*blitter.com/go/xs/xsnet.HKExListener" {
-        labelloc="b";
+        penwidth="0.5";
+fontsize="15";
+fontcolor="#222222";
+labelloc="b";
 style="rounded,filled";
 fillcolor="wheat2";
 label="(*HKExListener)";
 tooltip="type: *blitter.com/go/xs/xsnet.HKExListener";
-penwidth="0.5";
-fontsize="15";
-fontcolor="#222222";
         
-        "(*blitter.com/go/xs/xsnet.HKExListener).Accept" [ penwidth="1.5" fillcolor="moccasin" label="Accept" ]
+        "(*blitter.com/go/xs/xsnet.HKExListener).Accept" [ tooltip="(*blitter.com/go/xs/xsnet.HKExListener).Accept | defined in net.go:1081" fillcolor="moccasin" label="Accept" penwidth="1.5" ]
         
     }
 
-        subgraph "cluster_blitter.com/go/xs/xsnet.Conn" {
-        tooltip="type: blitter.com/go/xs/xsnet.Conn";
+        subgraph "cluster_*blitter.com/go/xs/xsnet.KEXAlg" {
+        fillcolor="wheat2";
+label="(*KEXAlg)";
+tooltip="type: *blitter.com/go/xs/xsnet.KEXAlg";
 penwidth="0.5";
 fontsize="15";
 fontcolor="#222222";
 labelloc="b";
 style="rounded,filled";
+        
+        "(*blitter.com/go/xs/xsnet.KEXAlg).String" [ label="String" penwidth="1.5" tooltip="(*blitter.com/go/xs/xsnet.KEXAlg).String | defined in net.go:111" fillcolor="moccasin" ]
+        
+    }
+
+        subgraph "cluster_blitter.com/go/xs/xsnet.Conn" {
+        fontcolor="#222222";
+labelloc="b";
+style="rounded,filled";
 fillcolor="wheat2";
 label="(Conn)";
+tooltip="type: blitter.com/go/xs/xsnet.Conn";
+penwidth="0.5";
+fontsize="15";
         
-        "(blitter.com/go/xs/xsnet.Conn).Write" [ fillcolor="moccasin" label="Write" penwidth="1.5" ]
+        "(blitter.com/go/xs/xsnet.Conn).Write" [ tooltip="(blitter.com/go/xs/xsnet.Conn).Write | defined in net.go:1424" fillcolor="moccasin" label="Write" penwidth="1.5" ]
         
     }
 
         subgraph "cluster_blitter.com/go/xs/xsnet.HKExListener" {
-        style="rounded,filled";
+        fontsize="15";
+fontcolor="#222222";
+labelloc="b";
+style="rounded,filled";
 fillcolor="wheat2";
 label="(HKExListener)";
 tooltip="type: blitter.com/go/xs/xsnet.HKExListener";
 penwidth="0.5";
+        
+        "(blitter.com/go/xs/xsnet.HKExListener).Close" [ fillcolor="moccasin" label="Close" penwidth="1.5" tooltip="(blitter.com/go/xs/xsnet.HKExListener).Close | defined in net.go:1066" ]
+        
+    }
+
+    }
+
+        subgraph "cluster_compress/flate" {
+        URL="/?f=compress/flate";
+style="filled";
+fillcolor="#E0FFE1";
+label="compress/flate";
+rank="sink";
+tooltip="package: compress/flate";
+penwidth="0.8";
+fontsize="16";
+fontname="Tahoma bold";
+        
+        
+        subgraph "cluster_compress/flate.CorruptInputError" {
+        labelloc="b";
+style="rounded,filled";
+fillcolor="#c2e3c2";
+label="(CorruptInputError)";
+tooltip="type: compress/flate.CorruptInputError";
+penwidth="0.5";
+fontsize="15";
+fontcolor="#222222";
+        
+        "(compress/flate.CorruptInputError).Error" [ penwidth="1.5" tooltip="(compress/flate.CorruptInputError).Error | defined in inflate.go:35" fillcolor="#adedad" label="Error" ]
+        
+    }
+
+        subgraph "cluster_compress/flate.InternalError" {
+        label="(InternalError)";
+tooltip="type: compress/flate.InternalError";
+penwidth="0.5";
 fontsize="15";
 fontcolor="#222222";
 labelloc="b";
+style="rounded,filled";
+fillcolor="#c2e3c2";
         
-        "(blitter.com/go/xs/xsnet.HKExListener).Close" [ label="Close" penwidth="1.5" fillcolor="moccasin" ]
+        "(compress/flate.InternalError).Error" [ fillcolor="#adedad" label="Error" penwidth="1.5" tooltip="(compress/flate.InternalError).Error | defined in inflate.go:42" ]
         
     }
 
     }
 
         subgraph "cluster_context" {
-        fontsize="16";
+        penwidth="0.8";
 fillcolor="#E0FFE1";
-label="[context]";
-tooltip="package: context";
-penwidth="0.8";
-style="filled";
-fontname="bold";
+fontname="Tahoma bold";
 rank="sink";
+tooltip="package: context";
+fontsize="16";
+style="filled";
+label="context";
 URL="/?f=context";
         
         
         subgraph "cluster_context.deadlineExceededError" {
-        labelloc="b";
-style="rounded,filled";
-fillcolor="#c2e3c2";
-label="(deadlineExceededError)";
+        label="(deadlineExceededError)";
 tooltip="type: context.deadlineExceededError";
 penwidth="0.5";
 fontsize="15";
 fontcolor="#222222";
+labelloc="b";
+style="rounded,filled";
+fillcolor="#c2e3c2";
         
-        "(context.deadlineExceededError).Error" [ fillcolor="#adedad" label="Error" penwidth="1.5" ]
+        "(context.deadlineExceededError).Error" [ fillcolor="#adedad" label="Error" penwidth="1.5" tooltip="(context.deadlineExceededError).Error | defined in context.go:165" ]
         
     }
 
     }
 
-        subgraph "cluster_github.com/kr/pty" {
-        label="[pty]";
-URL="/?f=github.com/kr/pty";
+        subgraph "cluster_github.com/creack/pty" {
+        URL="/?f=github.com/creack/pty";
+tooltip="package: github.com/creack/pty";
+fontsize="16";
+fillcolor="lightyellow";
+fontname="Tahoma bold";
+rank="sink";
+label="pty";
 penwidth="0.8";
 style="filled";
-fillcolor="lightyellow";
-rank="sink";
-fontsize="16";
-fontname="bold";
-tooltip="package: github.com/kr/pty";
         
-        "github.com/kr/pty.Start" [ fillcolor="moccasin" label="Start" penwidth="1.5" ]
-        "github.com/kr/pty.Setsize" [ label="Setsize" penwidth="1.5" fillcolor="moccasin" ]
+        "github.com/creack/pty.Start" [ label="Start" penwidth="1.5" tooltip="github.com/creack/pty.Start | defined in run.go:16" fillcolor="moccasin" ]
+        "github.com/creack/pty.Setsize" [ fillcolor="moccasin" label="Setsize" penwidth="1.5" tooltip="github.com/creack/pty.Setsize | defined in util.go:27" ]
         
     }
 
         subgraph "cluster_github.com/pkg/errors" {
-        fontname="bold";
-label="[errors]";
-style="filled";
-fontsize="16";
-fillcolor="lightyellow";
-rank="sink";
-URL="/?f=github.com/pkg/errors";
+        rank="sink";
+label="errors";
 tooltip="package: github.com/pkg/errors";
 penwidth="0.8";
+style="filled";
+fillcolor="lightyellow";
+fontname="Tahoma bold";
+fontsize="16";
+URL="/?f=github.com/pkg/errors";
         
         
         subgraph "cluster_*github.com/pkg/errors.fundamental" {
-        fontcolor="#222222";
+        penwidth="0.5";
+fontsize="15";
+fontcolor="#222222";
 labelloc="b";
 style="rounded,filled";
 fillcolor="wheat2";
 label="(*fundamental)";
 tooltip="type: *github.com/pkg/errors.fundamental";
-penwidth="0.5";
-fontsize="15";
         
-        "(*github.com/pkg/errors.fundamental).Error" [ label="Error" penwidth="1.5" fillcolor="moccasin" ]
+        "(*github.com/pkg/errors.fundamental).Error" [ label="Error" penwidth="1.5" tooltip="(*github.com/pkg/errors.fundamental).Error | defined in errors.go:125" fillcolor="moccasin" ]
         
     }
 
@@ -280,68 +413,92 @@ fontsize="15";
 
     }
 
-    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs/xsnet.Conn).Close" [ arrowhead="normalnoneodiamond" color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs.Session).SetOp" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs.Session).SetWho" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs.Session).SetConnHost" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs.Session).SetTermType" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs.Session).SetCmd" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs.Session).SetAuthCookie" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "(blitter.com/go/xs.Session).Op" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "(blitter.com/go/xs.Session).Who" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "(blitter.com/go/xs.Session).ConnHost" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "(blitter.com/go/xs.Session).Cmd" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "(blitter.com/go/xs.Session).AuthCookie" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "blitter.com/go/xs.AuthUserByToken" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs.Session).ClearAuthCookie" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "blitter.com/go/xs.AuthUserByPasswd" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "(blitter.com/go/xs/xsnet.Conn).Write" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "blitter.com/go/xs/logger.LogNotice" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs/xsnet.Conn).RemoteAddr" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "blitter.com/go/goutmp.GetHost" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "blitter.com/go/xs/xsd.GenAuthToken" [  ]
-    "blitter.com/go/xs/xsd.main$2" -> "(blitter.com/go/xs.Session).TermType" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.runShellAs" -> "github.com/kr/pty.Start" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/xs/xsd.runShellAs$1" [ arrowhead="normalnoneodiamond" ]
-    "blitter.com/go/xs/xsd.ptsName" -> "blitter.com/go/xs/xsd.ioctl" [  ]
-    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/xs/xsd.ptsName" [  ]
-    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/goutmp.Put_utmp" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.runShellAs$2" -> "blitter.com/go/goutmp.Unput_utmp" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/xs/xsd.runShellAs$2" [ arrowhead="normalnoneodiamond" ]
-    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/goutmp.Put_lastlog_entry" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.runShellAs$3" -> "github.com/kr/pty.Setsize" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/xs/xsd.runShellAs$3" [ arrowhead="normalnoneodot" ]
-    "blitter.com/go/xs/xsd.runShellAs$4" -> "(context.deadlineExceededError).Error" [ color="saddlebrown" style="dashed" ]
-    "blitter.com/go/xs/xsd.runShellAs$4" -> "(*github.com/pkg/errors.fundamental).Error" [ style="dashed" color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/xs/xsd.runShellAs$4" [ arrowhead="normalnoneodot" ]
-    "blitter.com/go/xs/xsd.runShellAs" -> "(*blitter.com/go/xs/xsnet.Conn).EnableChaff" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.runShellAs$5" -> "(*blitter.com/go/xs/xsnet.Conn).DisableChaff" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.runShellAs$5" -> "(*blitter.com/go/xs/xsnet.Conn).ShutdownChaff" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/xs/xsd.runShellAs$5" [ arrowhead="normalnoneodiamond" ]
-    "blitter.com/go/xs/xsd.runShellAs$6" -> "(context.deadlineExceededError).Error" [ style="dashed" color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.runShellAs$6" -> "(*github.com/pkg/errors.fundamental).Error" [ style="dashed" color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/xs/xsd.runShellAs$6" [ arrowhead="normalnoneodot" ]
-    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/xs/logger.LogDebug" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.runShellAs" -> "(*blitter.com/go/xs/xsnet.Conn).SetStatus" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "blitter.com/go/xs/xsd.runShellAs" [  ]
-    "blitter.com/go/xs/xsd.main$2" -> "blitter.com/go/xs/logger.LogErr" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs/xsnet.Conn).SetStatus" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.runClientToServerCopyAs" -> "(*blitter.com/go/xs/xsnet.Conn).EnableChaff" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.runClientToServerCopyAs" -> "(*blitter.com/go/xs/xsnet.Conn).DisableChaff" [ arrowhead="normalnoneodiamond" color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.runClientToServerCopyAs" -> "(*blitter.com/go/xs/xsnet.Conn).ShutdownChaff" [ arrowhead="normalnoneodiamond" color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$2" -> "blitter.com/go/xs/xsd.runClientToServerCopyAs" [  ]
-    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs/xsnet.Conn).WritePacket" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.runServerToClientCopyAs" -> "(*blitter.com/go/xs/xsnet.Conn).EnableChaff" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.runServerToClientCopyAs" -> "(*blitter.com/go/xs/xsnet.Conn).DisableChaff" [ arrowhead="normalnoneodiamond" color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.runServerToClientCopyAs" -> "(*blitter.com/go/xs/xsnet.Conn).ShutdownChaff" [ color="saddlebrown" arrowhead="normalnoneodiamond" ]
-    "blitter.com/go/xs/xsd.main$2" -> "blitter.com/go/xs/xsd.runServerToClientCopyAs" [  ]
-    "blitter.com/go/xs/xsd.main" -> "blitter.com/go/xs/logger.New" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main" -> "blitter.com/go/xs/xsnet.Init" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main$1" -> "blitter.com/go/xs/logger.LogNotice" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main" -> "blitter.com/go/xs/xsd.main$1" [ arrowhead="normalnoneodot" ]
-    "blitter.com/go/xs/xsd.main" -> "blitter.com/go/xs/xsnet.Listen" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main" -> "(blitter.com/go/xs/xsnet.HKExListener).Close" [ arrowhead="normalnoneodiamond" color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main" -> "(*blitter.com/go/xs/xsnet.HKExListener).Accept" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main" -> "(*blitter.com/go/xs/xsnet.Conn).SetupChaff" [ color="saddlebrown" ]
-    "blitter.com/go/xs/xsd.main" -> "blitter.com/go/xs/xsd.main$2" [ arrowhead="normalnoneodot" ]
+    "blitter.com/go/xs/xsd.main$2" -> "blitter.com/go/xs/xsd.runServerToClientCopyAs" [ tooltip="at xsd.go:828: calling [blitter.com/go/xs/xsd.runServerToClientCopyAs]" ]
+    "blitter.com/go/xs/xsd.main$2$1" -> "(*blitter.com/go/xs/xsnet.Conn).Close" [ color="saddlebrown" tooltip="at xsd.go:653: calling [(*blitter.com/go/xs/xsnet.Conn).Close]" ]
+    "blitter.com/go/xs/xsd.runShellAs$2" -> "blitter.com/go/goutmp.Unput_utmp" [ color="saddlebrown" tooltip="at xsd.go:336: calling [blitter.com/go/goutmp.Unput_utmp]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs.Session).SetTermType" [ color="saddlebrown" tooltip="at xsd.go:701: calling [(*blitter.com/go/xs.Session).SetTermType]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "(blitter.com/go/xs.Session).Who" [ color="saddlebrown" tooltip="at xsd.go:720: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:724: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:729: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:731: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:743: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:754: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:755: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:757: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:762: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:764: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:771: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:772: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:777: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:779: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:786: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:788: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:793: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:795: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:803: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:804: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:809: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:811: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:827: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:828: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:830: calling [(blitter.com/go/xs.Session).Who]\nat xsd.go:833: calling [(blitter.com/go/xs.Session).Who]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "blitter.com/go/xs.VerifyPass" [ color="saddlebrown" tooltip="at xsd.go:729: calling [blitter.com/go/xs.VerifyPass]" ]
+    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/xs/xsd.runShellAs$6" [ arrowhead="normalnoneodot" tooltip="at xsd.go:381: calling [blitter.com/go/xs/xsd.runShellAs$6]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs.Session).ClearAuthCookie" [ color="saddlebrown" tooltip="at xsd.go:737: calling [(*blitter.com/go/xs.Session).ClearAuthCookie]" ]
+    "blitter.com/go/xs/xsd.main" -> "(*blitter.com/go/xs/xsnet.Conn).CAlg" [ color="saddlebrown" tooltip="at xsd.go:627: calling [(*blitter.com/go/xs/xsnet.Conn).CAlg]\nat xsd.go:628: calling [(*blitter.com/go/xs/xsnet.Conn).CAlg]" ]
+    "blitter.com/go/xs/xsd.runClientToServerCopyAs" -> "(*blitter.com/go/xs/xsnet.Conn).ShutdownChaff" [ arrowhead="normalnoneodiamond" color="saddlebrown" tooltip="at xsd.go:122: calling [(*blitter.com/go/xs/xsnet.Conn).ShutdownChaff]" ]
+    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/xs/xsd.runShellAs$2" [ arrowhead="normalnoneodiamond" tooltip="at xsd.go:336: calling [blitter.com/go/xs/xsd.runShellAs$2]" ]
+    "blitter.com/go/xs/xsd.main" -> "(*blitter.com/go/xs/xsnet.Conn).SetupChaff" [ color="saddlebrown" tooltip="at xsd.go:641: calling [(*blitter.com/go/xs/xsnet.Conn).SetupChaff]" ]
+    "blitter.com/go/xs/xsd.main" -> "blitter.com/go/xs/xsnet.Listen" [ color="saddlebrown" tooltip="at xsd.go:610: calling [blitter.com/go/xs/xsnet.Listen]" ]
+    "blitter.com/go/xs/xsd.main" -> "(*blitter.com/go/xs/xsnet.Conn).KEX" [ tooltip="at xsd.go:623: calling [(*blitter.com/go/xs/xsnet.Conn).KEX]\nat xsd.go:624: calling [(*blitter.com/go/xs/xsnet.Conn).KEX]" color="saddlebrown" ]
+    "blitter.com/go/xs/xsd.runShellAs$6" -> "(context.deadlineExceededError).Error" [ style="dashed" color="saddlebrown" tooltip="at xsd.go:385: calling [(context.deadlineExceededError).Error]" ]
+    "blitter.com/go/xs/xsd.runServerToClientCopyAs" -> "(*blitter.com/go/xs/xsnet.Conn).EnableChaff" [ color="saddlebrown" tooltip="at xsd.go:220: calling [(*blitter.com/go/xs/xsnet.Conn).EnableChaff]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "blitter.com/go/xs/logger.LogNotice" [ color="saddlebrown" tooltip="at xsd.go:743: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:754: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:771: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:779: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:786: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:795: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:803: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:811: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:827: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:833: calling [blitter.com/go/xs/logger.LogNotice]" ]
+    "blitter.com/go/xs/xsd.runShellAs" -> "github.com/creack/pty.Start" [ color="saddlebrown" tooltip="at xsd.go:318: calling [github.com/creack/pty.Start]" ]
+    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/goutmp.Put_lastlog_entry" [ color="saddlebrown" tooltip="at xsd.go:337: calling [blitter.com/go/goutmp.Put_lastlog_entry]" ]
+    "blitter.com/go/xs/xsd.runShellAs$5" -> "(*blitter.com/go/xs/xsnet.Conn).DisableChaff" [ tooltip="at xsd.go:369: calling [(*blitter.com/go/xs/xsnet.Conn).DisableChaff]" color="saddlebrown" ]
+    "blitter.com/go/xs/xsd.main" -> "(blitter.com/go/xs/xsnet.HKExListener).Close" [ arrowhead="normalnoneodiamond" color="saddlebrown" tooltip="at xsd.go:614: calling [(blitter.com/go/xs/xsnet.HKExListener).Close]" ]
+    "blitter.com/go/xs/xsd.main" -> "(*blitter.com/go/xs/xsnet.HKExListener).Accept" [ color="saddlebrown" tooltip="at xsd.go:620: calling [(*blitter.com/go/xs/xsnet.HKExListener).Accept]" ]
+    "blitter.com/go/xs/xsd.main$1" -> "blitter.com/go/xs/logger.LogNotice" [ color="saddlebrown" tooltip="at xsd.go:591: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:595: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:599: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:601: calling [blitter.com/go/xs/logger.LogNotice]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs.Session).SetAuthCookie" [ color="saddlebrown" tooltip="at xsd.go:717: calling [(*blitter.com/go/xs.Session).SetAuthCookie]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "(blitter.com/go/xs.Session).TermType" [ color="saddlebrown" tooltip="at xsd.go:757: calling [(blitter.com/go/xs.Session).TermType]\nat xsd.go:772: calling [(blitter.com/go/xs.Session).TermType]\nat xsd.go:788: calling [(blitter.com/go/xs.Session).TermType]\nat xsd.go:804: calling [(blitter.com/go/xs.Session).TermType]\nat xsd.go:828: calling [(blitter.com/go/xs.Session).TermType]" ]
+    "blitter.com/go/xs/xsd.runShellAs$3" -> "github.com/creack/pty.Setsize" [ color="saddlebrown" tooltip="at xsd.go:348: calling [github.com/creack/pty.Setsize]" ]
+    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/xs/logger.LogDebug" [ color="saddlebrown" tooltip="at xsd.go:409: calling [blitter.com/go/xs/logger.LogDebug]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs/xsnet.Conn).SetStatus" [ color="saddlebrown" tooltip="at xsd.go:765: calling [(*blitter.com/go/xs/xsnet.Conn).SetStatus]\nat xsd.go:780: calling [(*blitter.com/go/xs/xsnet.Conn).SetStatus]\nat xsd.go:796: calling [(*blitter.com/go/xs/xsnet.Conn).SetStatus]\nat xsd.go:815: calling [(*blitter.com/go/xs/xsnet.Conn).SetStatus]\nat xsd.go:841: calling [(*blitter.com/go/xs/xsnet.Conn).SetStatus]" ]
+    "blitter.com/go/xs/xsd.main" -> "(blitter.com/go/xs/xsd.allowedCipherAlgs).allowed" [ tooltip="at xsd.go:627: calling [(blitter.com/go/xs/xsd.allowedCipherAlgs).allowed]" ]
+    "blitter.com/go/xs/xsd.runShellAs$6" -> "(compress/flate.CorruptInputError).Error" [ style="dashed" color="saddlebrown" tooltip="at xsd.go:385: calling [(compress/flate.CorruptInputError).Error]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs.Session).SetConnHost" [ color="saddlebrown" tooltip="at xsd.go:693: calling [(*blitter.com/go/xs.Session).SetConnHost]" ]
+    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/xs.GetTool" [ color="saddlebrown" tooltip="at xsd.go:308: calling [blitter.com/go/xs.GetTool]\nat xsd.go:297: calling [blitter.com/go/xs.GetTool]\nat xsd.go:303: calling [blitter.com/go/xs.GetTool]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "blitter.com/go/xs/xsd.runClientToServerCopyAs" [ tooltip="at xsd.go:804: calling [blitter.com/go/xs/xsd.runClientToServerCopyAs]" ]
+    "blitter.com/go/xs/xsd.main" -> "(blitter.com/go/xs/xsd.allowedKEXAlgs).allowed" [ tooltip="at xsd.go:623: calling [(blitter.com/go/xs/xsd.allowedKEXAlgs).allowed]" ]
+    "blitter.com/go/xs/xsd.main" -> "(blitter.com/go/xs/xsd.allowedHMACAlgs).allowed" [ tooltip="at xsd.go:631: calling [(blitter.com/go/xs/xsd.allowedHMACAlgs).allowed]" ]
+    "blitter.com/go/xs/xsd.runClientToServerCopyAs" -> "(*blitter.com/go/xs/xsnet.Conn).EnableChaff" [ color="saddlebrown" tooltip="at xsd.go:119: calling [(*blitter.com/go/xs/xsnet.Conn).EnableChaff]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs/xsnet.Conn).RemoteAddr" [ tooltip="at xsd.go:752: calling [(*blitter.com/go/xs/xsnet.Conn).RemoteAddr]\nat xsd.go:769: calling [(*blitter.com/go/xs/xsnet.Conn).RemoteAddr]\nat xsd.go:784: calling [(*blitter.com/go/xs/xsnet.Conn).RemoteAddr]\nat xsd.go:801: calling [(*blitter.com/go/xs/xsnet.Conn).RemoteAddr]\nat xsd.go:825: calling [(*blitter.com/go/xs/xsnet.Conn).RemoteAddr]" color="saddlebrown" ]
+    "blitter.com/go/xs/xsd.main$2" -> "blitter.com/go/xs/logger.LogErr" [ color="saddlebrown" tooltip="at xsd.go:762: calling [blitter.com/go/xs/logger.LogErr]\nat xsd.go:777: calling [blitter.com/go/xs/logger.LogErr]\nat xsd.go:809: calling [blitter.com/go/xs/logger.LogErr]\nat xsd.go:846: calling [blitter.com/go/xs/logger.LogErr]\nat xsd.go:830: calling [blitter.com/go/xs/logger.LogErr]" ]
+    "(blitter.com/go/xs/xsd.allowedCipherAlgs).allowed" -> "(*blitter.com/go/xs/xsnet.CSCipherAlg).String" [ color="saddlebrown" tooltip="at xsd.go:466: calling [(*blitter.com/go/xs/xsnet.CSCipherAlg).String]" ]
+    "(blitter.com/go/xs/xsd.allowedHMACAlgs).allowed" -> "(*blitter.com/go/xs/xsnet.CSHmacAlg).String" [ color="saddlebrown" tooltip="at xsd.go:484: calling [(*blitter.com/go/xs/xsnet.CSHmacAlg).String]" ]
+    "blitter.com/go/xs/xsd.main" -> "(*blitter.com/go/xs/xsnet.Conn).Close" [ color="saddlebrown" tooltip="at xsd.go:626: calling [(*blitter.com/go/xs/xsnet.Conn).Close]\nat xsd.go:630: calling [(*blitter.com/go/xs/xsnet.Conn).Close]\nat xsd.go:634: calling [(*blitter.com/go/xs/xsnet.Conn).Close]" ]
+    "blitter.com/go/xs/xsd.runClientToServerCopyAs" -> "blitter.com/go/xs.GetTool" [ color="saddlebrown" tooltip="at xsd.go:88: calling [blitter.com/go/xs.GetTool]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs.Session).SetCmd" [ color="saddlebrown" tooltip="at xsd.go:709: calling [(*blitter.com/go/xs.Session).SetCmd]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "(blitter.com/go/xs.Session).ConnHost" [ color="saddlebrown" tooltip="at xsd.go:720: calling [(blitter.com/go/xs.Session).ConnHost]\nat xsd.go:724: calling [(blitter.com/go/xs.Session).ConnHost]\nat xsd.go:755: calling [(blitter.com/go/xs.Session).ConnHost]" ]
+    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/xs/xsd.ptsName" [ tooltip="at xsd.go:331: calling [blitter.com/go/xs/xsd.ptsName]" ]
+    "blitter.com/go/xs/xsd.runShellAs$5" -> "(*blitter.com/go/xs/xsnet.Conn).ShutdownChaff" [ color="saddlebrown" tooltip="at xsd.go:370: calling [(*blitter.com/go/xs/xsnet.Conn).ShutdownChaff]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs/xsnet.Conn).WritePacket" [ color="saddlebrown" tooltip="at xsd.go:821: calling [(*blitter.com/go/xs/xsnet.Conn).WritePacket]" ]
+    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/goutmp.Put_utmp" [ tooltip="at xsd.go:335: calling [blitter.com/go/goutmp.Put_utmp]" color="saddlebrown" ]
+    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/xs/xsd.runShellAs$5" [ arrowhead="normalnoneodiamond" tooltip="at xsd.go:368: calling [blitter.com/go/xs/xsd.runShellAs$5]" ]
+    "blitter.com/go/xs/xsd.runServerToClientCopyAs" -> "(*blitter.com/go/xs/xsnet.Conn).DisableChaff" [ tooltip="at xsd.go:223: calling [(*blitter.com/go/xs/xsnet.Conn).DisableChaff]" arrowhead="normalnoneodiamond" color="saddlebrown" ]
+    "blitter.com/go/xs/xsd.runServerToClientCopyAs" -> "(*blitter.com/go/xs/xsnet.Conn).ShutdownChaff" [ color="saddlebrown" tooltip="at xsd.go:224: calling [(*blitter.com/go/xs/xsnet.Conn).ShutdownChaff]" arrowhead="normalnoneodiamond" ]
+    "blitter.com/go/xs/xsd.runShellAs$4" -> "(*github.com/pkg/errors.fundamental).Error" [ tooltip="at xsd.go:358: calling [(*github.com/pkg/errors.fundamental).Error]" style="dashed" color="saddlebrown" ]
+    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs.Session).SetWho" [ tooltip="at xsd.go:685: calling [(*blitter.com/go/xs.Session).SetWho]" color="saddlebrown" ]
+    "blitter.com/go/xs/xsd.main$2" -> "blitter.com/go/goutmp.GetHost" [ color="saddlebrown" tooltip="at xsd.go:753: calling [blitter.com/go/goutmp.GetHost]\nat xsd.go:770: calling [blitter.com/go/goutmp.GetHost]\nat xsd.go:785: calling [blitter.com/go/goutmp.GetHost]\nat xsd.go:802: calling [blitter.com/go/goutmp.GetHost]\nat xsd.go:826: calling [blitter.com/go/goutmp.GetHost]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "blitter.com/go/xs/xsd.GenAuthToken" [ tooltip="at xsd.go:755: calling [blitter.com/go/xs/xsd.GenAuthToken]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "blitter.com/go/xs/xsd.runShellAs" [ tooltip="at xsd.go:757: calling [blitter.com/go/xs/xsd.runShellAs]\nat xsd.go:772: calling [blitter.com/go/xs/xsd.runShellAs]\nat xsd.go:788: calling [blitter.com/go/xs/xsd.runShellAs]" ]
+    "blitter.com/go/xs/xsd.main" -> "blitter.com/go/xs/logger.LogNotice" [ color="saddlebrown" tooltip="at xsd.go:571: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:576: calling [blitter.com/go/xs/logger.LogNotice]\nat xsd.go:581: calling [blitter.com/go/xs/logger.LogNotice]" ]
+    "blitter.com/go/xs/xsd.main" -> "blitter.com/go/xs/xsd.main$1" [ arrowhead="normalnoneodot" tooltip="at xsd.go:586: calling [blitter.com/go/xs/xsd.main$1]" ]
+    "blitter.com/go/xs/xsd.main" -> "(*blitter.com/go/xs/xsnet.Conn).SetStatus" [ color="saddlebrown" tooltip="at xsd.go:625: calling [(*blitter.com/go/xs/xsnet.Conn).SetStatus]\nat xsd.go:629: calling [(*blitter.com/go/xs/xsnet.Conn).SetStatus]\nat xsd.go:633: calling [(*blitter.com/go/xs/xsnet.Conn).SetStatus]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs/xsnet.Conn).Close" [ color="saddlebrown" tooltip="at xsd.go:647: calling [(*blitter.com/go/xs/xsnet.Conn).Close]" arrowhead="normalnoneodiamond" ]
+    "blitter.com/go/xs/xsd.main$2" -> "(*blitter.com/go/xs.Session).SetOp" [ color="saddlebrown" tooltip="at xsd.go:677: calling [(*blitter.com/go/xs.Session).SetOp]\nat xsd.go:760: calling [(*blitter.com/go/xs.Session).SetOp]\nat xsd.go:775: calling [(*blitter.com/go/xs.Session).SetOp]\nat xsd.go:791: calling [(*blitter.com/go/xs.Session).SetOp]\nat xsd.go:807: calling [(*blitter.com/go/xs.Session).SetOp]\nat xsd.go:840: calling [(*blitter.com/go/xs.Session).SetOp]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "(blitter.com/go/xs.Session).AuthCookie" [ tooltip="at xsd.go:724: calling [(blitter.com/go/xs.Session).AuthCookie]\nat xsd.go:729: calling [(blitter.com/go/xs.Session).AuthCookie]\nat xsd.go:731: calling [(blitter.com/go/xs.Session).AuthCookie]" color="saddlebrown" ]
+    "blitter.com/go/xs/xsd.main" -> "blitter.com/go/xs/logger.New" [ tooltip="at xsd.go:559: calling [blitter.com/go/xs/logger.New]" color="saddlebrown" ]
+    "blitter.com/go/xs/xsd.runClientToServerCopyAs" -> "(*blitter.com/go/xs/xsnet.Conn).DisableChaff" [ arrowhead="normalnoneodiamond" color="saddlebrown" tooltip="at xsd.go:121: calling [(*blitter.com/go/xs/xsnet.Conn).DisableChaff]" ]
+    "blitter.com/go/xs/xsd.runShellAs" -> "(*blitter.com/go/xs/xsnet.Conn).EnableChaff" [ color="saddlebrown" tooltip="at xsd.go:365: calling [(*blitter.com/go/xs/xsnet.Conn).EnableChaff]" ]
+    "blitter.com/go/xs/xsd.runShellAs" -> "(*blitter.com/go/xs/xsnet.Conn).SetStatus" [ color="saddlebrown" tooltip="at xsd.go:407: calling [(*blitter.com/go/xs/xsnet.Conn).SetStatus]" ]
+    "blitter.com/go/xs/xsd.main$2$1" -> "(blitter.com/go/xs/xsnet.Conn).Write" [ color="saddlebrown" tooltip="at xsd.go:652: calling [(blitter.com/go/xs/xsnet.Conn).Write]" ]
+    "blitter.com/go/xs/xsd.runShellAs$6" -> "(compress/flate.InternalError).Error" [ tooltip="at xsd.go:385: calling [(compress/flate.InternalError).Error]" style="dashed" color="saddlebrown" ]
+    "blitter.com/go/xs/xsd.runShellAs$4" -> "(context.deadlineExceededError).Error" [ style="dashed" color="saddlebrown" tooltip="at xsd.go:358: calling [(context.deadlineExceededError).Error]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "blitter.com/go/xs.NewAuthCtx" [ tooltip="at xsd.go:724: calling [blitter.com/go/xs.NewAuthCtx]\nat xsd.go:729: calling [blitter.com/go/xs.NewAuthCtx]\nat xsd.go:731: calling [blitter.com/go/xs.NewAuthCtx]" color="saddlebrown" ]
+    "blitter.com/go/xs/xsd.main$2" -> "blitter.com/go/xs.AuthUserByPasswd" [ color="saddlebrown" tooltip="at xsd.go:731: calling [blitter.com/go/xs.AuthUserByPasswd]" ]
+    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/xs/xsd.runShellAs$3" [ arrowhead="normalnoneodot" tooltip="at xsd.go:345: calling [blitter.com/go/xs/xsd.runShellAs$3]" ]
+    "blitter.com/go/xs/xsd.main" -> "(*blitter.com/go/xs/xsnet.Conn).HAlg" [ color="saddlebrown" tooltip="at xsd.go:631: calling [(*blitter.com/go/xs/xsnet.Conn).HAlg]\nat xsd.go:632: calling [(*blitter.com/go/xs/xsnet.Conn).HAlg]" ]
+    "blitter.com/go/xs/xsd.runShellAs$6" -> "(*github.com/pkg/errors.fundamental).Error" [ style="dashed" color="saddlebrown" tooltip="at xsd.go:385: calling [(*github.com/pkg/errors.fundamental).Error]" ]
+    "(blitter.com/go/xs/xsd.allowedKEXAlgs).allowed" -> "(*blitter.com/go/xs/xsnet.KEXAlg).String" [ tooltip="at xsd.go:448: calling [(*blitter.com/go/xs/xsnet.KEXAlg).String]" color="saddlebrown" ]
+    "blitter.com/go/xs/xsd.main$2" -> "(blitter.com/go/xs/xsnet.Conn).Write" [ color="saddlebrown" tooltip="at xsd.go:741: calling [(blitter.com/go/xs/xsnet.Conn).Write]\nat xsd.go:744: calling [(blitter.com/go/xs/xsnet.Conn).Write]" ]
+    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/xs/xsd.runShellAs$1" [ arrowhead="normalnoneodiamond" tooltip="at xsd.go:325: calling [blitter.com/go/xs/xsd.runShellAs$1]" ]
+    "blitter.com/go/xs/xsd.runShellAs" -> "blitter.com/go/xs/xsd.runShellAs$4" [ arrowhead="normalnoneodot" tooltip="at xsd.go:355: calling [blitter.com/go/xs/xsd.runShellAs$4]" ]
+    "blitter.com/go/xs/xsd.main$2$1" -> "blitter.com/go/xs/logger.LogNotice" [ color="saddlebrown" tooltip="at xsd.go:651: calling [blitter.com/go/xs/logger.LogNotice]" ]
+    "blitter.com/go/xs/xsd.runServerToClientCopyAs" -> "blitter.com/go/xs.GetTool" [ color="saddlebrown" tooltip="at xsd.go:193: calling [blitter.com/go/xs.GetTool]" ]
+    "blitter.com/go/xs/xsd.runShellAs$4" -> "(compress/flate.CorruptInputError).Error" [ style="dashed" color="saddlebrown" tooltip="at xsd.go:358: calling [(compress/flate.CorruptInputError).Error]" ]
+    "blitter.com/go/xs/xsd.runShellAs$4" -> "(compress/flate.InternalError).Error" [ style="dashed" color="saddlebrown" tooltip="at xsd.go:358: calling [(compress/flate.InternalError).Error]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "(blitter.com/go/xs.Session).Op" [ color="saddlebrown" tooltip="at xsd.go:720: calling [(blitter.com/go/xs.Session).Op]\nat xsd.go:750: calling [(blitter.com/go/xs.Session).Op]\nat xsd.go:767: calling [(blitter.com/go/xs.Session).Op]\nat xsd.go:782: calling [(blitter.com/go/xs.Session).Op]\nat xsd.go:798: calling [(blitter.com/go/xs.Session).Op]\nat xsd.go:822: calling [(blitter.com/go/xs.Session).Op]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "(blitter.com/go/xs.Session).Cmd" [ color="saddlebrown" tooltip="at xsd.go:720: calling [(blitter.com/go/xs.Session).Cmd]\nat xsd.go:772: calling [(blitter.com/go/xs.Session).Cmd]\nat xsd.go:788: calling [(blitter.com/go/xs.Session).Cmd]\nat xsd.go:804: calling [(blitter.com/go/xs.Session).Cmd]\nat xsd.go:828: calling [(blitter.com/go/xs.Session).Cmd]" ]
+    "blitter.com/go/xs/xsd.main$2" -> "blitter.com/go/xs.AuthUserByToken" [ tooltip="at xsd.go:724: calling [blitter.com/go/xs.AuthUserByToken]" color="saddlebrown" ]
+    "blitter.com/go/xs/xsd.ptsName" -> "blitter.com/go/xs/xsd.ioctl" [ tooltip="at xsd.go:59: calling [blitter.com/go/xs/xsd.ioctl]" ]
+    "blitter.com/go/xs/xsd.main" -> "blitter.com/go/xs/xsnet.Init" [ color="saddlebrown" tooltip="at xsd.go:560: calling [blitter.com/go/xs/xsnet.Init]" ]
+    "blitter.com/go/xs/xsd.main" -> "blitter.com/go/xs/xsd.main$2" [ arrowhead="normalnoneodot" tooltip="at xsd.go:646: calling [blitter.com/go/xs/xsd.main$2]" ]
 }

@@ -19,7 +19,7 @@ var (
 joebloggs:$6$F.0IXOrb0w0VJHG1$3O4PYyng7F3hlh42mbroEdQZvslybY5etPPiLMQJ1xosjABY.Q4xqAfyIfe03Du61ZjGQIt3nL0j12P9k1fsK/:18310:0:99999:7:::
 disableduser:!:18310::::::`
 
-	dummyAuthTokenFile = "hostA:abcdefg\nhostB:wxyz\n"
+	dummyAuthTokenFile = "hostA:johndoe:abcdefg\nhostB:imposter:wxyz\n"
 
 	dummyXsPasswdFile = `#username:salt:authCookie
 bobdobbs:$2a$12$9vqGkFqikspe/2dTARqu1O:$2a$12$9vqGkFqikspe/2dTARqu1OuDKCQ/RYWsnaFjmi.HtmECRkxcZ.kBK
@@ -155,7 +155,7 @@ func TestAuthUserByTokenSucceedsWithMatchedUserAndToken(t *testing.T) {
 	ctx := newMockAuthCtx(_mock_ioutil_ReadFile, _mock_user_Lookup)
 	userlookup_arg_u = "johndoe"
 	readfile_arg_f = "/.xs_id"
-	stat := AuthUserByToken(ctx, userlookup_arg_u, "hostA", "hostA:abcdefg")
+	stat := AuthUserByToken(ctx, userlookup_arg_u, "hostA", "hostA:johndoe:abcdefg")
 	if !stat {
 		t.Fatal("failed with valid user and token")
 	}

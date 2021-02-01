@@ -1,4 +1,4 @@
-VERSION := 0.9.2
+VERSION := 0.9.3-pre
 .PHONY: lint vis clean common client server passwd subpkgs install uninstall reinstall
 
 ## Tag version of binaries with build info wrt.

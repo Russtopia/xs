@@ -855,21 +855,27 @@ func main() {
 		u, _ := user.Current() // nolint: gosec
 		ab, aerr := ioutil.ReadFile(fmt.Sprintf("%s/.xs_id", u.HomeDir))
 		if aerr == nil {
-			idx := strings.Index(string(ab), remoteHost)
-			if idx >= 0 {
-				ab = ab[idx:]
-				entries := strings.SplitN(string(ab), "\n", -1)
-				authCookie = strings.TrimSpace(entries[0])
-				// Security scrub
-				ab = nil
-				runtime.GC()
-			} else {
+			for _, line := range strings.Split(string(ab), "\n") {
+				line = line + "\n"
+				idx := strings.Index(string(line), remoteHost+":"+uname)
+				if idx >= 0 {
+					line = line[idx:]
+					entries := strings.SplitN(string(line), "\n", -1)
+					authCookie = strings.TrimSpace(entries[0])
+					// Security scrub
+					line = ""
+					break
+				}
+			}
+			if authCookie == "" {
 				_, _ = fmt.Fprintln(os.Stderr, "[no authtoken, use -g to request one from server]")
 			}
+
 		} else {
 			log.Printf("[cannot read %s/.xs_id]\n", u.HomeDir)
 		}
 	}
+	runtime.GC()
 
 	//=== Enforce some sane min/max vals on chaff flags
 	if chaffFreqMin < 2 {
