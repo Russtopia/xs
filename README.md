@@ -3,9 +3,14 @@
 # XS
 --
 
-XS (**X**perimental **S**hell) is a golang implementation of a simple remote shell client and
-server, similar in role to ssh, offering encrypted interactive and non-interactive sessions (remote commands),
-remote file copying and tunnels with optional traffic obfuscation ('chaffing').
+XS (**X**perimental **S**hell) is a simple alternative to ssh (<5% total SLOCC) written from scratch in Go.
+A testbed for candidate PQC (Post-Quantum Cryptography) KEMs (Key-Encapsulation Mechanisms) and symmetric
+session encryption algorithms.
+
+xs also features integrated traffic chaffing to obscure interactive session and file copy activity.
+Supports encrypted interactive and non-interactive sessions (remote commands), remote file copying and tunnels.
+
+Runs on Linux, FreeBSD, Windows (client only, MSYS) and Android (within Termux). https://gogs.blitter.com/RLabs/xs
 
 It is stable to the point that I use it for day-to-day remote access in place of, and in preference to, ssh.
 
