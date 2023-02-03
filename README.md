@@ -1,7 +1,7 @@
 # XS
 An alternative to ssh (&lt;5% SLOCC) written from scratch in Go. Testbed for post-quantum cryptography KEMs (Key-Encapsulation Mechanisms) and symmetric session encryption algos. Traffic chaffing to obscure session activity. Linux, FreeBSD, Windows (MSYS), Android (Termux).
 
-## I no longer host (new) projects on Github, preferring self-hosted solutions. See https://gogs.blitter.com/RLabs/xs to learn more about this project.
+## I no longer host (new) projects on Github, preferring self-hosted solutions and to avoid Github Copilot doing unauthorized scans of project code. See https://gogs.blitter.com/RLabs/xs to learn more about this project.
 ---
 
 
